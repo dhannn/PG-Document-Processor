@@ -287,10 +287,220 @@ void test__remove_token()
     destroy_test_suite(testSuite);
 }
 
+void test__is_token_found_setup(void **ptr)
+{
+    TokenList *tl = initialize_tokenlist();
+
+    add_token(tl, "Hello");
+    add_token(tl, " ");
+    add_token(tl, "world");
+    add_token(tl, "!");
+    add_token(tl, "\n");
+
+    *ptr = tl;
+}
+
+void test__is_token_found_destroy(void **ptr)
+{
+    TokenList **tl = (TokenList**)ptr;
+    destroy_tokenList(*tl);
+}
+
+void test__is_token_found1(void *ptr)
+{
+    TokenList *tl = (TokenList*)ptr;
+    char *token = "CCPROG";
+
+    int expected = false;
+    int actual = is_token_found(tl, token);
+
+    assert_equal_int(expected, actual);
+}
+
+void test__is_token_found2(void *ptr)
+{
+    TokenList *tl = (TokenList*)ptr;
+    char *token = "Hello";
+
+    int expected = true;
+    int actual = is_token_found(tl, token);
+
+    assert_equal_int(expected, actual);
+}
+
+void test__is_token_found3(void *ptr)
+{
+    TokenList *tl = (TokenList*)ptr;
+    char *token = "\n";
+
+    int expected = true;
+    int actual = is_token_found(tl, token);
+
+    assert_equal_int(expected, actual);
+}
+
+void test__is_token_found4(void *ptr)
+{
+    TokenList *tl = (TokenList*)ptr;
+    char *token = "world";
+
+    int expected = true;
+    int actual = is_token_found(tl, token);
+
+    assert_equal_int(expected, actual);
+}
+
+void test__is_token_found()
+{
+    TestSuite *testSuite = create_test_suite(
+        "is_token_found()", 
+        test__is_token_found_setup,
+        test__is_token_found_destroy, 
+        4
+    );
+
+    add_test(testSuite, test__is_token_found1);
+    add_test(testSuite, test__is_token_found2);
+    add_test(testSuite, test__is_token_found3);
+    add_test(testSuite, test__is_token_found4);
+    run_tests(testSuite);
+    
+    destroy_test_suite(testSuite);
+}
+
+void test__increment_token_frequency_setup(void** ptr)
+{
+    TokenList *tk = initialize_tokenlist();
+
+    *ptr = tk;
+}
+
+void test__increment_token_frequency_destroy(void **ptr)
+{
+    TokenList **tk = (TokenList**)ptr;
+    destroy_tokenList(*tk);
+}
+
+void test__increment_token_frequency1(void *ptr)
+{
+    TokenList *tk = (TokenList*)ptr;
+    char *token = "hello";
+
+    add_token(tk, token);
+    increment_token_frequency(tk, token);
+
+    int expected = 1;
+    int actual = tk->tokens->frequency;
+
+    assert_equal_int(expected, actual);
+}
+
+void test__increment_token_frequency2(void *ptr)
+{
+    TokenList *tk = (TokenList*)ptr;
+    char *token = "hello";
+
+    add_token(tk, token);
+    tk->tokens->frequency = 1;
+    increment_token_frequency(tk, token);
+
+    int expected = 2;
+    int actual = tk->tokens->frequency;
+
+    assert_equal_int(expected, actual);
+}
+
+void test__increment_token_frequency3(void *ptr)
+{
+    TokenList *tk = (TokenList*)ptr;
+    char *token = "hello";
+
+    add_token(tk, token);
+    tk->tokens->frequency = 7;
+    increment_token_frequency(tk, token);
+
+    int expected = 8;
+    int actual = tk->tokens->frequency;
+
+    assert_equal_int(expected, actual);
+}
+
+void test__increment_token_frequency4(void *ptr)
+{
+    TokenList *tk = (TokenList*)ptr;
+    char *token[] = {"hello", "world", "!"};
+    int tokenFreq[] = {0, 2, 11};
+
+    TokenNode *curr;
+    for(int i = 0; i < 3; i++) {
+        add_token(tk, token[i]);
+
+        if(tk->tokens->next == NULL)
+            curr = tk->tokens;
+        else
+            curr = curr->next;
+        
+        curr->frequency = tokenFreq[i];        
+
+    }
+    
+    increment_token_frequency(tk, token[1]);
+
+    int expected = 3;
+    int actual = tk->tokens->next->frequency;
+
+    assert_equal_int(expected, actual);
+}
+
+void test__increment_token_frequency5(void *ptr)
+{
+    TokenList *tk = (TokenList*)ptr;
+    char *token[] = {"hello", "world", "!"};
+    int tokenFreq[] = {0, 2, 11};
+
+    TokenNode *curr;
+    for(int i = 0; i < 3; i++) {
+        add_token(tk, token[i]);
+
+        if(tk->tokens->next == NULL)
+            curr = tk->tokens;
+        else
+            curr = curr->next;
+        
+        curr->frequency = tokenFreq[i];        
+
+    }
+    
+    increment_token_frequency(tk, token[2]);
+
+    int expected = 12;
+    int actual = tk->tokens->next->next->frequency;
+
+    assert_equal_int(expected, actual);
+}
+
+void test__increment_token_frequency()
+{
+    TestSuite *ts = create_test_suite(
+        "increment_token_frequency()",
+        test__increment_token_frequency_setup,
+        test__increment_token_frequency_destroy,
+        4
+    );
+
+    add_test(ts, test__increment_token_frequency1);
+    add_test(ts, test__increment_token_frequency2);
+    add_test(ts, test__increment_token_frequency3);
+    add_test(ts, test__increment_token_frequency4);
+    run_tests(ts);
+    destroy_test_suite(ts);
+}
 
 int main()
 {
-    test__add_token();
-    test__remove_token();
+    // test__add_token();
+    // test__remove_token();
+    // test__is_token_found();
+    test__increment_token_frequency();
     return 0;
 }

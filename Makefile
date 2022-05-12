@@ -23,12 +23,12 @@ TEST_FRAMEWORK=$(TEST_DIR)/ceemply/ceemply.c
 OBJ_DIR=obj
 OBJS=$(patsubst $(INCLUDE_DIR)/%.c,$(OBJ_DIR)/%.o,$(INCLUDES))
 
-MAIN_SRC=$(SRC_DIR)/main.c
+MAIN_SRC=$(wildcard $(SRC_DIR)/*.c)
 
 all: $(BIN)
 
 $(BIN): $(OBJS)
-	$(CC) $(CFLAGS) $(MAIN_SRC) $? -o $(BIN)
+	$(CC) $(CFLAGS) $(MAIN_SRC) $? -o $(BIN) -lm
 
 $(OBJ_DIR)/%.o: $(INCLUDE_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -62,8 +62,8 @@ endif
 
 test: $(TEST_BINS)
 
-test_%: $(OBJ_DIR)/%.o
-	$(CC) $(CFLAGS) $(TEST_DIR)/$@.c $< $(TEST_FRAMEWORK) -o $(TEST_BIN_DIR)/$@
+test_%: $(OBJS)
+	$(CC) $(CFLAGS) $(TEST_DIR)/$@.c $^ $(TEST_FRAMEWORK) -o $(TEST_BIN_DIR)/$@
 
 submit:
 	minizip -o $(SUBMISSION) $(BIN) $(INCLUDES) $(HEADERS) $(OBJS) $(MAIN_SRC) $(INCLUDED_MISC_FILES)

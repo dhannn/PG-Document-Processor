@@ -1,14 +1,17 @@
 #include "../pgdocs.h"
 #include "internals.h"
-
+#include <stdbool.h>
+#include <string.h>
+#include <ctype.h>
 #include <stdlib.h>
 
 /* -------------------------------------------------------------------------- */
 /*                         PRIVATE FUNCTION PROTOTYPES                        */
 /* -------------------------------------------------------------------------- */
 /* ------------------ functions only visible to tokenizer.c ----------------- */
+TokenType _get_token_type(char token);
 void _destroy_tokens(TokenNode *head);
-void _recurse_add_token(TokenNode **head, char *token);
+void _recurse_add_token(TokenNode **head, char *token, TokenType type);
 void _recurse_remove_token(TokenNode **head, char *token);
 
 
@@ -28,8 +31,36 @@ TokenList *initialize_tokenlist()
 
 void add_token(TokenList *tokenList, char *token)
 {
-    _recurse_add_token(&tokenList->tokens, token);
+    TokenType type = _get_token_type(*token);
+    
+    _recurse_add_token(&tokenList->tokens, token, type);
     tokenList->size++;
+}
+
+bool is_token_found(TokenList *tokenList, char *token)
+{
+    bool isFound = false;
+    TokenNode *tokenNode = tokenList->tokens;
+
+    while(tokenNode != NULL && !isFound) {
+        if(strcmp(tokenNode->token, token) == 0)
+            isFound = true;
+        tokenNode = tokenNode->next;
+    }
+
+    return isFound;
+}
+
+void increment_token_frequency(TokenList *tokenList, char *token)
+{
+    TokenNode *tokenNode = tokenList->tokens;
+
+    while(tokenNode != NULL) {
+        if(strcmp(tokenNode->token, token) == 0)
+            tokenNode->frequency++;
+        
+        tokenNode = tokenNode->next;
+    }
 }
 
 void remove_token(TokenList *tokenList, char *token)
@@ -44,18 +75,45 @@ void destroy_tokenList(TokenList *tokenList)
     free(tokenList);
 }
 
+void print_tokens(TokenList *tokenList)
+{
+    TokenNode *tokenNode = tokenList->tokens;
+
+    while(tokenNode != NULL) {
+        printf("%s (%d)\n", tokenNode->token, tokenNode->frequency);
+        tokenNode = tokenNode->next;
+    }
+}
+
 /* -------------------------------------------------------------------------- */
 /*                              PRIVATE FUNCTIONS                             */
 /* -------------------------------------------------------------------------- */
 /* ------------------ functions only visible to tokenizer.c ----------------- */
-void _recurse_add_token(TokenNode **head, char *token)
+
+TokenType _get_token_type(char token)
+{
+    if(isalpha(token) != 0)
+        return ALPHA;
+
+    if(isalnum(token) != 0)
+        return NUMERIC;
+
+    if(isspace(token) != 0)
+        return WHITESPACE;
+    
+    return SPECIAL;
+}
+
+void _recurse_add_token(TokenNode **head, char *token, TokenType type)
 {
     if(*head == NULL) {
         *head = malloc(sizeof(TokenNode));
         (*head)->token = token;
+        (*head)->frequency = 1;
+        (*head)->tokenType = type;
         (*head)->next = NULL;
     } else {
-        _recurse_add_token(&(*head)->next, token);
+        _recurse_add_token(&(*head)->next, token, type);
     }
 }
 

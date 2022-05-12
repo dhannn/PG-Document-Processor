@@ -1,18 +1,18 @@
-#include "internals.h"
 #include "../pgdocs.h"
+#include "internals.h"
 
 #include <stdlib.h>
 #include <stdio.h>
-#define SIZE 10000
+#define SIZE 100
 
-unsigned long _get_hash_function(char *key);
+unsigned long _stub_get_hash();
 
 HashTable *create_hash_table()
 {
     HashTable *hashTable = malloc(sizeof(HashTable) * SIZE);
 
     for(int i = 0; i < SIZE; i++) {
-        hashTable->tokens = NULL;
+        hashTable[i].tokenList = initialize_tokenlist();
     }
 
     hashTable->size = 0;
@@ -20,26 +20,57 @@ HashTable *create_hash_table()
     return hashTable;
 }
 
-void add_element(HashTable *hashTable, char *item)
+bool contains(HashTable *hashTable, char *item)
 {
-    unsigned long index = _get_hash_function(item);
-    
-    TokenNode *tk = malloc(sizeof(TokenNode));
-    
-    add_token(tk, item);
+    unsigned long index = get_hash(item);
+    TokenList *tokens = hashTable[index].tokenList;
+
+    return is_token_found(tokens, item);
+}
+
+// Pre-condition: item is unique
+int add_element(HashTable *hashTable, char *item)
+{
+    unsigned long index = get_hash(item);
+    add_token(hashTable[index].tokenList, item);
+    return index;
 }
 
 void print_elements(HashTable *hashTable)
 {
-    return;
+    for(int i = 0; i < SIZE; i++) {
+        TokenNode *tn = hashTable[i].tokenList->tokens;
+
+        printf("[%d]: ", i);
+
+        while(tn != NULL) {
+            printf("%s:%d", tn->token, tn->frequency);
+
+            tn = tn->next;
+
+            if(tn != NULL)
+                printf(" -> ");
+        }
+
+        printf("\n");
+    }
 }
 
 void destroy_hash_table(HashTable *hashTable)
 {
+    for(int i = 0; i < SIZE; i++) {
+        if(hashTable[i].tokenList != NULL)
+            destroy_tokenList(hashTable[i].tokenList);
+    }
     free(hashTable);
 }
 
-unsigned long _get_hash_function(char *key)
+unsigned long _stub_get_hash()
+{
+    return 1;
+}
+
+unsigned long get_hash(char *key)
 {
     unsigned long hash = 5381;
     int c = *key;
