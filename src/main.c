@@ -8,7 +8,7 @@ int main()
     Summary summary;
     Config config;
     config.numChar = 0;
-    summary.inFile = fopen("sample_files/cleaned_files/a.txt", "r");
+    summary.inFile = fopen("sample_files/cleaned_files/c.txt", "r");
     summary.metadata.metadataItems[0].name = "Title";
     summary.metadata.metadataItems[1].name = "Author";
     summary.metadata.metadataItems[2].name = "Release Date";

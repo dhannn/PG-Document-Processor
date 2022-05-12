@@ -31,12 +31,13 @@ int _get_metadata_index(MetadataItem metadataItems[], char *str)
 {
     int i;
     int flag = -1;
-
+    
     for(i = 0; i < MAX_METADATA_ITEMS && flag == -1; i++) {
+        printf("metadata_item: %s\n", metadataItems[i].name);
         if(strcmp(metadataItems[i].name, str) == 0)
             flag = i;
     }
-
+    
     return flag;
 }
 
@@ -50,8 +51,22 @@ void read_clean_file(Summary *summary, Config config, char *filename)
     
     char buff[buffSize];
 
-    // Read metadata
-    int flag;
+    // read metadata
+    int flag = -1;
+    
+    // sets the position to metadata information
+    // TODO: seek metadata
+    while(flag == -1) {
+        fscanf(infile, "%s", buff);
+
+        buff[strlen(buff) - 1] = '\0';
+
+        flag = _get_metadata_index(summary->metadata.metadataItems, buff);
+    }
+
+    fseek(infile, -(strlen(buff)) - 1, SEEK_CUR);
+
+    // TODO: extract read metadata method
     do {
         flag = fscanf(infile," %[^:]: s", buff);
 
@@ -61,11 +76,12 @@ void read_clean_file(Summary *summary, Config config, char *filename)
         if(index > -1) {
             flag = fscanf(infile,"%[^\n]s", buff);
             _set_metadata(summary, index, buff);
+            printf("Index: %d; Metadata: %s\n", index, buff);
         }
-
     } while(strcmp(buff, CONTENT_START_SIGNIFIER) && flag != EOF);
     
     
+    // TODO: extract read content method
     // Read content
     int runningTotal = 0;
     char *strTemp = calloc(1, sizeof(char));
@@ -234,6 +250,7 @@ void _close_files(Summary *summary)
     fclose(summary->outFile);
 }
 
+// TODO: deallocate metadata
 void _set_metadata(Summary *summary, int metadataIndex, char *data)
 {
     char *temp = malloc(strlen(data) + 1);

@@ -26,27 +26,34 @@ typedef struct {
 } Metadata;
 
 typedef struct {
-    FILE *inFile;
-    FILE *outFile;
-    Metadata metadata;
-    unsigned int options;
-    char *inData;
-    TokenList *tokenList;
-    char *outData;
+    int i;                      // placeholder for int variable
+    char *s;                    // placeholder for string variable
+} AdditionalOptions;
+
+typedef struct {
+    FILE *inFile;               // file pointer to input 
+    FILE *outFile;              // file pointer to output
+    Metadata metadata;          // info about the document
+    unsigned int options;       // chosen option for cleaning or analysis
+    char *inData;               // string of data to be processed
+    char *outData;              // string of data to be reported
+    TokenList *tokenList;       // tokenized version of the input
+    AdditionalOptions addOpts;  // 
 } Summary;
 
 typedef struct {
-    bool isInitialized;
-    char *inputPath;
-    char *outputPath;
-    char *corpusPath;
-    int numChar;
-    bool multiSelect;
+    bool isInitialized;         // whether config is initialized or not
+    char *rawDocumentPath;      // path of 
+    char *cleanedDocumentPath;  // path of cleaned documents
+    char *analysisOutputPath;   // path of output files (i.e., word count,...)
+    int numChar;                // number of character to be read from content
+    bool multiSelect;           // allow to choose more than one option
 } Config;
 
 typedef struct {
     char *name;
     void (*do_analysis)(Summary*, Config);
+    void (*report_analysis)(Summary*, Config);
 } AnalyzerOption;
 
 #define MAX_ANALYZER_OPTIONS 3
