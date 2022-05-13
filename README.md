@@ -12,7 +12,7 @@ This project is programmed by Daniel Ramos and Gwen Roco in partial fulfillment 
 1. C compiler
     * By default, make is configured with GCC.
     * If Clang is used, simply change the $(CC) variable.
-3. Make
+2. Make
 
 # Setup
 

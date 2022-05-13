@@ -13,11 +13,11 @@ typedef struct tk{
     char *token;
     int frequency;
     TokenType tokenType;
-    struct tk *next;
+    struct tk *next;        // pointer for the next node
 } TokenNode;
 
 struct _tokenList {
-    TokenNode *tokens;
+    TokenNode *head;
     int size;
 };
 
@@ -27,8 +27,14 @@ typedef struct _hashTable {
 } HashTable;
 
 TokenList *initialize_tokenlist();
-void remove_token(TokenList *tl, char *token);
+
+/**
+ * 
+ * 
+ * 
+ */
 void add_token(TokenList *tl, char *token);
+void remove_token(TokenList *tl, char *token);
 void increment_token_frequency(TokenList *tokenList, char *token);
 bool is_token_found(TokenList *tokenList, char *token);
 void destroy_tokenList(TokenList *tl);
@@ -41,7 +47,7 @@ void print_elements(HashTable *hashTable);
 int add_element(HashTable *hashTable, char *item);
 unsigned long get_hash(char *key);
 
-TokenList *tokenize(char *input, bool includeSpace);
+TokenList *tokenize_string(char *input, bool includeSpace);
 void swap(TokenNode *a, TokenNode *b);
 void sort_tokens(TokenList *tl);
 

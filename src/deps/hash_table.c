@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#define SIZE 100
+#define SIZE 500
 
 unsigned long _stub_get_hash();
 
@@ -39,7 +39,7 @@ int add_element(HashTable *hashTable, char *item)
 void print_elements(HashTable *hashTable)
 {
     for(int i = 0; i < SIZE; i++) {
-        TokenNode *tn = hashTable[i].tokenList->tokens;
+        TokenNode *tn = hashTable[i].tokenList->head;
 
         printf("[%d]: ", i);
 
@@ -72,11 +72,13 @@ unsigned long _stub_get_hash()
 
 unsigned long get_hash(char *key)
 {
+    // https://theartincode.stanis.me/008-djb2/
+
     unsigned long hash = 5381;
     int c = *key;
 
     while(c != '\0') {
-        hash = ((hash << 5) + hash) + c;
+        hash = ((hash << 5) + hash) + c; // hash =  hash * 33 + c
         c = *key++;
     }
 

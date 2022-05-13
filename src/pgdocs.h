@@ -11,6 +11,11 @@ typedef struct {
     char *data;
 } MetadataItem;
 
+typedef enum {
+    CLEAN, 
+    ANALYZE
+} Mode;
+
 // const char **METADATA_ITEM_NAMES = {
 //     "Title",
 //     "Author", 
@@ -31,14 +36,15 @@ typedef struct {
 } AdditionalOptions;
 
 typedef struct {
+    Mode mode;                  // processing mode (i.e. clean or analyze)
     FILE *inFile;               // file pointer to input 
     FILE *outFile;              // file pointer to output
     Metadata metadata;          // info about the document
     unsigned int options;       // chosen option for cleaning or analysis
     char *inData;               // string of data to be processed
-    char *outData;              // string of data to be reported
     TokenList *tokenList;       // tokenized version of the input
-    AdditionalOptions addOpts;  // 
+    char *outData;              // string of data to be reported
+    AdditionalOptions addOpts;  // additional options
 } Summary;
 
 typedef struct {
@@ -51,10 +57,16 @@ typedef struct {
 } Config;
 
 typedef struct {
-    char *name;
-    void (*do_analysis)(Summary*, Config);
-    void (*report_analysis)(Summary*, Config);
+    char *name;                                 // name of analysis option
+    void (*do_analysis)(Summary*, Config);      // function pointer to analysis
+    void (*report_analysis)(Summary*, Config);  // function pointer to report
 } AnalyzerOption;
+
+typedef struct {
+    char *name;                                 // name of cleaning option
+    void (*clean)(Summary*, Config);            // function pointer to cleaning
+    void (*report_cleaned)(Summary*, Config);   // function pointer to report
+} CleanerOption;
 
 #define MAX_ANALYZER_OPTIONS 3
 
@@ -63,5 +75,8 @@ void read_clean_file(Summary *summary, Config config, char *filename);
 TokenList *convert_to_ngrams(TokenList *tl, int n);
 void delete_tokens(TokenList *tokenList);
 void get_word_count(Summary *summary, Config config);
+void report_word_count(Summary *summary, Config config);
 void get_ngram_count(Summary *summary, Config config);
+void report_ngram_count(Summary *summary, Config config);
 void get_concordance(Summary *summary, Config config);
+void report_concordance(Summary *summary, Config config);

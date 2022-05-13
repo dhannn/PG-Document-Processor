@@ -23,8 +23,8 @@ void test__add_token1(void *ptr)
 
     add_token(tl, token);
 
-    assert_equal_string(token, tl->tokens->token);
-    assert_equal_null_ptr(tl->tokens->next);
+    assert_equal_string(token, tl->head->token);
+    assert_equal_null_ptr(tl->head->next);
 }
 
 void test__add_token2(void *ptr)
@@ -40,10 +40,10 @@ void test__add_token2(void *ptr)
 
     add_token(tl, token);
 
-    TokenNode *current = tl->tokens;
+    TokenNode *current = tl->head;
     for(int i = 0; i < sizeOfOriginal; i++) {
         assert_equal_string(sample[i], current->token);
-        current = tl->tokens->next;
+        current = tl->head->next;
     }
 
     assert_equal_string(token, current->token);
@@ -63,7 +63,7 @@ void test__add_token3(void *ptr)
 
     add_token(tl, token);
 
-    TokenNode *current = tl->tokens;
+    TokenNode *current = tl->head;
     for(int i = 0; i < sizeOfOriginal; i++) {
         assert_equal_string(sample[i], current->token);
         current = current->next;
@@ -80,8 +80,8 @@ void test__add_token4(void *ptr)
 
     add_token(tl, token);
 
-    assert_equal_string(token, tl->tokens->token);
-    assert_equal_null_ptr(tl->tokens->next);
+    assert_equal_string(token, tl->head->token);
+    assert_equal_null_ptr(tl->head->next);
 }
 
 void test__add_token5(void *ptr)
@@ -97,7 +97,7 @@ void test__add_token5(void *ptr)
 
     add_token(tl, token);
 
-    TokenNode *current = tl->tokens;
+    TokenNode *current = tl->head;
     for(int i = 0; i < sizeOfOriginal; i++) {
         assert_equal_string(sample[i], current->token);
         current = current->next;
@@ -120,7 +120,7 @@ void test__add_token6(void *ptr)
 
     add_token(tl, token);
 
-    TokenNode *current = tl->tokens;
+    TokenNode *current = tl->head;
     for(int i = 0; i < sizeOfOriginal; i++) {
         assert_equal_string(sample[i], current->token);
         current = current->next;
@@ -179,7 +179,7 @@ void test__remove_token1(void *ptr)
 
     remove_token(tl, removedToken);
 
-    TokenNode *current = tl->tokens;
+    TokenNode *current = tl->head;
     for(int i = 0; i < size - 1; i++) {
         assert_equal_string(expected[i], current->token);
         current = current->next;
@@ -202,7 +202,7 @@ void test__remove_token2(void *ptr)
 
     remove_token(tl, removedToken);
 
-    TokenNode *current = tl->tokens;
+    TokenNode *current = tl->head;
     for(int i = 0; i < size - 1; i++) {
         assert_equal_string(expected[i], current->token);
         current = current->next;
@@ -226,7 +226,7 @@ void test__remove_token3(void *ptr)
 
     remove_token(tl, removedToken);
 
-    TokenNode *current = tl->tokens;
+    TokenNode *current = tl->head;
     for(int i = 0; i < size - 1; i++) {
         assert_equal_string(expected[i], current->token);
         current = current->next;
@@ -242,7 +242,7 @@ void test__remove_token4(void *ptr)
 
     remove_token(tl, removedToken);
 
-    assert_equal_null_ptr(tl->tokens);
+    assert_equal_null_ptr(tl->head);
 }
 
 void test__remove_token5(void *ptr)
@@ -259,7 +259,7 @@ void test__remove_token5(void *ptr)
 
     remove_token(tl, removedToken);
 
-    TokenNode *current = tl->tokens;
+    TokenNode *current = tl->head;
     for(int i = 0; i < size; i++) {
         assert_equal_string(expected[i], current->token);
         current = current->next;
@@ -390,7 +390,7 @@ void test__increment_token_frequency1(void *ptr)
     increment_token_frequency(tk, token);
 
     int expected = 1;
-    int actual = tk->tokens->frequency;
+    int actual = tk->head->frequency;
 
     assert_equal_int(expected, actual);
 }
@@ -401,11 +401,11 @@ void test__increment_token_frequency2(void *ptr)
     char *token = "hello";
 
     add_token(tk, token);
-    tk->tokens->frequency = 1;
+    tk->head->frequency = 1;
     increment_token_frequency(tk, token);
 
     int expected = 2;
-    int actual = tk->tokens->frequency;
+    int actual = tk->head->frequency;
 
     assert_equal_int(expected, actual);
 }
@@ -416,11 +416,11 @@ void test__increment_token_frequency3(void *ptr)
     char *token = "hello";
 
     add_token(tk, token);
-    tk->tokens->frequency = 7;
+    tk->head->frequency = 7;
     increment_token_frequency(tk, token);
 
     int expected = 8;
-    int actual = tk->tokens->frequency;
+    int actual = tk->head->frequency;
 
     assert_equal_int(expected, actual);
 }
@@ -435,8 +435,8 @@ void test__increment_token_frequency4(void *ptr)
     for(int i = 0; i < 3; i++) {
         add_token(tk, token[i]);
 
-        if(tk->tokens->next == NULL)
-            curr = tk->tokens;
+        if(tk->head->next == NULL)
+            curr = tk->head;
         else
             curr = curr->next;
         
@@ -447,7 +447,7 @@ void test__increment_token_frequency4(void *ptr)
     increment_token_frequency(tk, token[1]);
 
     int expected = 3;
-    int actual = tk->tokens->next->frequency;
+    int actual = tk->head->next->frequency;
 
     assert_equal_int(expected, actual);
 }
@@ -462,8 +462,8 @@ void test__increment_token_frequency5(void *ptr)
     for(int i = 0; i < 3; i++) {
         add_token(tk, token[i]);
 
-        if(tk->tokens->next == NULL)
-            curr = tk->tokens;
+        if(tk->head->next == NULL)
+            curr = tk->head;
         else
             curr = curr->next;
         
@@ -474,7 +474,7 @@ void test__increment_token_frequency5(void *ptr)
     increment_token_frequency(tk, token[2]);
 
     int expected = 12;
-    int actual = tk->tokens->next->next->frequency;
+    int actual = tk->head->next->next->frequency;
 
     assert_equal_int(expected, actual);
 }

@@ -23,7 +23,7 @@ TokenList *initialize_tokenlist()
 {
     TokenList *tokenList = malloc(sizeof(TokenList));
 
-    tokenList->tokens = NULL;
+    tokenList->head = NULL;
     tokenList->size = 0;
 
     return tokenList;
@@ -33,14 +33,14 @@ void add_token(TokenList *tokenList, char *token)
 {
     TokenType type = _get_token_type(*token);
     
-    _recurse_add_token(&tokenList->tokens, token, type);
+    _recurse_add_token(&tokenList->head, token, type);
     tokenList->size++;
 }
 
 bool is_token_found(TokenList *tokenList, char *token)
 {
     bool isFound = false;
-    TokenNode *tokenNode = tokenList->tokens;
+    TokenNode *tokenNode = tokenList->head;
 
     while(tokenNode != NULL && !isFound) {
         if(strcmp(tokenNode->token, token) == 0)
@@ -53,7 +53,7 @@ bool is_token_found(TokenList *tokenList, char *token)
 
 void increment_token_frequency(TokenList *tokenList, char *token)
 {
-    TokenNode *tokenNode = tokenList->tokens;
+    TokenNode *tokenNode = tokenList->head;
 
     while(tokenNode != NULL) {
         if(strcmp(tokenNode->token, token) == 0)
@@ -65,19 +65,19 @@ void increment_token_frequency(TokenList *tokenList, char *token)
 
 void remove_token(TokenList *tokenList, char *token)
 {
-    _recurse_remove_token(&tokenList->tokens, token);
+    _recurse_remove_token(&tokenList->head, token);
 }
 
 void destroy_tokenList(TokenList *tokenList)
 {
-    if(tokenList->tokens != NULL)
-        _destroy_tokens(tokenList->tokens);
+    if(tokenList->head != NULL)
+        _destroy_tokens(tokenList->head);
     free(tokenList);
 }
 
 void print_tokens(TokenList *tokenList)
 {
-    TokenNode *tokenNode = tokenList->tokens;
+    TokenNode *tokenNode = tokenList->head;
 
     while(tokenNode != NULL) {
         printf("%s (%d)\n", tokenNode->token, tokenNode->frequency);

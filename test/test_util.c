@@ -17,9 +17,9 @@ void test__tokenize1(void *ptr)
 {
     char *input = "Hello";
     char *expected[] = {"Hello"};
-    TokenList *tl = tokenize(input);
+    TokenList *tl = tokenize_string(input);
 
-    TokenNode *tokenNode = tl->tokens;
+    TokenNode *tokenNode = tl->head;
     
     int i = 0;
     while(tokenNode != NULL) {
@@ -36,9 +36,9 @@ void test__tokenize2(void *ptr)
 {
     char *input = ",";
     char *expected[] = {","};
-    TokenList *tl = tokenize(input);
+    TokenList *tl = tokenize_string(input);
 
-    TokenNode *tokenNode = tl->tokens;
+    TokenNode *tokenNode = tl->head;
     
     int i = 0;
     while(tokenNode != NULL) {
@@ -55,9 +55,9 @@ void test__tokenize3(void *ptr)
 {
     char *input = "Hel1o";
     char *expected[] = {"Hel", "1", "o"};
-    TokenList *tl = tokenize(input);
+    TokenList *tl = tokenize_string(input);
 
-    TokenNode *tokenNode = tl->tokens;
+    TokenNode *tokenNode = tl->head;
     
     int i = 0;
     while(tokenNode != NULL) {
@@ -74,9 +74,9 @@ void test__tokenize4(void *ptr)
 {
     char *input = "Hello world";
     char *expected[] = {"Hello", " ", "world"};
-    TokenList *tl = tokenize(input);
+    TokenList *tl = tokenize_string(input);
 
-    TokenNode *tokenNode = tl->tokens;
+    TokenNode *tokenNode = tl->head;
     
     int i = 0;
     while(tokenNode != NULL) {
@@ -93,9 +93,9 @@ void test__tokenize5(void *ptr)
 {
     char *input = "Hello!";
     char *expected[] = {"Hello", "!"};
-    TokenList *tl = tokenize(input);
+    TokenList *tl = tokenize_string(input);
 
-    TokenNode *tokenNode = tl->tokens;
+    TokenNode *tokenNode = tl->head;
     
     int i = 0;
     while(tokenNode != NULL) {
@@ -112,9 +112,9 @@ void test__tokenize6(void *ptr)
 {
     char *input = "Hel1o, world!\t";
     char *expected[] = {"Hel", "1", "o", ",", " ", "world", "!", "\t"};
-    TokenList *tl = tokenize(input);
+    TokenList *tl = tokenize_string(input);
 
-    TokenNode *tokenNode = tl->tokens;
+    TokenNode *tokenNode = tl->head;
     
     int i = 0;
     while(tokenNode != NULL) {
@@ -163,47 +163,47 @@ void test__swap1(void *ptr)
 {
     TokenList *tokenList = (TokenList*)ptr;
     add_token(tokenList, "Hello");
-    tokenList->tokens->frequency = 2;
+    tokenList->head->frequency = 2;
     add_token(tokenList, " ");
     add_token(tokenList, "world");
-    tokenList->tokens->next->next->frequency = 10;
+    tokenList->head->next->next->frequency = 10;
 
-    swap(tokenList->tokens, tokenList->tokens->next->next);
+    swap(tokenList->head, tokenList->head->next->next);
 
-    assert_equal_string("world", tokenList->tokens->token);
-    assert_equal_string("Hello", tokenList->tokens->next->next->token);
-    assert_equal_int(10, tokenList->tokens->frequency);
-    assert_equal_int(2, tokenList->tokens->next->next->frequency);
+    assert_equal_string("world", tokenList->head->token);
+    assert_equal_string("Hello", tokenList->head->next->next->token);
+    assert_equal_int(10, tokenList->head->frequency);
+    assert_equal_int(2, tokenList->head->next->next->frequency);
 }
 
 void test__swap2(void *ptr)
 {
     TokenList *tokenList = (TokenList*)ptr;
     add_token(tokenList, "Hello");
-    tokenList->tokens->frequency = 2;
+    tokenList->head->frequency = 2;
     add_token(tokenList, " ");
     add_token(tokenList, "world");
-    tokenList->tokens->next->next->frequency = 10;
+    tokenList->head->next->next->frequency = 10;
 
-    swap(NULL, tokenList->tokens->next->next);
+    swap(NULL, tokenList->head->next->next);
 
-    assert_equal_string("world", tokenList->tokens->next->next->token);
-    assert_equal_int(10, tokenList->tokens->next->next->frequency);
+    assert_equal_string("world", tokenList->head->next->next->token);
+    assert_equal_int(10, tokenList->head->next->next->frequency);
 }
 
 void test__swap3(void *ptr)
 {
     TokenList *tokenList = (TokenList*)ptr;
     add_token(tokenList, "Hello");
-    tokenList->tokens->frequency = 2;
+    tokenList->head->frequency = 2;
     add_token(tokenList, " ");
     add_token(tokenList, "world");
-    tokenList->tokens->next->next->frequency = 10;
+    tokenList->head->next->next->frequency = 10;
 
-    swap(tokenList->tokens->next->next, NULL);
+    swap(tokenList->head->next->next, NULL);
 
-    assert_equal_string("world", tokenList->tokens->next->next->token);
-    assert_equal_int(10, tokenList->tokens->next->next->frequency);
+    assert_equal_string("world", tokenList->head->next->next->token);
+    assert_equal_int(10, tokenList->head->next->next->frequency);
 }
 
 void test__swap()

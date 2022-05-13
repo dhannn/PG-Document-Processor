@@ -33,7 +33,6 @@ int _get_metadata_index(MetadataItem metadataItems[], char *str)
     int flag = -1;
     
     for(i = 0; i < MAX_METADATA_ITEMS && flag == -1; i++) {
-        printf("metadata_item: %s\n", metadataItems[i].name);
         if(strcmp(metadataItems[i].name, str) == 0)
             flag = i;
     }
@@ -76,7 +75,6 @@ void read_clean_file(Summary *summary, Config config, char *filename)
         if(index > -1) {
             flag = fscanf(infile,"%[^\n]s", buff);
             _set_metadata(summary, index, buff);
-            printf("Index: %d; Metadata: %s\n", index, buff);
         }
     } while(strcmp(buff, CONTENT_START_SIGNIFIER) && flag != EOF);
     
@@ -96,7 +94,7 @@ void read_clean_file(Summary *summary, Config config, char *filename)
     }
     
     summary->inData = strTemp;
-    summary->tokenList = tokenize(summary->inData, false);
+    summary->tokenList = tokenize_string(summary->inData, false);
 }
 
 void analyze_data(Summary *summary, Config config)
@@ -108,6 +106,7 @@ void analyze_data(Summary *summary, Config config)
 
         if((current & options) != 0) {
             ANALYZER_OPTIONS[i].do_analysis(summary, config);
+            ANALYZER_OPTIONS[i].report_analysis(summary, config);
         }
     }
 }
@@ -117,7 +116,7 @@ TokenList *remove_duplicate_tokens(TokenList *tl)
     HashTable *ht = create_hash_table();
     
     TokenList *cleanedTl = initialize_tokenlist();
-    TokenNode *currentNode = tl->tokens;
+    TokenNode *currentNode = tl->head;
 
     while(currentNode != NULL) {
         char *currentTokenStr = currentNode->token;
@@ -148,7 +147,7 @@ TokenList *convert_to_ngrams(TokenList *tl, int n)
     }
 
     TokenList *ngrams = initialize_tokenlist();
-    TokenNode *curr = tl->tokens;
+    TokenNode *curr = tl->head;
     char buff[BUFSIZ];
 
     while(curr != NULL) {
@@ -181,10 +180,12 @@ void get_word_count(Summary *summary, Config config)
 {
     HashTable *ht = create_hash_table();
     
-    TokenList *uncleanedList = summary->tokenList;
+    // uncleaned list = with duplicates
+    TokenList *tokensWithDuplicates = summary->tokenList;
 
-    TokenList *cleanedList = remove_duplicate_tokens(uncleanedList);
-    TokenNode *currentNode = uncleanedList->tokens;
+    // cleaned list = without duplicates
+    TokenList *tokensWithoutDuplicates = remove_duplicate_tokens(tokensWithDuplicates);
+    TokenNode *currentNode = tokensWithDuplicates->head;
 
     while(currentNode != NULL) {
         char *currentTokenStr = currentNode->token;
@@ -192,14 +193,14 @@ void get_word_count(Summary *summary, Config config)
         if(!contains(ht, currentTokenStr)) {
             add_element(ht, currentTokenStr);
         } else {
-            increment_token_frequency(cleanedList, currentTokenStr);
+            increment_token_frequency(tokensWithoutDuplicates, currentTokenStr);
         }
 
         currentNode = currentNode->next;
-    }   
+    }
 
-    summary->tokenList = cleanedList;
-    destroy_tokenList(uncleanedList);
+    summary->tokenList = tokensWithoutDuplicates;
+    destroy_tokenList(tokensWithDuplicates);
 }
 
 void get_ngram_count(Summary *summary, Config config)
@@ -211,7 +212,7 @@ void get_ngram_count(Summary *summary, Config config)
 
     // print_tokens(summary->tokenList);
 
-    TokenNode *currentNode = rawTokens->tokens;
+    TokenNode *currentNode = rawTokens->head;
     while(currentNode != NULL) {
         char *currentTokenStr = currentNode->token;
 
