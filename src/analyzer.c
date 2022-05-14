@@ -106,7 +106,7 @@ void analyze_data(Summary *summary, Config config)
 
         if((current & options) != 0) {
             ANALYZER_OPTIONS[i].do_analysis(summary, config);
-            ANALYZER_OPTIONS[i].report_analysis(summary, config);
+            // ANALYZER_OPTIONS[i].report_analysis(summary, config);
         }
     }
 }
@@ -119,7 +119,7 @@ TokenList *remove_duplicate_tokens(TokenList *tl)
     TokenNode *currentNode = tl->head;
 
     while(currentNode != NULL) {
-        char *currentTokenStr = currentNode->token;
+        char *currentTokenStr = currentNode->tokenString;
 
         if(*currentTokenStr == ' ') {
             currentNode = currentNode->next;
@@ -151,13 +151,13 @@ TokenList *convert_to_ngrams(TokenList *tl, int n)
     char buff[BUFSIZ];
 
     while(curr != NULL) {
-        strcpy(buff, curr->token);
+        strcpy(buff, curr->tokenString);
         
         int i;
         TokenNode *window = curr->next;
         for(i = 1; i < n && window != NULL; i++) {
             strcat(buff, " ");
-            strcat(buff, window->token);
+            strcat(buff, window->tokenString);
             window = window->next;
         }
 
@@ -188,7 +188,7 @@ void get_word_count(Summary *summary, Config config)
     TokenNode *currentNode = tokensWithDuplicates->head;
 
     while(currentNode != NULL) {
-        char *currentTokenStr = currentNode->token;
+        char *currentTokenStr = currentNode->tokenString;
 
         if(!contains(ht, currentTokenStr)) {
             add_element(ht, currentTokenStr);
@@ -200,7 +200,21 @@ void get_word_count(Summary *summary, Config config)
     }
 
     summary->tokenList = tokensWithoutDuplicates;
+    
+    sort_tokens(summary->tokenList);
+
+    print_tokens(summary->tokenList);
+
+    // TODO: abstract away the deallocation of shit
+    delete_tokens(tokensWithDuplicates);
+    free(summary->inData);
+    for(int i = 0; i < MAX_METADATA_ITEMS; i++) {
+        free(summary->metadata.metadataItems[i].data);
+    }
+    destroy_hash_table(ht);
     destroy_tokenList(tokensWithDuplicates);
+    destroy_tokenList(summary->tokenList);
+    fclose(summary->inFile);
 }
 
 void get_ngram_count(Summary *summary, Config config)
@@ -214,7 +228,7 @@ void get_ngram_count(Summary *summary, Config config)
 
     TokenNode *currentNode = rawTokens->head;
     while(currentNode != NULL) {
-        char *currentTokenStr = currentNode->token;
+        char *currentTokenStr = currentNode->tokenString;
 
         if(!contains(ht, currentTokenStr)) {
             add_element(ht, currentTokenStr);
@@ -228,6 +242,7 @@ void get_ngram_count(Summary *summary, Config config)
     destroy_tokenList(summary->tokenList);
     summary->tokenList = ngrams;
     destroy_tokenList(rawTokens);
+
 }
 
 void get_concordance(Summary *summary, Config config)

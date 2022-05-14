@@ -49,7 +49,7 @@ typedef struct {
 
 typedef struct {
     bool isInitialized;         // whether config is initialized or not
-    char *rawDocumentPath;      // path of 
+    char *rawDocumentPath;      // path of raw PG documents
     char *cleanedDocumentPath;  // path of cleaned documents
     char *analysisOutputPath;   // path of output files (i.e., word count,...)
     int numChar;                // number of character to be read from content

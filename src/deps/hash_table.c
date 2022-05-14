@@ -44,7 +44,7 @@ void print_elements(HashTable *hashTable)
         printf("[%d]: ", i);
 
         while(tn != NULL) {
-            printf("%s:%d", tn->token, tn->frequency);
+            printf("%s:%d", tn->tokenString, tn->frequency);
 
             tn = tn->next;
 

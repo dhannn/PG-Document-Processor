@@ -19,11 +19,7 @@ int main()
     read_clean_file(&summary, config, "s");
 
     get_word_count(&summary, config);
-    sort_tokens(summary.tokenList);
 
-    print_tokens(summary.tokenList);
-    delete_tokens(summary.tokenList);
-    destroy_tokenList(summary.tokenList);
 
 
     return 0;

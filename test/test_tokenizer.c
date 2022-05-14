@@ -23,7 +23,7 @@ void test__add_token1(void *ptr)
 
     add_token(tl, token);
 
-    assert_equal_string(token, tl->head->token);
+    assert_equal_string(token, tl->head->tokenString);
     assert_equal_null_ptr(tl->head->next);
 }
 
@@ -42,11 +42,11 @@ void test__add_token2(void *ptr)
 
     TokenNode *current = tl->head;
     for(int i = 0; i < sizeOfOriginal; i++) {
-        assert_equal_string(sample[i], current->token);
+        assert_equal_string(sample[i], current->tokenString);
         current = tl->head->next;
     }
 
-    assert_equal_string(token, current->token);
+    assert_equal_string(token, current->tokenString);
     assert_equal_null_ptr(current->next);
 }
 
@@ -65,11 +65,11 @@ void test__add_token3(void *ptr)
 
     TokenNode *current = tl->head;
     for(int i = 0; i < sizeOfOriginal; i++) {
-        assert_equal_string(sample[i], current->token);
+        assert_equal_string(sample[i], current->tokenString);
         current = current->next;
     }
 
-    assert_equal_string(token, current->token);
+    assert_equal_string(token, current->tokenString);
     assert_equal_null_ptr(current->next);
 }
 
@@ -80,7 +80,7 @@ void test__add_token4(void *ptr)
 
     add_token(tl, token);
 
-    assert_equal_string(token, tl->head->token);
+    assert_equal_string(token, tl->head->tokenString);
     assert_equal_null_ptr(tl->head->next);
 }
 
@@ -99,11 +99,11 @@ void test__add_token5(void *ptr)
 
     TokenNode *current = tl->head;
     for(int i = 0; i < sizeOfOriginal; i++) {
-        assert_equal_string(sample[i], current->token);
+        assert_equal_string(sample[i], current->tokenString);
         current = current->next;
     }
 
-    assert_equal_string(token, current->token);
+    assert_equal_string(token, current->tokenString);
     assert_equal_null_ptr(current->next);
 }
 
@@ -122,11 +122,11 @@ void test__add_token6(void *ptr)
 
     TokenNode *current = tl->head;
     for(int i = 0; i < sizeOfOriginal; i++) {
-        assert_equal_string(sample[i], current->token);
+        assert_equal_string(sample[i], current->tokenString);
         current = current->next;
     }
 
-    assert_equal_string(token, current->token);
+    assert_equal_string(token, current->tokenString);
     assert_equal_null_ptr(current->next);
 }
 
@@ -181,7 +181,7 @@ void test__remove_token1(void *ptr)
 
     TokenNode *current = tl->head;
     for(int i = 0; i < size - 1; i++) {
-        assert_equal_string(expected[i], current->token);
+        assert_equal_string(expected[i], current->tokenString);
         current = current->next;
     }
 
@@ -204,7 +204,7 @@ void test__remove_token2(void *ptr)
 
     TokenNode *current = tl->head;
     for(int i = 0; i < size - 1; i++) {
-        assert_equal_string(expected[i], current->token);
+        assert_equal_string(expected[i], current->tokenString);
         current = current->next;
     }
 
@@ -228,7 +228,7 @@ void test__remove_token3(void *ptr)
 
     TokenNode *current = tl->head;
     for(int i = 0; i < size - 1; i++) {
-        assert_equal_string(expected[i], current->token);
+        assert_equal_string(expected[i], current->tokenString);
         current = current->next;
     }
 
@@ -261,7 +261,7 @@ void test__remove_token5(void *ptr)
 
     TokenNode *current = tl->head;
     for(int i = 0; i < size; i++) {
-        assert_equal_string(expected[i], current->token);
+        assert_equal_string(expected[i], current->tokenString);
         current = current->next;
     }
 
@@ -496,11 +496,73 @@ void test__increment_token_frequency()
     destroy_test_suite(ts);
 }
 
+void test__next_token_setup(void **ptr)
+{
+    TokenList *tl = initialize_tokenlist();
+    add_token(tl, "hi");
+    add_token(tl, "hello");
+    add_token(tl, "world");
+
+    *ptr = tl;
+}
+
+void test__next_token_destroy(void **ptr)
+{
+    TokenList **tl = (TokenList**)ptr;
+
+    destroy_tokenList(*tl);
+}
+
+void test__next_token1(void *ptr)
+{
+    TokenList *tl = (TokenList*)ptr;
+    TokenNode *tokenNode = next_token(tl);
+
+    assert_equal_string(tokenNode->tokenString, "hi");
+}
+
+void test__next_token2(void *ptr)
+{
+    TokenList *tl = (TokenList*)ptr;
+    next_token(tl);
+    TokenNode *tokenNode = next_token(tl);
+
+    assert_equal_string(tokenNode->tokenString, "hello");
+}
+
+void test__next_token3(void *ptr)
+{
+    TokenList *tl = (TokenList*)ptr;
+    next_token(tl);
+    next_token(tl);
+    next_token(tl);
+    TokenNode *tokenNode = next_token(tl);
+
+    assert_equal_null_ptr(tokenNode);
+}
+
+void test__next_token()
+{
+    TestSuite *ts = create_test_suite(
+        "next_token()", 
+        test__next_token_setup,
+        test__next_token_destroy, 
+        3
+    );
+
+    add_test(ts, test__next_token1);
+    add_test(ts, test__next_token2);
+    add_test(ts, test__next_token3);
+    run_tests(ts);
+    destroy_test_suite(ts);
+}
+
 int main()
 {
     // test__add_token();
     // test__remove_token();
     // test__is_token_found();
-    test__increment_token_frequency();
+    // test__increment_token_frequency();
+    test__next_token();
     return 0;
 }

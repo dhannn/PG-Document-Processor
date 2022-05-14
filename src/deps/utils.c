@@ -8,7 +8,7 @@
 #define METADATA (!NOT_METADATA)
 
 #define CLEAN_CONTENT_START_SIGNIFIER "*** Start"
-#define ANALYZE_CONTENT_START_SIGNIFIER "*** Start"
+#define ANALYZE_CONTENT_START_SIGNIFIER "Content:"
 
 void set_infile(Summary *summary, char *filename);
 void set_outfile(Summary *summary, char *filename);
@@ -185,9 +185,9 @@ void swap(TokenNode *a, TokenNode *b)
     a->frequency = b->frequency;
     b->frequency = tempInt;
     
-    char *tempStr = a->token;
-    a->token = b->token;
-    b->token = tempStr;
+    char *tempStr = a->tokenString;
+    a->tokenString = b->tokenString;
+    b->tokenString = tempStr;
 
     TokenType tempType = a->tokenType;
     a->tokenType = b->tokenType;
@@ -199,7 +199,7 @@ void delete_tokens(TokenList *tokenList)
     TokenNode *tokenNode = tokenList->head;
 
     while(tokenNode != NULL) {
-        free(tokenNode->token);
+        free(tokenNode->tokenString);
 
         tokenNode = tokenNode->next;
     }

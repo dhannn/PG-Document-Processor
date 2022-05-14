@@ -24,6 +24,7 @@ TokenList *initialize_tokenlist()
     TokenList *tokenList = malloc(sizeof(TokenList));
 
     tokenList->head = NULL;
+    tokenList->iterator = tokenList->head;
     tokenList->size = 0;
 
     return tokenList;
@@ -35,6 +36,21 @@ void add_token(TokenList *tokenList, char *token)
     
     _recurse_add_token(&tokenList->head, token, type);
     tokenList->size++;
+
+    if(tokenList->iterator == NULL)
+        tokenList->iterator = tokenList->head;
+}
+
+TokenNode *next_token(TokenList *tokenList)
+{
+    TokenNode *current = tokenList->iterator;
+
+    if(current == NULL)
+        tokenList->iterator = tokenList->head;
+    else
+        tokenList->iterator = tokenList->iterator->next;
+
+    return current;
 }
 
 bool is_token_found(TokenList *tokenList, char *token)
@@ -43,7 +59,7 @@ bool is_token_found(TokenList *tokenList, char *token)
     TokenNode *tokenNode = tokenList->head;
 
     while(tokenNode != NULL && !isFound) {
-        if(strcmp(tokenNode->token, token) == 0)
+        if(strcmp(tokenNode->tokenString, token) == 0)
             isFound = true;
         tokenNode = tokenNode->next;
     }
@@ -56,7 +72,7 @@ void increment_token_frequency(TokenList *tokenList, char *token)
     TokenNode *tokenNode = tokenList->head;
 
     while(tokenNode != NULL) {
-        if(strcmp(tokenNode->token, token) == 0)
+        if(strcmp(tokenNode->tokenString, token) == 0)
             tokenNode->frequency++;
         
         tokenNode = tokenNode->next;
@@ -80,7 +96,7 @@ void print_tokens(TokenList *tokenList)
     TokenNode *tokenNode = tokenList->head;
 
     while(tokenNode != NULL) {
-        printf("%s (%d)\n", tokenNode->token, tokenNode->frequency);
+        printf("%s (%d)\n", tokenNode->tokenString, tokenNode->frequency);
         tokenNode = tokenNode->next;
     }
 }
@@ -108,7 +124,7 @@ void _recurse_add_token(TokenNode **head, char *token, TokenType type)
 {
     if(*head == NULL) {
         *head = malloc(sizeof(TokenNode));
-        (*head)->token = token;
+        (*head)->tokenString = token;
         (*head)->frequency = 1;
         (*head)->tokenType = type;
         (*head)->next = NULL;
@@ -122,7 +138,7 @@ void _recurse_remove_token(TokenNode **head, char *token)
     if(*head == NULL) return; // guard clause
 
     // if the token is in the head node
-    if((*head)->token == token) {
+    if((*head)->tokenString == token) {
         TokenNode *oldHead = *head;
         TokenNode *newHead = (*head)->next;
 
@@ -138,7 +154,7 @@ void _recurse_remove_token(TokenNode **head, char *token)
     TokenNode *current = (*head)->next;
     TokenNode *next = current->next;
 
-    if(current->token == token) {
+    if(current->tokenString == token) {
         previous->next = next;
         current->next = NULL;
         free(current);

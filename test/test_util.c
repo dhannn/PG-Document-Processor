@@ -23,7 +23,7 @@ void test__tokenize1(void *ptr)
     
     int i = 0;
     while(tokenNode != NULL) {
-        assert_equal_string(expected[i], tokenNode->token);
+        assert_equal_string(expected[i], tokenNode->tokenString);
 
         tokenNode = tokenNode->next;
         i++;
@@ -42,7 +42,7 @@ void test__tokenize2(void *ptr)
     
     int i = 0;
     while(tokenNode != NULL) {
-        assert_equal_string(expected[i], tokenNode->token);
+        assert_equal_string(expected[i], tokenNode->tokenString);
 
         tokenNode = tokenNode->next;
         i++;
@@ -61,7 +61,7 @@ void test__tokenize3(void *ptr)
     
     int i = 0;
     while(tokenNode != NULL) {
-        assert_equal_string(expected[i], tokenNode->token);
+        assert_equal_string(expected[i], tokenNode->tokenString);
 
         tokenNode = tokenNode->next;
         i++;
@@ -80,7 +80,7 @@ void test__tokenize4(void *ptr)
     
     int i = 0;
     while(tokenNode != NULL) {
-        assert_equal_string(expected[i], tokenNode->token);
+        assert_equal_string(expected[i], tokenNode->tokenString);
 
         tokenNode = tokenNode->next;
         i++;
@@ -99,7 +99,7 @@ void test__tokenize5(void *ptr)
     
     int i = 0;
     while(tokenNode != NULL) {
-        assert_equal_string(expected[i], tokenNode->token);
+        assert_equal_string(expected[i], tokenNode->tokenString);
 
         tokenNode = tokenNode->next;
         i++;
@@ -118,7 +118,7 @@ void test__tokenize6(void *ptr)
     
     int i = 0;
     while(tokenNode != NULL) {
-        assert_equal_string(expected[i], tokenNode->token);
+        assert_equal_string(expected[i], tokenNode->tokenString);
 
         tokenNode = tokenNode->next;
         i++;
@@ -170,8 +170,8 @@ void test__swap1(void *ptr)
 
     swap(tokenList->head, tokenList->head->next->next);
 
-    assert_equal_string("world", tokenList->head->token);
-    assert_equal_string("Hello", tokenList->head->next->next->token);
+    assert_equal_string("world", tokenList->head->tokenString);
+    assert_equal_string("Hello", tokenList->head->next->next->tokenString);
     assert_equal_int(10, tokenList->head->frequency);
     assert_equal_int(2, tokenList->head->next->next->frequency);
 }
@@ -187,7 +187,7 @@ void test__swap2(void *ptr)
 
     swap(NULL, tokenList->head->next->next);
 
-    assert_equal_string("world", tokenList->head->next->next->token);
+    assert_equal_string("world", tokenList->head->next->next->tokenString);
     assert_equal_int(10, tokenList->head->next->next->frequency);
 }
 
@@ -202,7 +202,7 @@ void test__swap3(void *ptr)
 
     swap(tokenList->head->next->next, NULL);
 
-    assert_equal_string("world", tokenList->head->next->next->token);
+    assert_equal_string("world", tokenList->head->next->next->tokenString);
     assert_equal_int(10, tokenList->head->next->next->frequency);
 }
 

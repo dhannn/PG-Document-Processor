@@ -22,7 +22,7 @@ void test__add_element1(void *ptr)
     int index = add_element(hashTable, "hello");
 
     char *expected = "hello";
-    char *actual = hashTable[index].tokenList->head->token;
+    char *actual = hashTable[index].tokenList->head->tokenString;
 
     assert_equal_string(actual, expected);
 }
@@ -35,7 +35,7 @@ void test__add_element2(void *ptr)
     index = add_element(hashTable, "world");
 
     char *expected = "world";
-    char *actual = hashTable[index].tokenList->head->next->token;
+    char *actual = hashTable[index].tokenList->head->next->tokenString;
 
     assert_equal_string(actual, expected);
 }
@@ -51,7 +51,7 @@ void test__add_element3(void *ptr)
     int index = add_element(hashTable, "!");
 
     char *expected = "!";
-    char *actual = hashTable[index].tokenList->head->next->next->next->next->token;
+    char *actual = hashTable[index].tokenList->head->next->next->next->next->tokenString;
 
     assert_equal_string(actual, expected);
 }
