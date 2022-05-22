@@ -4,112 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#define NOT_METADATA -1
-#define METADATA (!NOT_METADATA)
-
-#define CLEAN_CONTENT_START_SIGNIFIER "*** Start"
-#define ANALYZE_CONTENT_START_SIGNIFIER "Content:"
-
-void set_infile(Summary *summary, char *filename);
-void set_outfile(Summary *summary, char *filename);
-void close_files(Summary *summary);
-void set_metadata(MetadataItem items[], int metadataIndex, char *data);
-void set_options(Summary *summary, Config config, int rawInput);
-int get_metadata_index(MetadataItem metadataItems[], char *str);
-
-void seek_metadata(FILE *file, MetadataItem items[], int buffSize)
-{
-    int flag = NOT_METADATA;
-    char buff[buffSize];
-
-    // increments the pointer until a metadata item is found
-    while(flag == NOT_METADATA) {
-        fscanf(file, "%s", buff);
-
-        buff[strlen(buff) - 1] = '\0';
-
-        flag = get_metadata_index(items, buff);
-    }
-
-    // redirects current pointer right before the first metadata item
-    fseek(file, -(strlen(buff)) - 1, SEEK_CUR);
-}
-
-char *_get_starting_token(Mode mode)
-{
-    if(mode == CLEAN)
-        return CLEAN_CONTENT_START_SIGNIFIER;
-        
-    return ANALYZE_CONTENT_START_SIGNIFIER;
-}
-
-void read_metadata(FILE *file, MetadataItem items[], Mode mode)
-{
-    char buff[BUFSIZ];
-    int flag;
-
-    char *startingToken = _get_starting_token(mode);
-    
-    do {
-        flag = fscanf(file," %[^:]: s", buff);
-        int index = get_metadata_index(items, buff);
-
-        if(index != NOT_METADATA) {
-            flag = fscanf(file,"%[^\n]s", buff);
-            set_metadata(items, index, buff);
-        }
-    } while(strcmp(buff, startingToken) && flag != EOF);
-}
-
-void read_content(FILE *file, char **inputData, int maxChar)
-{
-    int flag;               // flag to determine if EOF
-
-    int runningTotal = 0;   // total number of characters
-    char *temp = calloc(1, sizeof(char)); // allocation for the content string
-
-    char buff[BUFSIZ];
-
-    do {
-        flag = fscanf(file, "%s", buff);
-        runningTotal += strlen(buff) + 1; // + 1 for the space
-        
-        if(maxChar != 0 && runningTotal > maxChar)
-            break;
-
-        temp = realloc(temp, runningTotal + 1); // + 1 for null byte
-
-        strcat(buff, " ");
-        strcat(temp, buff);
-    } while(flag != EOF);
-
-    *inputData = temp;
-}
-
-void set_metadata(MetadataItem items[], int metadataIndex, char *data)
-{
-    char *temp = malloc(strlen(data) + 1);
-    strcpy(temp, data);
-    items[metadataIndex].data = temp;
-}
-
-int get_metadata_index(MetadataItem metadataItems[], char *str)
-{
-    int i;
-    int flag = NOT_METADATA;
-    
-    for(i = 0; i < MAX_METADATA_ITEMS && flag == -1; i++) {
-        if(strcmp(metadataItems[i].name, str) == 0)
-            flag = i;
-    }
-    
-    return flag;
-}
-
-void deallocate_metadata();
-void deallocate_content_string();
-void deallocate_tokenized_string();
-
 TokenList *tokenize_string(char *input, bool includeSpace)
 {
     TokenList *tokenlist = initialize_tokenlist();
@@ -156,6 +50,34 @@ TokenList *tokenize_string(char *input, bool includeSpace)
     return tokenlist;
 }
 
+TokenList *remove_duplicate_tokens(TokenList *tl)
+{
+    HashTable *ht = create_hash_table();
+    
+    TokenList *cleanedTl = initialize_tokenlist();
+    TokenNode *currentNode = tl->head;
+
+    while(currentNode != NULL) {
+        char *currentTokenStr = currentNode->tokenString;
+
+        if(*currentTokenStr == ' ') {
+            currentNode = currentNode->next;
+            continue;
+        }
+
+        if(!contains(ht, currentTokenStr)) {
+            add_element(ht, currentTokenStr);
+            add_token(cleanedTl, currentTokenStr);
+        }
+
+        currentNode = currentNode->next;
+    }
+
+    destroy_hash_table(ht);
+
+    return cleanedTl;
+}
+
 void sort_tokens(TokenList *tl)
 {
     TokenNode *sortedNode = tl->head;
@@ -165,9 +87,8 @@ void sort_tokens(TokenList *tl)
 
         TokenNode *curr = max->next;
         while(curr != NULL) {
-            if(curr->frequency > max->frequency) {
+            if(curr->frequency > max->frequency)
                 max = curr;
-            }
 
             curr = curr->next;
         }
@@ -194,7 +115,7 @@ void swap(TokenNode *a, TokenNode *b)
     b->tokenType = tempType;
 }
 
-void delete_tokens(TokenList *tokenList)
+void delete_token_strings(TokenList *tokenList)
 {
     TokenNode *tokenNode = tokenList->head;
 

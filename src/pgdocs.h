@@ -1,3 +1,6 @@
+#ifndef PG_DOCS_H
+#define PG_DOCS_H
+
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -7,7 +10,7 @@ typedef struct _hashTable HashTable;
 #define NUM_OF_METADATA 5
 
 typedef struct {
-    char *name;
+    const char *name;
     char *data;
 } MetadataItem;
 
@@ -15,14 +18,6 @@ typedef enum {
     CLEAN, 
     ANALYZE
 } Mode;
-
-// const char **METADATA_ITEM_NAMES = {
-//     "Title",
-//     "Author", 
-//     "Release Date",
-//     "Language",
-//     "Produced by"
-// };
 
 #define MAX_METADATA_ITEMS 5
 
@@ -39,8 +34,8 @@ typedef struct {
     Mode mode;                  // processing mode (i.e. clean or analyze)
     FILE *inFile;               // file pointer to input 
     FILE *outFile;              // file pointer to output
-    Metadata metadata;          // info about the document
     unsigned int options;       // chosen option for cleaning or analysis
+    Metadata metadata;          // info about the document
     char *inData;               // string of data to be processed
     TokenList *tokenList;       // tokenized version of the input
     char *outData;              // string of data to be reported
@@ -60,6 +55,7 @@ typedef struct {
     char *name;                                 // name of analysis option
     void (*do_analysis)(Summary*, Config);      // function pointer to analysis
     void (*report_analysis)(Summary*, Config);  // function pointer to report
+    char *fileSuffix;                           // name of analysis option
 } AnalyzerOption;
 
 typedef struct {
@@ -70,13 +66,43 @@ typedef struct {
 
 #define MAX_ANALYZER_OPTIONS 3
 
-void read_clean_file(Summary *summary, Config config, char *filename);
-// TokenList *tokenize(char *input, bool includeSpace);
+TokenList *remove_duplicate_tokens(TokenList*);
+
+Metadata initialize_metadata();
+void set_metadata(MetadataItem items[], int metadataIndex, char *data);
+int get_metadata_index(MetadataItem metadataItems[], char *str);
+void delete_metadata(Metadata *metadata);
+
+
+void read_file(Summary *summary, Config config);
+void seek_metadata(FILE *file, MetadataItem items[], int buffSize);
+void read_metadata(FILE *file, MetadataItem items[], Mode mode);
+void read_content(FILE *file, char **inputData, int maxChar);
+void clean_up_reader();
+
+void set_mode(Summary *summary, Mode mode);
+void set_infile(Summary *summary, char *filename);
+void set_outfile(Summary *summary, char *filename);
+
+void set_options(Summary *summary, Config config, int rawInput);
+void set_additional_options(Summary *summary, AdditionalOptions addopts);
+void execute_summary(Summary *summary, Config config);
+
+void close_files(Summary *summary);
+void destroy_summary(Summary* summary);
+
+void analyze_data(Summary *summary, Config config);
 TokenList *convert_to_ngrams(TokenList *tl, int n);
-void delete_tokens(TokenList *tokenList);
 void get_word_count(Summary *summary, Config config);
-void report_word_count(Summary *summary, Config config);
+void report_token_frequency(Summary *summary, Config config);
 void get_ngram_count(Summary *summary, Config config);
 void report_ngram_count(Summary *summary, Config config);
 void get_concordance(Summary *summary, Config config);
 void report_concordance(Summary *summary, Config config);
+
+Metadata initialize_metadata();
+void delete_metadata(Metadata *metadata);
+
+extern const AnalyzerOption ANALYZER_OPTIONS[];
+
+#endif

@@ -23,7 +23,7 @@ TEST_FRAMEWORK=$(TEST_DIR)/ceemply/ceemply.c
 OBJ_DIR=obj
 OBJS=$(patsubst $(INCLUDE_DIR)/%.c,$(OBJ_DIR)/%.o,$(INCLUDES))
 
-MAIN_SRC=$(wildcard $(SRC_DIR)/*.c)
+MAIN_SRC=$(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/.*.c)
 
 all: $(BIN)
 

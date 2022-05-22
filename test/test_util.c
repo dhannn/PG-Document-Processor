@@ -29,7 +29,7 @@ void test__tokenize1(void *ptr)
         i++;
     }
 
-    delete_tokens(tl);
+    delete_token_strings(tl);
 }
 
 void test__tokenize2(void *ptr)
@@ -48,7 +48,7 @@ void test__tokenize2(void *ptr)
         i++;
     }
 
-    delete_tokens(tl);
+    delete_token_strings(tl);
 }
 
 void test__tokenize3(void *ptr)
@@ -67,7 +67,7 @@ void test__tokenize3(void *ptr)
         i++;
     }
 
-    delete_tokens(tl);
+    delete_token_strings(tl);
 }
 
 void test__tokenize4(void *ptr)
@@ -86,7 +86,7 @@ void test__tokenize4(void *ptr)
         i++;
     }
 
-    delete_tokens(tl);
+    delete_token_strings(tl);
 }
 
 void test__tokenize5(void *ptr)
@@ -105,7 +105,7 @@ void test__tokenize5(void *ptr)
         i++;
     }
 
-    delete_tokens(tl);
+    delete_token_strings(tl);
 }
 
 void test__tokenize6(void *ptr)
@@ -124,7 +124,7 @@ void test__tokenize6(void *ptr)
         i++;
     }
 
-    delete_tokens(tl);
+    delete_token_strings(tl);
 }
 
 void test__tokenize()
