@@ -34,11 +34,7 @@ void _convert_string_to_lowercase (char *str)
    	}
 }
 
-/*	
- *
- *
- *
- */
+
 void to_lowercase (Summary *summary, Config config)
 {
 	TokenNode *currentNode = summary->tokenList->head;
@@ -86,7 +82,7 @@ void clean_whitespace (Summary *summary, Config config)
 	TokenNode *currentNode = summary->tokenList->head;
 	
 	while(currentNode != NULL) {
-		if (currentNode.tokenType == NUMERIC){
+		if (currentNode.tokenType == WHITESPACE){ 
 			if (isPreviousNodeWhiteSpace == 1)
 				remove_token(summary->tokenList, currentNode->tokenString);
 			
