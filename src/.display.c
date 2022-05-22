@@ -1,38 +1,44 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "pgdocs.h"
 
-#define MAX_WIDTH 85
-#define MAX_HEIGHT 35
+#define MAX_WIDTH       85
+#define MAX_HEIGHT      35
+#define MAX_HEADER_ROW  2
 
-// const char **TITLE = {
-//     "█▀█ █▀▀   █▀▄ █▀█ █▀▀ █░█ █▀▄▀█ █▀▀ █▄░█ ▀█▀   █▀█ █▀█ █▀█ █▀▀ █▀▀ █▀ █▀ █▀█ █▀█",
-//     "█▀▀ █▄█   █▄▀ █▄█ █▄▄ █▄█ █░▀░█ ██▄ █░▀█ ░█░   █▀▀ █▀▄ █▄█ █▄▄ ██▄ ▄█ ▄█ █▄█ █▀▄"
-// };
+#define MAX_SCREENS     4
 
-// const char **DATA_CLEANER = {
-//     "█▀▄ ▄▀█ ▀█▀ ▄▀█   █▀▀ █░░ █▀▀ ▄▀█ █▄░█ █▀▀ █▀█", 
-//     "█▄▀ █▀█ ░█░ █▀█   █▄▄ █▄▄ ██▄ █▀█ █░▀█ ██▄ █▀▄"
-// };
+#define WSTRLEN_COEFFFICIENT    (0.350649351)
 
-// const char **DATA_CLEANER = {
-//     "█▀▄ ▄▀█ ▀█▀ ▄▀█   ▄▀█ █▄░█ ▄▀█ █░░ █▄█ ▀█ █▀▀ █▀█", 
-//     "█▄▀ █▀█ ░█░ █▀█   █▀█ █░▀█ █▀█ █▄▄ ░█░ █▄ ██▄ █▀▄"
-// };
+const char *TITLE[] = {
+    "█▀█ █▀▀   █▀▄ █▀█ █▀▀ █░█ █▀▄▀█ █▀▀ █▄░█ ▀█▀   █▀█ █▀█ █▀█ █▀▀ █▀▀ █▀ █▀ █▀█ █▀█",
+    "█▀▀ █▄█   █▄▀ █▄█ █▄▄ █▄█ █░▀░█ ██▄ █░▀█ ░█░   █▀▀ █▀▄ █▄█ █▄▄ ██▄ ▄█ ▄█ █▄█ █▀▄"
+};
 
-typedef struct {
-    int index;
-    char *option;
-    void (*show_next_screen)(void*);
-} ScreenOption;
+const char *DATA_CLEANER[] = {
+    "█▀▄ ▄▀█ ▀█▀ ▄▀█   █▀▀ █░░ █▀▀ ▄▀█ █▄░█ █▀▀ █▀█", 
+    "█▄▀ █▀█ ░█░ █▀█   █▄▄ █▄▄ ██▄ █▀█ █░▀█ ██▄ █▀▄"
+};
 
-typedef struct {
-    int n;
-    char *input;
-    ScreenOption options[];
-} Screen;
+const char *DATA_ANALYZER[] = {
+    "█▀▄ ▄▀█ ▀█▀ ▄▀█   ▄▀█ █▄░█ ▄▀█ █░░ █▄█ ▀█ █▀▀ █▀█", 
+    "█▄▀ █▀█ ░█░ █▀█   █▀█ █░▀█ █▀█ █▄▄ ░█░ █▄ ██▄ █▀▄"
+};
+
+const char **HEADERS[] = {TITLE, DATA_CLEANER, DATA_ANALYZER};
 
 Screen *initialize_screens();
+void destroy_screens();
 
 Screen *initialize_screens()
 {
-    return NULL;
+    Screen *screen = malloc(sizeof(Screen) * MAX_SCREENS);
+    
+    for(int i = 0; i < MAX_SCREENS; i++) {
+        const char **headerRow = HEADERS[i];
+        screen[i].header = headerRow;
+    }
+
+    return screen;
 }

@@ -11,30 +11,31 @@ const AnalyzerOption ANALYZER_OPTIONS[] = {
 
 int main()
 {
-    Summary summary;
-    Config config;
-    config.numChar = 0;
+    Screen *screens = initialize_screens();   
+    // Summary summary;
+    // Config config;
+    // config.numChar = 0;
 
-    printf("Choose a mode:\n");
-    printf("  [1] Cleaning\n");
-    printf("  [2] Analyis\n\n");
+    // printf("Choose a mode:\n");
+    // printf("  [1] Cleaning\n");
+    // printf("  [2] Analyis\n\n");
 
-    int i; 
-    scanf("%d", &i);
+    // int i; 
+    // scanf("%d", &i);
 
-    set_mode(&summary, i - 1);
+    // set_mode(&summary, i - 1);
 
-    printf("Choose an option:\n");
-    for(int i = 0; i < MAX_ANALYZER_OPTIONS; i++) {
-        printf("  [%d] %s\n", i + 1, ANALYZER_OPTIONS[i].name);
-    }
-    scanf("%d", &i);
+    // printf("Choose an option:\n");
+    // for(int i = 0; i < MAX_ANALYZER_OPTIONS; i++) {
+    //     printf("  [%d] %s\n", i + 1, ANALYZER_OPTIONS[i].name);
+    // }
+    // scanf("%d", &i);
 
-    set_options(&summary, config, i);
+    // set_options(&summary, config, i);
 
-    summary.inFile = fopen("sample_files/cleaned_files/d.txt", "r");
-    summary.outFile = fopen("meh.txt", "w");
-    execute_summary(&summary, config);
+    // summary.inFile = fopen("sample_files/cleaned_files/d.txt", "r");
+    // summary.outFile = fopen("meh.txt", "w");
+    // execute_summary(&summary, config);
 
     // summary.inFile = fopen("sample_files/cleaned_files/d.txt", "r");
     // summary.metadata.metadataItems[0].name = "Title";

@@ -64,6 +64,22 @@ typedef struct {
     void (*report_cleaned)(Summary*, Config);   // function pointer to report
 } CleanerOption;
 
+typedef struct _screen Screen;
+
+typedef struct {
+    int index;
+    char *option;
+    Screen *next_screen;
+    void (*show_next_screen)(void*);
+} ScreenOption;
+
+struct _screen{
+    const char **header;
+    int n;
+    char *input;
+    ScreenOption *options;
+};
+
 #define MAX_ANALYZER_OPTIONS 3
 
 TokenList *remove_duplicate_tokens(TokenList*);
@@ -73,6 +89,7 @@ void set_metadata(MetadataItem items[], int metadataIndex, char *data);
 int get_metadata_index(MetadataItem metadataItems[], char *str);
 void delete_metadata(Metadata *metadata);
 
+Screen *initialize_screens();
 
 void read_file(Summary *summary, Config config);
 void seek_metadata(FILE *file, MetadataItem items[], int buffSize);
