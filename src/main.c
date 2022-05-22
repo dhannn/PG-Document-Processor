@@ -12,6 +12,9 @@ const AnalyzerOption ANALYZER_OPTIONS[] = {
 int main()
 {
     Screen *screens = initialize_screens();   
+
+    for(int i = 0; i < 7; i++)
+        printf("%s\n", screens[1].options[i].optionName);
     // Summary summary;
     // Config config;
     // config.numChar = 0;

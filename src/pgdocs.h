@@ -68,16 +68,16 @@ typedef struct _screen Screen;
 
 typedef struct {
     int index;
-    char *option;
+    const char *optionName;
     Screen *next_screen;
-    void (*show_next_screen)(void*);
+    Screen *previous_screen;
 } ScreenOption;
 
 struct _screen{
     const char **header;
     int n;
     char *input;
-    ScreenOption *options;
+    const ScreenOption *options;
 };
 
 #define MAX_ANALYZER_OPTIONS 3
