@@ -242,7 +242,6 @@ void get_ngram_count(Summary *summary, Config config)
     destroy_tokenList(summary->tokenList);
     summary->tokenList = ngrams;
     destroy_tokenList(rawTokens);
-
 }
 
 void get_concordance(Summary *summary, Config config)
