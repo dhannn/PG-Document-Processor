@@ -1,6 +1,6 @@
 # Compiler Information
 CC=gcc
-CFLAGS=-Wall -g
+CFLAGS=-g -std=gnu99
 EXEC=.exe
 
 # Directories
@@ -28,7 +28,7 @@ MAIN_SRC=$(wildcard $(SRC_DIR)/*.c)
 all: $(BIN)
 
 $(BIN): $(OBJS)
-	$(CC) $(CFLAGS) $(MAIN_SRC) $? -o $(BIN) -lm
+	$(CC) $(CFLAGS) -std=c99 $(MAIN_SRC) $? -o $(BIN) -lm
 
 $(OBJ_DIR)/%.o: $(INCLUDE_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

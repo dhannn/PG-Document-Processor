@@ -16,7 +16,10 @@ int main()
     summary.metadata.metadataItems[4].name = "Produced by";
     summary.options = 1;
     summary.outFile = fopen("samples_files/output/a_word_count.txt", "w");
-//    read_clean_file(&summary, config, "s");
+    read_clean_file(&summary, config, "s");
+    remove_special (&summary, config);
+
+    print_tokens (summary.tokenList);
 
   //  get_word_count(&summary, config);
 
