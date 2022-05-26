@@ -2,6 +2,7 @@
 #include "deps/internals.h"
 #include <ctype.h>
 #include <string.h>
+#include <locale.h>
 
 const AnalyzerOption ANALYZER_OPTIONS[] = {
     {"Word Count", get_word_count, report_token_frequency, "_wcount"},
@@ -13,8 +14,7 @@ int main()
 {
     Screen *screens = initialize_screens();   
 
-    for(int i = 0; i < 7; i++)
-        printf("%s\n", screens[1].options[i].optionName);
+    display_screen(screens, 0);
     // Summary summary;
     // Config config;
     // config.numChar = 0;
@@ -53,6 +53,6 @@ int main()
     // get_word_count(&summary, config);
 
 
-
+    destroy_screens(screens);
     return 0;
 }

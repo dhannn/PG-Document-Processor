@@ -77,7 +77,7 @@ struct _screen{
     const char **header;
     int n;
     char *input;
-    const ScreenOption *options;
+    ScreenOption *options;
 };
 
 #define MAX_ANALYZER_OPTIONS 3
@@ -90,6 +90,8 @@ int get_metadata_index(MetadataItem metadataItems[], char *str);
 void delete_metadata(Metadata *metadata);
 
 Screen *initialize_screens();
+void display_screen(Screen *screen, int screenIndex);
+void destroy_screens(Screen* screen);
 
 void read_file(Summary *summary, Config config);
 void seek_metadata(FILE *file, MetadataItem items[], int buffSize);

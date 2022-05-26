@@ -16,6 +16,18 @@
 
 #define WSTRLEN_COEFFFICIENT    (0.350649351)
 
+#define ESC "\x1b"
+#define CLEAR() (printf("%s[2J", ESC))
+#define MOVE(row, col) (printf("%s[%d;%df", (ESC), (row), (col)))
+
+#define FMT_BOLD        1
+#define FMT_ITALIC      3
+#define FMT_UNDERLINE   4
+
+#define COLOR(FG, BG) (printf("%s[%d;%dm", (ESC), (FG), (BG)))
+#define FORMAT(FMT) (printf("%s[%dm", (ESC), (FMT)))
+#define RESET() (COLOR(0, 0))
+
 const char *TITLE[] = {
     "█▀█ █▀▀   █▀▄ █▀█ █▀▀ █░█ █▀▄▀█ █▀▀ █▄░█ ▀█▀   █▀█ █▀█ █▀█ █▀▀ █▀▀ █▀ █▀ █▀█ █▀█",
     "█▀▀ █▄█   █▄▀ █▄█ █▄▄ █▄█ █░▀░█ ██▄ █░▀█ ░█░   █▀▀ █▀▄ █▄█ █▄▄ ██▄ ▄█ ▄█ █▄█ █▀▄"
@@ -42,7 +54,8 @@ const char **HEADERS[] = {
 const char *OPTION_NAME_PER_SCREEN[MAX_SCREENS][MAX_OPTIONS] = {
     {
         "Clean Document", 
-        "Analyze Document"
+        "Analyze Document",
+        "Configurations"
     },
     {
         "To Lowercase", 
@@ -72,23 +85,36 @@ const char *DEFAULT_OPTIONS_NAME[] = {
     "Back"
 };
 
-const ScreenOption *initialize_options(int screenIndex);
-void destroy_screens();
+ScreenOption *__initialize_options(int screenIndex);
+void __display_header(Screen *screens, int screenIndex);
+void __display_options(Screen *screens, int screenIndex);
 
 Screen *initialize_screens()
 {
-    Screen *screen = malloc(sizeof(Screen) * MAX_SCREENS);
+    Screen *screens = malloc(sizeof(Screen) * MAX_SCREENS);
     
     for(int i = 0; i < MAX_SCREENS; i++) {
         const char **headerRow = HEADERS[i];
-        screen[i].header = headerRow;
-        screen[i].options = initialize_options(i);
+
+        screens[i].header = headerRow;
+        screens[i].options = __initialize_options(i);
+        screens[i].input = "";
     }
 
-    return screen;
+    screens[0].options[0].next_screen = &screens[1];
+    screens[0].options[1].next_screen = &screens[2];
+
+    return screens;
 }
 
-const ScreenOption *initialize_options(int screenIndex)
+void display_screen(Screen *screen, int screenIndex)
+{
+    CLEAR();
+    __display_header(screen, screenIndex);
+    __display_options(screen, screenIndex);
+}
+
+ScreenOption *__initialize_options(int screenIndex)
 {
     ScreenOption *options = malloc(sizeof(ScreenOption) * MAX_OPTIONS);
 
@@ -117,4 +143,46 @@ const ScreenOption *initialize_options(int screenIndex)
     }
 
     return options;
+}
+
+void destroy_screens(Screen *screen)
+{
+    for(int i = 0; i < MAX_SCREENS; i++) {
+        free((ScreenOption*)screen[i].options);
+    }
+
+    free(screen);
+}
+
+void __display_header(Screen *screens, int screenIndex)
+{
+    int headerWidth = strlen(screens[screenIndex].header[0]) * WSTRLEN_COEFFFICIENT;
+    int headerStart = (MAX_WIDTH - headerWidth) / 2;
+    const char **header = screens[screenIndex].header;
+
+    for(int row = 0; row < MAX_HEADER_ROW; row++) {
+        MOVE(1 + row, headerStart);
+        printf("%s", header[row]);
+    }
+}
+
+void __display_options(Screen *screens, int screenIndex)
+{
+    ScreenOption *options = screens[screenIndex].options;
+    printf("\n\n");
+
+    for(int i = 0; options[i].index != NULL_OPTION; i++) {
+        FORMAT(FMT_BOLD);
+        printf("\t[%d]", options[i].index + 1);
+
+        RESET();
+        printf(" %s\n", options[i].optionName);
+    }
+
+    
+    RESET();
+    FORMAT(FMT_BOLD);
+    printf("\n\tPress the number of your choice\n");
+    RESET();
+    printf("\t>> ");
 }
