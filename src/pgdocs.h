@@ -1,6 +1,7 @@
 #ifndef PG_DOCS_H
 #define PG_DOCS_H
 
+#include <stdbool.h>
 #define MAX_CHAR 1024
 
 typedef struct _screen Screen;
@@ -15,7 +16,7 @@ struct _screen {
     char **header;
     char *prompt;
     ScreenOption *options;
-    void *(get_input)();
+    void (*get_input)(ActiveScreen*);
     int backIndex;
 };
 
@@ -26,7 +27,7 @@ typedef struct {
 } ActiveScreen;
 
 void initialize_screens(Screen screens[]);
-void activate_screen(ActiveScreen* active, Screens screens[]);
+void activate_screen(ActiveScreen* active, Screen screens[]);
 void __validate_screen_option(ActiveScreen *active);
 void go_to_screen(Screen *screens[], ActiveScreen *active);
 void get_int(ActiveScreen *active);
