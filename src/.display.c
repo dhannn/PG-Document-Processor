@@ -142,7 +142,7 @@ void __extract_options(Screen *screens, int index)
 {
     Screen *current = &screens[index];
     int numDefaultOpts = 0;
-    
+
     for(int i = 0; i < MAX_OPTIONS; i++) {
         ScreenOption *opt = &current->options[i];
 
@@ -151,7 +151,8 @@ void __extract_options(Screen *screens, int index)
             continue;
         }
 
-        if(DEFAULT_OPTION_NAMES[i] != NULL) {
+        // TODO: refactor ugly logic
+        if(DEFAULT_OPTION_NAMES[numDefaultOpts] != NULL && strcmp(OPTION_NAMES[index][0], "") != 0) {
             strcpy(opt->optionName, DEFAULT_OPTION_NAMES[numDefaultOpts]);
             numDefaultOpts++;
         } else 
