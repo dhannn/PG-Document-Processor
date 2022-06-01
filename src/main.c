@@ -5,22 +5,11 @@
 int main()
 {
     Screen screens[MAX_SCREENS];
+    char *metadataItems[] = {"Song Title", "Album", "Artist", "Release Date"};
+    char *metadata[] = {"All Too Well (Taylor's Version) (10-Minute Version) (From The Vault)", "Red (Taylor's Version)", "Taylor Swift", "2021"};
 
     initialize_screens(screens);
+    print_metadata(metadataItems, metadata, 4);
 
-    for(int i = 0; i < MAX_SCREENS; i++) {
-        for(int j = 0; j < 2; j++)
-            printf("%s\n", screens[i].header[j]);
-
-        printf("\n");
-
-        for(int k = 0; k < MAX_OPTIONS; k++) {
-            if(strcmp(screens[i].options[k].optionName, "") != 0)
-                printf("\t[%d] %s\n", k + 1, screens[i].options[k].optionName);
-        }
-
-        printf("\n\t%s\n", screens[i].prompt);
-
-        printf("\t>> ");
-    }
+    return 000000000;
 }

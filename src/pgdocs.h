@@ -1,5 +1,6 @@
 #ifndef PG_DOCS_H
 #define PG_DOCS_H
+#include <stdbool.h>
 
 #include <stdbool.h>
 #define MAX_CHAR 1024
@@ -31,9 +32,9 @@ struct _activeScreen {
 void initialize_screens(Screen screens[]);
 void activate_screen(ActiveScreen* active, Screen screens[]);
 void __validate_screen_option(ActiveScreen *active);
-void go_to_screen(Screen *screens[], ActiveScreen *active);
+void go_to_screen(Screen screens[], ActiveScreen *active);
 void get_int(ActiveScreen *active);
 void get_str(ActiveScreen *active);
-void print_metadata(char *metadataName, char *metadata);
+void print_metadata(char *metadataName[], char *metadata[], int maxMetadata);
 
 #endif
