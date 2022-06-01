@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_SCREENS 12
 typedef enum {
     CONFIG, 
     MAIN_MENU,
@@ -16,8 +15,6 @@ typedef enum {
     ENTER_PATH_MENU,
     ENTER_NUMBER_CHAR_MENU,
     ENTER_MULTISELECT_BOOL_MENU,
-    COMMAND_OPTIONS,
-    DO_COMMAND
 } ScreenTag;
 
 /* -------------------------------------------------------------------------- */
@@ -25,27 +22,27 @@ typedef enum {
 /* -------------------------------------------------------------------------- */
 
 // no more than 80 characters per line rule is overruled in this constant
-const char *TITLE_HEADER[] = {
+char *TITLE_HEADER[] = {
     "█▀█ █▀▀   █▀▄ █▀█ █▀▀ █░█ █▀▄▀█ █▀▀ █▄░█ ▀█▀   █▀█ █▀█ █▀█ █▀▀ █▀▀ █▀ █▀ █▀█ █▀█",
     "█▀▀ █▄█   █▄▀ █▄█ █▄▄ █▄█ █░▀░█ ██▄ █░▀█ ░█░   █▀▀ █▀▄ █▄█ █▄▄ ██▄ ▄█ ▄█ █▄█ █▀▄"
 };
 
-const char *DATA_CLEANER_HEADER[] = {
+char *DATA_CLEANER_HEADER[] = {
     "█▀▄ ▄▀█ ▀█▀ ▄▀█   █▀▀ █░░ █▀▀ ▄▀█ █▄░█ █▀▀ █▀█", 
     "█▄▀ █▀█ ░█░ █▀█   █▄▄ █▄▄ ██▄ █▀█ █░▀█ ██▄ █▀▄"
 };
 
-const char *DATA_ANALYZER_HEADER[] = {
+char *DATA_ANALYZER_HEADER[] = {
     "█▀▄ ▄▀█ ▀█▀ ▄▀█   ▄▀█ █▄░█ ▄▀█ █░░ █▄█ ▀█ █▀▀ █▀█", 
     "█▄▀ █▀█ ░█░ █▀█   █▀█ █░▀█ █▀█ █▄▄ ░█░ █▄ ██▄ █▀▄"
 };
 
-const char *CONFIG_HEADER[] = {
+char *CONFIG_HEADER[] = {
     "█▀▀ █▀█ █▄░█ █▀▀ █ █▀▀",
     "█▄▄ █▄█ █░▀█ █▀░ █ █▄█"
 };
 
-const char **HEADERS[] = {
+char **HEADERS[] = {
     CONFIG_HEADER,
     TITLE_HEADER,
     TITLE_HEADER,
@@ -64,7 +61,7 @@ const char **HEADERS[] = {
 /*                            CONSTANTS FOR PROMPTS                           */
 /* -------------------------------------------------------------------------- */
 
-const *PROMPTS[] = {
+char *PROMPTS[] = {
     "Enter the number of the configuration option you want to change",
     "Enter the number of your choice",
     "Enter a valid filename of your chosen document",
@@ -84,7 +81,7 @@ const *PROMPTS[] = {
 /* -------------------------------------------------------------------------- */
 
 // If NULL, it means that the screen is not a multi-option input
-const char *OPTION_NAMES[] = {
+char *OPTION_NAMES[][MAX_OPTIONS] = {
     {
         "Default path for raw documents",
         "Default path for cleaned documents",
@@ -98,7 +95,7 @@ const char *OPTION_NAMES[] = {
         "Analyze document (Multi-file)",
         "Config"
     }, 
-    NULL,
+    {""},
     {
         "To lowercase",
         "Remove special characters",
@@ -115,84 +112,63 @@ const char *OPTION_NAMES[] = {
         "tf-idf",
         "Document clustering"
     },
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
+    {""},
+    {""},
+    {""},
+    {""},
+    {""},
+    {""}
 };
 
-ScreenTag *RESULTING_SCREENTAG_PER_OPTION[] = {
-    {
-        ENTER_PATH_MENU,
-        ENTER_PATH_MENU,
-        ENTER_PATH_MENU,
-        ENTER_NUMBER_CHAR_MENU,
-        ENTER_MULTISELECT_BOOL_MENU
-    },
-    {
-        CLEAN_DOCUMENT_MENU,
-        SINGLE_ANALYZE_DOCUMENT_MENU,
-        MULTI_ANALYZE_DOCUMENT_MENU
-    }, 
-    {
-        COMMAND_OPTIONS
-    },
-    {
-        DO_COMMAND,
-        DO_COMMAND,
-        DO_COMMAND,
-        DO_COMMAND,
-        DO_COMMAND
-    }, 
-    {
-        DO_COMMAND,
-        ENTER_N_MENU,
-        ENTER_KEYWORD_MENU
-    }, 
-    {
-        DO_COMMAND,
-        ENTER_NUMBER_CLUSTERS_MENU
-    },
-    {
-        DO_COMMAND
-    },
-    {
-        ENTER_N_MENU
-    },
-    {
-        DO_COMMAND
-    }, 
-    {
-        CONFIG
-    },
-    {
-        CONFIG
-    },
-    {
-        CONFIG
-    },
-    NULL,
-    NULL
+char *DEFAULT_OPTION_NAMES[MAX_OPTIONS] = {
+    "Help",
+    "Back"
 };
 
-ScreenOption *__extract_options(Screen *screens, int index);
+void __extract_options(Screen *screens, int index);
+void __extract_back_index(Screen *screens, int index);
 
 void initialize_screens(Screen *screens)
 {
     for(int i = 0; i < MAX_SCREENS; i++) {
-        screens->header = HEADERS[i];
-        screens->options = __extract_options(screens, i);
+        screens[i].header = HEADERS[i];
+        screens[i].prompt = PROMPTS[i];
+        __extract_options(screens, i);
+        __extract_back_index(screens, i);
     }
 }
 
-ScreenOption *__extract_options(Screen *screens, int index)
+void __extract_options(Screen *screens, int index)
 {
     Screen *current = &screens[index];
-    ScreenOption *opt = &current->options;
+    int numDefaultOpts = 0;
     
-    for(int i = 0; i < MAX_SCREENS; i++) {
-        strcpy(current->options->optionName, OPTION_NAMES[index]);
+    for(int i = 0; i < MAX_OPTIONS; i++) {
+        ScreenOption *opt = &current->options[i];
+
+        if(OPTION_NAMES[index][i] != NULL) {
+            strcpy(opt->optionName, OPTION_NAMES[index][i]);
+            continue;
+        }
+
+        if(DEFAULT_OPTION_NAMES[i] != NULL) {
+            strcpy(opt->optionName, DEFAULT_OPTION_NAMES[numDefaultOpts]);
+            numDefaultOpts++;
+        } else 
+            strcpy(opt->optionName, "");
+    }
+}
+
+void __extract_back_index(Screen *screens, int index)
+{
+    Screen *current = &screens[index];
+
+    for(int i = 0; i < MAX_OPTIONS; i++) {
+        ScreenOption *opt = &current->options[i];
+
+        if(strcmp(opt->optionName, "Back") == 0) {
+            current->backIndex = i;
+            break;
+        }
     }
 }

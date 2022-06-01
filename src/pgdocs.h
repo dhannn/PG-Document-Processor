@@ -4,27 +4,29 @@
 #include <stdbool.h>
 #define MAX_CHAR 1024
 
-typedef struct _screen Screen;
+#define MAX_OPTIONS 10
+#define MAX_SCREENS 12
 
 typedef struct {
-    char *optionName;
-    Screen *resultingScreen;
-    bool pointsToCommand;
+    char optionName[MAX_CHAR];
+    void (*do_option)(void*, void*, void*);
 } ScreenOption;
 
-struct _screen { 
+typedef struct _activeScreen ActiveScreen;
+
+typedef struct { 
     char **header;
     char *prompt;
-    ScreenOption *options;
+    ScreenOption options[MAX_OPTIONS];
     void (*get_input)(ActiveScreen*);
     int backIndex;
-};
+} Screen;
 
-typedef struct {
+struct _activeScreen {
     Screen *screen;
     int nInput;
     char strInput[MAX_CHAR];
-} ActiveScreen;
+};
 
 void initialize_screens(Screen screens[]);
 void activate_screen(ActiveScreen* active, Screen screens[]);
