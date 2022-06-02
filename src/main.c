@@ -21,7 +21,7 @@ int main()
 
     print_tokens (summary.tokenList);
 
-  //  get_word_count(&summary, config);
+    get_word_count(&summary, config);
 
 
 
