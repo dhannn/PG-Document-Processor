@@ -16,6 +16,11 @@ typedef enum {
     CONCORDANCE     =       0b00100
 } ANALYZER_OPTIONS_INDEX;
 
+void clean_data(Summary *summary, Config config)
+{
+    return;
+}
+
 void analyze_data__single(Summary *summary, Config config)
 {
     unsigned int options = summary->options;
@@ -28,6 +33,11 @@ void analyze_data__single(Summary *summary, Config config)
             // ANALYZER_OPTIONS[i].report_analysis(summary, config);
         }
     }
+}
+
+void analyze_data__multi(Summary *summary, Config config)
+{
+    return;
 }
 
 TokenList *convert_to_ngrams(TokenList *tl, int n)

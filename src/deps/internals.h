@@ -130,6 +130,7 @@ int add_element(HashTable *hashTable, char *item);
 unsigned long get_hash(char *key);
 
 TokenList *tokenize_string(char *input, bool includeSpace);
+TokenList *remove_duplicate_tokens(TokenList*);
 void delete_token_strings(TokenList *tokenList);
 void swap(TokenNode *a, TokenNode *b);
 void sort_tokens(TokenList *tl);

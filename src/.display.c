@@ -4,20 +4,13 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-typedef enum {
-    CONFIG, 
-    MAIN_MENU,
-    ENTER_FILENAME_MENU,
-    CLEAN_DOCUMENT_MENU,
-    SINGLE_ANALYZE_DOCUMENT_MENU,
-    MULTI_ANALYZE_DOCUMENT_MENU,
-    ENTER_N_MENU,
-    ENTER_KEYWORD_MENU,
-    ENTER_NUMBER_CLUSTERS_MENU, 
-    ENTER_PATH_MENU,
-    ENTER_NUMBER_CHAR_MENU,
-    ENTER_MULTISELECT_BOOL_MENU,
-} ScreenTag;
+#define MAX_WIDTH       85
+#define MAX_HEIGHT      35
+#define WSTRLEN_COEFFFICIENT    (0.350649351)
+
+#define ESC "\x1b"
+#define CLEAR() (printf("%s[2J", (ESC)));
+#define MOVE(ROW, COL) (printf("%s[%d;%df", (ESC), (ROW), (COL)))
 
 /* -------------------------------------------------------------------------- */
 /*                            CONSTANTS FOR HEADER                            */
@@ -176,10 +169,25 @@ void __extract_back_index(Screen *screens, int index)
     }
 }
 
+int __get_starting_cell(int strlen)
+{
+    strlen *= WSTRLEN_COEFFFICIENT;
+    int start = (MAX_WIDTH - strlen) / 2;
+
+    return start;
+}
+
 void display_screen(ActiveScreen *active)
 {
-    for (int i = 0; i < 2; i++)
-        printf("%s\n", active->screen->header[i]);
+    CLEAR();
+
+    for (int i = 0; i < 2; i++) {
+        char *headerRow = active->screen->header[i];
+        int startingCell = __get_starting_cell(strlen(headerRow));
+
+        MOVE(1 + i, startingCell);
+        printf("%s\n", headerRow);
+    }
 
     printf("\n");
 

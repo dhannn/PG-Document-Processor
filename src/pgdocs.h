@@ -28,16 +28,36 @@
  *     + Metadata
  */
 
+
+
+typedef struct _summary Summary;
+typedef struct _config Config;
+
+typedef struct _activeScreen ActiveScreen;
+
 /* -------------------------------------------------------------------------- */
 /*                            DISPLAY.C STRUCTURES                            */
 /* -------------------------------------------------------------------------- */
 
+typedef enum {
+    CONFIG, 
+    MAIN_MENU,
+    ENTER_FILENAME_MENU,
+    CLEAN_DOCUMENT_MENU,
+    SINGLE_ANALYZE_DOCUMENT_MENU,
+    MULTI_ANALYZE_DOCUMENT_MENU,
+    ENTER_N_MENU,
+    ENTER_KEYWORD_MENU,
+    ENTER_NUMBER_CLUSTERS_MENU, 
+    ENTER_PATH_MENU,
+    ENTER_NUMBER_CHAR_MENU,
+    ENTER_MULTISELECT_BOOL_MENU,
+} ScreenTag;
+
 typedef struct {
     char optionName[MAX_CHAR];
-    void (*do_option)(Screen, Summary, Config);
+    void (*do_option)(ActiveScreen, Summary, Config);
 } ScreenOption;
-
-typedef struct _activeScreen ActiveScreen;
 
 typedef struct { 
     char **header;
@@ -56,9 +76,6 @@ struct _activeScreen {
 /* -------------------------------------------------------------------------- */
 /*                            SUMMARY.C STRUCTURES                            */
 /* -------------------------------------------------------------------------- */
-
-typedef struct _summary Summary;
-typedef struct _config Config;
 
 typedef struct {
     const char *name;
@@ -114,6 +131,7 @@ struct _config {
 /* -------------------------------------------------------------------------- */
 
 void initialize_screens(Screen screens[]);
+void display_screen(ActiveScreen *active);
 void activate_screen(ActiveScreen* active, Screen screens[]);
 void __validate_screen_option(ActiveScreen *active);
 void go_to_screen(Screen screens[], ActiveScreen *active, int index);
@@ -176,12 +194,6 @@ void get_document_similarity(Summary *summary, Config config);
 
 void report_tfidf(Summary *summary, Config config);
 void report_document_similarity(Summary *summary, Config config);
-
-const Mode MODES[3] = {
-    {.index = CLEAN, .clean_or_analyze = clean_data}, 
-    {.index = ANALYZE_SINGLE, .clean_or_analyze = analyze_data__single},
-    {.index = ANALYZE_MULTI, .clean_or_analyze = analyze_data__multi}
-};
 
 
 #endif

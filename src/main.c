@@ -5,11 +5,13 @@
 int main()
 {
     Screen screens[MAX_SCREENS];
-    char *metadataItems[] = {"Song Title", "Album", "Artist", "Release Date"};
-    char *metadata[] = {"All Too Well (Taylor's Version) (10-Minute Version) (From The Vault)", "Red (Taylor's Version)", "Taylor Swift", "2021"};
+    ActiveScreen activeScreen;
+    // Summary summary;
+    // Config config;
 
     initialize_screens(screens);
-    print_metadata(metadataItems, metadata, 4);
+    go_to_screen(screens, &activeScreen, ENTER_PATH_MENU);
+    display_screen(&activeScreen);
 
     return 0;
 }

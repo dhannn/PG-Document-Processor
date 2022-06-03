@@ -5,6 +5,12 @@
 #include <ctype.h>
 #include <math.h>
 
+Mode MODES[] = {
+    {.index = CLEAN, .clean_or_analyze = clean_data}, 
+    {.index = ANALYZE_SINGLE, .clean_or_analyze = analyze_data__single},
+    {.index = ANALYZE_MULTI, .clean_or_analyze = analyze_data__multi}
+};
+
 #define MAX_ANALYZER_OPTIONS 3
 
 unsigned int _convert_multiselect_options(int rawInput);
@@ -21,7 +27,7 @@ void execute_summary(Summary *summary, Config config)
     tokenize_string(summary->inData, summary->mode.index == CLEAN);
 
     if(summary->mode.index == CLEAN)
-        printf("%d", summary->mode);
+        printf("%d", summary->mode.index);
     else
         analyze_data__single(summary, config);
 }
@@ -67,5 +73,4 @@ void destroy_summary(Summary *summary)
 {
     delete_token_strings(summary->tokenList);
     destroy_tokenList(summary->tokenList);
-    delete_metadata(&summary->metadata);
 }
