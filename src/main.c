@@ -11,5 +11,5 @@ int main()
     initialize_screens(screens);
     print_metadata(metadataItems, metadata, 4);
 
-    return 000000000;
+    return 0;
 }
