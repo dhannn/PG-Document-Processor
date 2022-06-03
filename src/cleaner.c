@@ -126,7 +126,21 @@ void clean_whitespace (Summary *summary, Config config)
 	TokenNode *currentNode = summary->tokenList->head;
 	TokenNode *whitespaceNode;
 	bool isPreviousNodeWhitespace = false;
+	int flag = 0;
 	
+	// removes all leading whitespaces
+	while(currentNode->tokenType == WHITESPACE){
+		if (flag == 1)
+			remove_token(summary->tokenList, whitespaceNode->tokenString);
+
+		whitespaceNode = currentNode;
+		currentNode = currentNode->next;
+		flag = 1;
+	}
+
+	if (flag == 1)
+		remove_token(summary->tokenList, whitespaceNode->tokenString);
+
 	while(currentNode != NULL) {
 		if (currentNode->tokenType == WHITESPACE){ 
 			if (isPreviousNodeWhitespace){
@@ -144,21 +158,4 @@ void clean_whitespace (Summary *summary, Config config)
 		currentNode = currentNode->next;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

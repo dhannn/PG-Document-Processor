@@ -122,7 +122,7 @@ TokenList *tokenize_string(char *input, bool includeSpace)
     
     while(*curr != '\0') {
         // bypasses the current character if excluding spaces
-        if(!includeSpace && *curr == ' ') {
+        if(!includeSpace && isspace(*curr)) {
             isPrevAlpha = isalpha(*curr);
             curr++;
             continue;
