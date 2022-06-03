@@ -37,13 +37,12 @@ void clean_data(Summary *summary, Config config)
 /*	
  *	_convert_string_to_lowercase
  *	converts a string to lowercase
+ *  precondition: all string elements are alpha
  */
 void _convert_string_to_lowercase (char *str)
 {
-	int i;
-	
-	for (i = 0; i < (strlen(str)); i++){
-   		if (str[i] < 'a' || str[i] > 'z')
+	for (int i = 0; i < (strlen(str)); i++){
+   		if (str[i] < 'a')
    			str[i] += 32;
    	}
 }
@@ -67,11 +66,34 @@ void to_lowercase (Summary *summary, Config config)
 void remove_special (Summary *summary, Config config)
 {
 	TokenNode *currentNode = summary->tokenList->head;
+	TokenNode *specialNode;
+	bool isPreviousSpecial = false;
+	
+	while(currentNode != NULL) 
+	{
+		if (currentNode->tokenType == SPECIAL){ 
+			if (isPreviousSpecial)
+				remove_token(summary->tokenList, specialNode->tokenString);
 
-	while(currentNode != NULL) {
-		if (currentNode->tokenType == SPECIAL)	
-			remove_token(summary->tokenList, currentNode->tokenString);
-			
+			else
+				isPreviousSpecial = true;
+
+			specialNode = currentNode;
+		}
+		
+		else if (currentNode->tokenType == WHITESPACE 
+				 && isPreviousSpecial){
+			remove_token(summary->tokenList, specialNode->tokenString);
+			isPreviousSpecial = false;
+		}
+
+		else if ((currentNode->tokenType == ALPHA || 
+				  currentNode->tokenType == NUMERIC) && 
+				  isPreviousSpecial){
+			strcpy(specialNode->tokenString, " ");
+			isPreviousSpecial = false;
+		}
+	
 		currentNode = currentNode->next;
 	}
 }
@@ -80,10 +102,19 @@ void remove_special (Summary *summary, Config config)
 void remove_numbers (Summary *summary, Config config)
 {
 	TokenNode *currentNode = summary->tokenList->head;
+	TokenNode *numericNode;
+	int flag = 0;
 
 	while(currentNode != NULL) {
-		if (currentNode->tokenType == NUMERIC)	
-			remove_token(summary->tokenList, currentNode->tokenString);
+		if (flag == 1){
+			remove_token(summary->tokenList, numericNode->tokenString);
+			flag = 0;
+		}
+
+		if (currentNode->tokenType == NUMERIC){
+			numericNode = currentNode;
+			flag = 1;
+		}
 			
 		currentNode = currentNode->next;
 	}
@@ -92,19 +123,23 @@ void remove_numbers (Summary *summary, Config config)
 
 void clean_whitespace (Summary *summary, Config config)
 {
-	int isPreviousNodeWhitespace = 0;
 	TokenNode *currentNode = summary->tokenList->head;
+	TokenNode *whitespaceNode;
+	bool isPreviousNodeWhitespace = false;
 	
 	while(currentNode != NULL) {
 		if (currentNode->tokenType == WHITESPACE){ 
-			if (isPreviousNodeWhitespace == 1)
-				remove_token(summary->tokenList, currentNode->tokenString);
-			
-			isPreviousNodeWhitespace = 1;	
+			if (isPreviousNodeWhitespace){
+				remove_token(summary->tokenList, whitespaceNode->tokenString);
+				isPreviousNodeWhitespace = false;		
+			} else{
+				whitespaceNode = currentNode;
+				isPreviousNodeWhitespace = true;
+			}
 		}
 		
 		else
-			isPreviousNodeWhitespace = 0;
+			isPreviousNodeWhitespace = false;
 	
 		currentNode = currentNode->next;
 	}
