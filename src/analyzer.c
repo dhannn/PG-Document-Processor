@@ -29,8 +29,8 @@ void analyze_data__single(Summary *summary, Config config)
         int current = pow(2, i);
 
         if((current & options) != 0) {
-            // ANALYZER_OPTIONS[i].do_analysis(summary, config);
-            // ANALYZER_OPTIONS[i].report_analysis(summary, config);
+            summary->mode.commands[i].execute_command(summary);
+            summary->mode.commands[i].report_results(summary);
         }
     }
 }

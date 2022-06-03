@@ -52,11 +52,12 @@ typedef enum {
     ENTER_PATH_MENU,
     ENTER_NUMBER_CHAR_MENU,
     ENTER_MULTISELECT_BOOL_MENU,
+    EXIT
 } ScreenTag;
 
 typedef struct {
     char optionName[MAX_CHAR];
-    void (*do_option)(ActiveScreen, Summary, Config);
+    void (*do_option)(ActiveScreen*, Summary*, Config*);
 } ScreenOption;
 
 typedef struct { 
@@ -68,7 +69,8 @@ typedef struct {
 } Screen;
 
 struct _activeScreen {
-    Screen *screen;
+    Screen *current;
+    Screen screens[MAX_SCREENS];
     int nInput;
     char strInput[MAX_CHAR];
 };
@@ -84,8 +86,8 @@ typedef struct {
 
 typedef struct {
     char *name;
-    void (*execute_command)();
-    void (*report_results)();
+    void (*execute_command)(Summary*);
+    void (*report_results)(Summary*);
 } Command;
 
 typedef enum {
@@ -130,11 +132,11 @@ struct _config {
 /*                        DISPLAY.C FUNCTION PROTOTYPES                       */
 /* -------------------------------------------------------------------------- */
 
-void initialize_screens(Screen screens[]);
+void initialize_screens(ActiveScreen *screens);
 void display_screen(ActiveScreen *active);
 void activate_screen(ActiveScreen* active, Screen screens[]);
 void __validate_screen_option(ActiveScreen *active);
-void go_to_screen(Screen screens[], ActiveScreen *active, int index);
+void go_to_screen(ActiveScreen *active, int index);
 void get_int(ActiveScreen *active);
 void get_str(ActiveScreen *active);
 void print_metadata(char *metadataName[], char *metadata[], int maxMetadata);
@@ -195,5 +197,12 @@ void get_document_similarity(Summary *summary, Config config);
 void report_tfidf(Summary *summary, Config config);
 void report_document_similarity(Summary *summary, Config config);
 
+
+void load_help(ActiveScreen* active, Summary *summary, Config *config);
+void return_screen(ActiveScreen* active, Summary *summary, Config *config);
+void get_filename_for_processing(ActiveScreen* active, Summary *summary, Config *config);
+void choose_option(ActiveScreen* active, Summary *summary, Config *config);
+void do_processing(ActiveScreen* active, Summary *summary, Config *config);
+bool check_if_exit(Screen screens[], ActiveScreen *active);
 
 #endif

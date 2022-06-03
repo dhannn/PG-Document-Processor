@@ -9,7 +9,7 @@
 #define WSTRLEN_COEFFFICIENT    (0.350649351)
 
 #define ESC "\x1b"
-#define CLEAR() (printf("%s[2J", (ESC)));
+#define CLEAR() (printf("%s[2J", (ESC)))
 #define MOVE(ROW, COL) (printf("%s[%d;%df", (ESC), (ROW), (COL)))
 
 /* -------------------------------------------------------------------------- */
@@ -120,16 +120,89 @@ char *DEFAULT_OPTION_NAMES[MAX_OPTIONS] = {
     "Back"
 };
 
+int BACK_INDICES[] = {
+    MAIN_MENU, 
+    EXIT,
+    -1,
+    MAIN_MENU,
+    MAIN_MENU,
+    MAIN_MENU,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1
+};
+
+/* -------------------------------------------------------------------------- */
+/*                 CONSTANTS FOR FUNCTION POINTERS PER OPTION                 */
+/* -------------------------------------------------------------------------- */
+
+void (*GET_INPUT_FUNCTIONS[])(ActiveScreen*) = {
+    get_int,
+    get_int,
+    get_str,
+    get_int,
+    get_int,
+    get_int,
+    get_int,
+    get_str,
+    get_int,
+    get_str,
+    get_int,
+    get_int
+};
+
+void (*DO_DEFAULT_OPTION[])(ActiveScreen*, Summary*, Config*) = {
+    load_help,
+    return_screen
+};
+
+
+void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
+    {
+        NULL
+    },
+    {
+        get_filename_for_processing,
+        get_filename_for_processing,
+        get_filename_for_processing
+    },
+    {
+        choose_option
+    },
+    {
+        do_processing,
+        do_processing,
+        do_processing,
+        do_processing,
+        do_processing
+    },
+    {
+        do_processing,
+        do_processing,
+        do_processing
+    },
+    {
+        do_processing,
+        do_processing
+    }
+};
+
 void __extract_options(Screen *screens, int index);
 void __extract_back_index(Screen *screens, int index);
 
-void initialize_screens(Screen *screens)
+void initialize_screens(ActiveScreen *screen)
 {
+    Screen *screens = screen->screens;
+    
     for(int i = 0; i < MAX_SCREENS; i++) {
         screens[i].header = HEADERS[i];
         screens[i].prompt = PROMPTS[i];
+        screens[i].get_input = GET_INPUT_FUNCTIONS[i];
+        screens[i].backIndex = BACK_INDICES[i];
         __extract_options(screens, i);
-        __extract_back_index(screens, i);
     }
 }
 
@@ -143,12 +216,14 @@ void __extract_options(Screen *screens, int index)
 
         if(OPTION_NAMES[index][i] != NULL) {
             strcpy(opt->optionName, OPTION_NAMES[index][i]);
+            opt->do_option = DO_OPTION[index][i];
             continue;
         }
 
         // TODO: refactor ugly logic
         if(DEFAULT_OPTION_NAMES[numDefaultOpts] != NULL && strcmp(OPTION_NAMES[index][0], "") != 0) {
             strcpy(opt->optionName, DEFAULT_OPTION_NAMES[numDefaultOpts]);
+            opt->do_option = DO_DEFAULT_OPTION[numDefaultOpts];
             numDefaultOpts++;
         } else 
             strcpy(opt->optionName, "");
@@ -182,7 +257,7 @@ void display_screen(ActiveScreen *active)
     CLEAR();
 
     for (int i = 0; i < 2; i++) {
-        char *headerRow = active->screen->header[i];
+        char *headerRow = active->current->header[i];
         int startingCell = __get_starting_cell(strlen(headerRow));
 
         MOVE(1 + i, startingCell);
@@ -192,18 +267,19 @@ void display_screen(ActiveScreen *active)
     printf("\n");
 
     for (int i = 0; i < MAX_OPTIONS; i++){
-        if (strcmp(active->screen->options[i].optionName, "") != 0)
-            printf("\t[%d] %s\n", i + 1, active->screen->options[i].optionName);
+        if (strcmp(active->current->options[i].optionName, "") != 0)
+            printf("\t[%d] %s\n", i + 1, active->current->options[i].optionName);
     }
 
-    printf("\n\t%s\n", active->screen->prompt);
+    printf("\n\t%s\n", active->current->prompt);
     printf("\t>> ");
 }
 
 
-void go_to_screen(Screen screens[], ActiveScreen *active, int index)
+void go_to_screen(ActiveScreen *active, int index)
 {   
-    active->screen = &screens[index];
+    Screen *screens = active->screens;
+    active->current = &screens[index];
 }
 
 void get_int(ActiveScreen *active)
