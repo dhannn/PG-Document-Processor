@@ -18,17 +18,16 @@ int main()
     summary.outFile = fopen("samples_files/output/a_word_count.txt", "w");
     read_clean_file(&summary, config, "s");
 
-    // remove_numbers (&summary, config);
-    // remove_special (&summary, config);
-    // to_lowercase (&summary, config);
-    // clean_whitespace (&summary, config);
+    // remove_numbers (&summary);
+    // remove_special (&summary);
+    // to_lowercase (&summary);
+    // clean_whitespace (&summary);
+    // _merge_alpha_nodes (&summary);
 
-    print_tokens (summary.tokenList);
+    // print_tokens (summary.tokenList);
 
 
     //get_word_count(&summary, config);
-
-
-
+    
     return 0;
 }

@@ -72,12 +72,13 @@ typedef struct {
 #define MAX_CLEANER_OPTIONS 4
 
 void read_clean_file(Summary *summary, Config config, char *filename);
-// TokenList *tokenize(char *input, bool includeSpace);
+TokenList *tokenize(char *input, bool includeSpace);
 
-void to_lowercase (Summary *summary, Config config);
-void remove_special (Summary *summary, Config config);
-void remove_numbers (Summary *summary, Config config);
-void clean_whitespace (Summary *summary, Config config);
+void to_lowercase (Summary *summary);
+void remove_special (Summary *summary);
+void remove_numbers (Summary *summary);
+void clean_whitespace (Summary *summary);
+void remove_stopword (Summary *summary);
 
 TokenList *convert_to_ngrams(TokenList *tl, int n);
 void delete_tokens(TokenList *tokenList);

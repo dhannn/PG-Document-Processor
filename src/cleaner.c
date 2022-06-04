@@ -13,6 +13,7 @@ typedef enum {
     CLEAN_WHITESPACE 	=		0b01000
 } CLEANER_OPTIONS_INDEX;
 
+/*
 const CleanerOption CLEANER_OPTIONS[] = {
     {"To Lowercase", to_lowercase},
     {"Remove Special Characters", remove_special},
@@ -20,7 +21,7 @@ const CleanerOption CLEANER_OPTIONS[] = {
     {"Clean Whitespace", clean_whitespace}
 };
 
-void clean_data(Summary *summary, Config config)
+void clean_data(Summary *summary)
 {
 	unsigned int options = summary->options;
 
@@ -32,7 +33,7 @@ void clean_data(Summary *summary, Config config)
             // CLEANER_OPTIONS[i].report_analysis(summary, config);
         }
     }
-}
+}*/
 
 /*	
  *	_convert_string_to_lowercase
@@ -48,7 +49,7 @@ void _convert_string_to_lowercase (char *str)
 }
 
 
-void to_lowercase (Summary *summary, Config config)
+void to_lowercase (Summary *summary)
 {
 	TokenNode *currentNode = summary->tokenList->head;
     
@@ -63,7 +64,7 @@ void to_lowercase (Summary *summary, Config config)
 }
 
 
-void remove_special (Summary *summary, Config config)
+void remove_special (Summary *summary)
 {
 	TokenNode *currentNode = summary->tokenList->head;
 	TokenNode *specialNode;
@@ -99,7 +100,7 @@ void remove_special (Summary *summary, Config config)
 }
 
 
-void remove_numbers (Summary *summary, Config config)
+void remove_numbers (Summary *summary)
 {
 	TokenNode *currentNode = summary->tokenList->head;
 	TokenNode *numericNode;
@@ -121,7 +122,7 @@ void remove_numbers (Summary *summary, Config config)
 }
 
 
-void clean_whitespace (Summary *summary, Config config)
+void clean_whitespace (Summary *summary)
 {
 	TokenNode *currentNode = summary->tokenList->head;
 	TokenNode *whitespaceNode;
@@ -159,3 +160,41 @@ void clean_whitespace (Summary *summary, Config config)
 	}
 }
 
+/*	
+ *	_merge_alpha_node
+ *	merges all neighboring alpha nodes
+ */
+void _merge_alpha_nodes (Summary *summary)
+{
+	TokenNode *currentNode = summary->tokenList->head;
+	TokenNode *alphaNode, *deleteNode;
+	bool isPreviousAlpha = false; 
+	int flag = 0;
+	
+	while(currentNode != NULL) 
+	{
+		if (currentNode->tokenType == ALPHA){ 
+			if (isPreviousAlpha){
+				strcat(alphaNode->tokenString, currentNode->tokenString);
+				deleteNode = currentNode;
+				flag = 1;
+			} else{
+				isPreviousAlpha = true;
+				alphaNode = currentNode;
+			}
+		}
+
+		else 
+			isPreviousAlpha = false;
+		
+		currentNode = currentNode->next;
+
+		if (flag == 1){
+			remove_token(summary->tokenList, deleteNode->tokenString);
+			flag = 0;
+		}
+	}
+}
+
+
+void remove_stopword (Summary *summary);
