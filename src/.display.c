@@ -292,7 +292,11 @@ void display_screen(ActiveScreen *active, Summary *summary)
 
         for(int i = 0; i < MAX_METADATA; i++) {
             strcpy(metadata[i], summary->metadata[i].name);
-            strcpy(metadataItem[i], summary->metadata[i].data);
+            
+            if(summary->metadata[i].data != NULL) 
+                strcpy(metadataItem[i], summary->metadata[i].data);
+            else
+                strcpy(metadataItem[i], "");
         }
 
         print_metadata(metadata, metadataItem, MAX_METADATA);
@@ -327,13 +331,14 @@ void get_str(ActiveScreen *active)
 
 void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], int maxMetadata)
 {
-    printf ("*************************************************************************************\n");
+    printf ("*************************************************************************************\n\n");
 		
     for (int i = 0; i < maxMetadata; i++){
-        printf ("\t%s: %s\n", metadataName[i], metadata[i]);
+        if(strcmp(metadata[i], "") != 0)
+            printf ("\t%s: %s\n", metadataName[i], metadata[i]);
      }
 
-    printf ("*************************************************************************************\n");
+    printf ("\n*************************************************************************************\n");
 }
 
 

@@ -57,6 +57,7 @@ void read_metadata(FILE *file, MetadataItem items[], ModeIndex mode)
             flag = fscanf(file, "%[^\n]s", buff);
             set_metadata(items, index, buff);
         }
+        
     } while(!__check_if_content_start(buff, mode) && flag != EOF);
 
 }

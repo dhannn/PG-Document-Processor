@@ -62,11 +62,6 @@ void return_screen(ActiveScreen* active, Summary *summary, Config *config)
         // TODO: move this code snippet to a function in display.c
         MOVE(1, 1);
         CLEAR();
-        fflush(stdin);
-        printf("Press ENTER to exit\n");
-        scanf("%*c");
-        MOVE(1, 1);
-        CLEAR();
         exit(EXIT_SUCCESS);
     }
 
