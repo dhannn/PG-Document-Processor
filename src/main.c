@@ -9,7 +9,9 @@ int main()
     Config config;
 
     initialize_screens(&activeScreen);
-    config.isInitialized = false;
+
+    if(!check_config_initialized())
+        initialize_config(&activeScreen, &config);
 
     go_to_screen(&activeScreen, MAIN_MENU);
     do {

@@ -43,9 +43,9 @@ What are the options for data analysis?
         similar to the word count and n-gram count but considers relative term 
         frequency of other documents in a corpus of text
     * Document similarity
-        computes the similarity of two documents either based on tf-idf
+        computes the similarity of two documents based on tf-idf
     * Document clustering
-        assigns documents in a corpus to clusters either based on tf-idf
+        assigns documents in a corpus to clusters based on tf-idf
 
 ------------------------------------------------------------------------------------
 

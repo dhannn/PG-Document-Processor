@@ -4,10 +4,44 @@
 #include <stdlib.h>
 
 #define HELP_FILE "dat/help.txt"
+#define CONFIG_FILE "dat/config"
 #define ESC "\x1b"
 #define CLEAR() (printf("%s[2J", (ESC)))
 #define MOVE(ROW, COL) (printf("%s[%d;%df", (ESC), (ROW), (COL)))
 
+void initialize_config(ActiveScreen *active, Config *config)
+{
+    const ScreenTag CONFIG_SCREENS[] = {
+        ENTER_RAW_PATH_MENU, 
+        ENTER_CLEANED_PATH_MENU,
+        ENTER_ANALYSIS_PATH_MENU,
+        ENTER_NUMBER_CHAR_MENU,
+        ENTER_MULTISELECT_BOOL_MENU
+    };
+    
+    FILE *configFile = fopen("dat/config", "w");
+    fclose(configFile);
+
+    for(int i = 0; i < 5; i++) {
+        
+        int index = CONFIG_SCREENS[i];
+        
+        go_to_screen(active, index);
+        display_screen(active);
+        active->current->get_input(active);
+
+        if(i < 3) {
+            set_config_path(config, i, active->strInput);
+        } else {
+            set_config_int(config, i, active->nInput);
+        }
+    }
+}
+
+void reset_config(ActiveScreen *active, Summary *summary, Config *config)
+{
+    remove(CONFIG_FILE);
+}
 
 void load_help(ActiveScreen* active, Summary *summary, Config *config)
 {
@@ -23,8 +57,10 @@ void return_screen(ActiveScreen* active, Summary *summary, Config *config)
         MOVE(1, 1);
         CLEAR();
         fflush(stdin);
-        printf("Press ENTER to exit.");
+        printf("Press ENTER to exit\n");
         scanf("%*c");
+        MOVE(1, 1);
+        CLEAR();
         exit(EXIT_SUCCESS);
     }
 
@@ -65,7 +101,7 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config)
 
 void do_processing(ActiveScreen* active, Summary *summary, Config *config)
 {
-    summary->mode.clean_or_analyze();
+    summary->mode.clean_or_analyze(summary, *config);
 }
 
 bool check_if_exit(Screen screens[], ActiveScreen *active)

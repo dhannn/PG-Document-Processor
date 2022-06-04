@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #define MAX_CHAR        1024
 #define MAX_OPTIONS     10
-#define MAX_SCREENS     12
+#define MAX_SCREENS     14
 #define MAX_METADATA    5
 
 /**
@@ -49,7 +49,9 @@ typedef enum {
     ENTER_N_MENU,
     ENTER_KEYWORD_MENU,
     ENTER_NUMBER_CLUSTERS_MENU, 
-    ENTER_PATH_MENU,
+    ENTER_RAW_PATH_MENU,
+    ENTER_CLEANED_PATH_MENU,
+    ENTER_ANALYSIS_PATH_MENU,
     ENTER_NUMBER_CHAR_MENU,
     ENTER_MULTISELECT_BOOL_MENU,
     EXIT
@@ -98,7 +100,7 @@ typedef enum {
 
 typedef struct {
     Command commands[MAX_OPTIONS];
-    void (*clean_or_analyze)();
+    void (*clean_or_analyze)(Summary*, Config);
     ModeIndex index;
 } Mode;
 
@@ -121,9 +123,9 @@ struct _summary {
 
 struct _config {
     bool isInitialized;         // whether config is initialized or not
-    char *rawDocumentPath;      // path of raw PG documents
-    char *cleanedDocumentPath;  // path of cleaned documents
-    char *analysisOutputPath;   // path of output files (i.e., word count,...)
+    char rawDocumentPath[MAX_CHAR];      // path of raw PG documents
+    char cleanedDocumentPath[MAX_CHAR];  // path of cleaned documents
+    char analysisOutputPath[MAX_CHAR];   // path of output files (e.g. word count)
     int numChar;                // number of character to be read from content
     bool multiSelect;           // allow to choose more than one option
 };
@@ -171,6 +173,13 @@ int get_metadata_index(MetadataItem metadataItems[], char *str);
 void delete_metadata(MetadataItem metadata[]);
 
 /* -------------------------------------------------------------------------- */
+/*                        CONFIG.C FUNCTION PROTOTYPES                        */
+/* -------------------------------------------------------------------------- */
+bool check_config_initialized();
+void set_config_path(Config *config, int index, char *path);
+void set_config_int(Config *config, int index, int data);
+
+/* -------------------------------------------------------------------------- */
 /*                        CLEANER.C FUNCTION PROTOTYPES                       */
 /* -------------------------------------------------------------------------- */
 void clean_data(Summary *summary, Config config);
@@ -197,7 +206,12 @@ void get_document_similarity(Summary *summary, Config config);
 void report_tfidf(Summary *summary, Config config);
 void report_document_similarity(Summary *summary, Config config);
 
+/* -------------------------------------------------------------------------- */
+/*                        ENGINE.C FUNCTION PROTOTYPES                        */
+/* -------------------------------------------------------------------------- */
 
+void initialize_config(ActiveScreen *active, Config *config);
+void reset_config(ActiveScreen *active, Summary *summary, Config *config);
 void load_help(ActiveScreen* active, Summary *summary, Config *config);
 void return_screen(ActiveScreen* active, Summary *summary, Config *config);
 void get_filename_for_processing(ActiveScreen* active, Summary *summary, Config *config);

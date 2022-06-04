@@ -49,6 +49,8 @@ char **HEADERS[] = {
     TITLE_HEADER,
     CONFIG_HEADER,
     CONFIG_HEADER,
+    CONFIG_HEADER,
+    CONFIG_HEADER,
     CONFIG_HEADER
 };
 
@@ -66,7 +68,9 @@ char *PROMPTS[] = {
     "Enter the value of N",
     "Enter a keyword to be searched",
     "Enter the number of clusters to be analyzed",
-    "Enter a valid path",
+    "Enter a valid path for the raw document files",
+    "Enter a valid path for the cleaned document files",
+    "Enter a valid path for the analysis files",
     "Enter the number of characters you want to read (enter 0 if all)",
     "Enter 1 if you want multiselect on; 0 if otherwise"
 };
@@ -82,7 +86,8 @@ char *OPTION_NAMES[][MAX_OPTIONS] = {
         "Default path for cleaned documents",
         "Default path for analyses",
         "Default number for characters to read",
-        "Multi-select?"
+        "Multi-select?",
+        "Reset config"
     }, 
     {
         "Clean document",
@@ -112,6 +117,8 @@ char *OPTION_NAMES[][MAX_OPTIONS] = {
     {""},
     {""},
     {""},
+    {""},
+    {""},
     {""}
 };
 
@@ -127,6 +134,8 @@ int BACK_INDICES[] = {
     MAIN_MENU,
     MAIN_MENU,
     MAIN_MENU,
+    -1,
+    -1,
     -1,
     -1,
     -1,
@@ -150,6 +159,8 @@ void (*GET_INPUT_FUNCTIONS[])(ActiveScreen*) = {
     get_str,
     get_int,
     get_str,
+    get_str,
+    get_str,
     get_int,
     get_int
 };
@@ -162,7 +173,12 @@ void (*DO_DEFAULT_OPTION[])(ActiveScreen*, Summary*, Config*) = {
 
 void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
     {
-        NULL
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        reset_config
     },
     {
         get_filename_for_processing,

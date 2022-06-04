@@ -26,10 +26,7 @@ void execute_summary(Summary *summary, Config config)
     read_file(summary, config);
     tokenize_string(summary->inData, summary->mode.index == CLEAN);
 
-    if(summary->mode.index == CLEAN)
-        printf("%d", summary->mode.index);
-    else
-        analyze_data__single(summary, config);
+    summary->mode.clean_or_analyze(summary, config);
 }
 
 void set_options(Summary *summary, Config config, int rawInput)
