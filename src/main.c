@@ -21,7 +21,7 @@ int main()
             index = activeScreen.nInput - 1;
         
         activeScreen.current->options[index].do_option(&activeScreen, &summary, &config);
-    } while(!check_if_exit(activeScreen.current, &activeScreen));
+    } while(!check_if_exit(activeScreen.screens, &activeScreen));
 
     return 0;
 }

@@ -7,10 +7,11 @@
 
 #define NOT_METADATA -1
 
-#define CLEAN_CONTENT_START_SIGNIFIER "*** Start"
+#define CLEAN_CONTENT_START_SIGNIFIER "*** START"
 #define ANALYZE_CONTENT_START_SIGNIFIER "Content"
 
-char *_get_starting_token(ModeIndex mode);
+char *__get_starting_token(ModeIndex mode);
+bool __check_if_content_start(char buff[], ModeIndex mode);
 
 void read_file(Summary *summary, Config config)
 {
@@ -45,21 +46,18 @@ void seek_metadata(FILE *file, MetadataItem items[], int buffSize)
 
 void read_metadata(FILE *file, MetadataItem items[], ModeIndex mode)
 {
-    char buff[BUFSIZ];
+    char buff[MAX_CHAR];
     int flag;
 
-    char *startingToken = _get_starting_token(mode);
-    
     do {
-        flag = fscanf(file," %[^:]: s", buff);
+        flag = fscanf(file, " %[^:\n]: s", buff);
         int index = get_metadata_index(items, buff);
-
+        
         if(index != NOT_METADATA) {
-            flag = fscanf(file,"%[^\n]s", buff);
+            flag = fscanf(file, "%[^\n]s", buff);
             set_metadata(items, index, buff);
         }
-        
-    } while(strcmp(buff, startingToken) != 0 && flag != EOF);
+    } while(!__check_if_content_start(buff, mode) && flag != EOF);
 
 }
 
@@ -93,10 +91,19 @@ void clean_up_reader()
     
 }
 
-char *_get_starting_token(ModeIndex mode)
+char *__get_starting_token(ModeIndex mode)
 {
     if(mode == CLEAN)
         return CLEAN_CONTENT_START_SIGNIFIER;
         
     return ANALYZE_CONTENT_START_SIGNIFIER;
+}
+
+bool __check_if_content_start(char buff[], ModeIndex mode)
+{
+    char *startingToken = __get_starting_token(mode);
+    int len = strlen(startingToken);
+    buff[len] = '\0';
+
+    return strcmp(startingToken, buff) == 0;
 }
