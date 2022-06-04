@@ -9,13 +9,11 @@ int main()
     Config config;
 
     initialize_screens(&activeScreen);
-
-    if(!check_config_initialized())
-        initialize_config(&activeScreen, &config);
+    initialize_config(&activeScreen, &config);
 
     go_to_screen(&activeScreen, MAIN_MENU);
     do {
-        display_screen(&activeScreen);
+        display_screen(&activeScreen, &summary);
         activeScreen.current->get_input(&activeScreen);
 
         int index = 0;
@@ -24,7 +22,6 @@ int main()
         
         activeScreen.current->options[index].do_option(&activeScreen, &summary, &config);
     } while(!check_if_exit(activeScreen.current, &activeScreen));
-    display_screen(&activeScreen);
 
     return 0;
 }

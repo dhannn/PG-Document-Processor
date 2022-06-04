@@ -22,7 +22,25 @@ bool check_config_initialized()
 
 void load_config(Config *config)
 {
+    FILE *file = fopen(CONFIG_FILENAME, "r");
+    int flag = 1;
+    char *arr[] = {
+        config->rawDocumentPath,
+        config->cleanedDocumentPath,
+        config->analysisOutputPath
+    };
 
+    char buff[MAX_CHAR];
+
+    for(int i = 0; flag != EOF; i++) {
+        flag = fscanf(file, "%s", buff);
+        
+        if(i < 3) {
+            strcpy(arr[i], buff);
+        }
+    }
+
+    fclose(file);
 }
 
 void set_config_path(Config *config, int index, char *path)

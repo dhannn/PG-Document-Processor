@@ -29,8 +29,8 @@ void analyze_data__single(Summary *summary, Config config)
         int current = pow(2, i);
 
         if((current & options) != 0) {
-            summary->mode.commands[i].execute_command(summary);
-            summary->mode.commands[i].report_results(summary);
+            summary->mode.commands[i].execute_command(summary, config);
+            summary->mode.commands[i].report_results(summary, config);
         }
     }
 }
@@ -160,6 +160,9 @@ void report_token_frequency(Summary *summary, Config config)
         tokenNode = next_token(list);
         n++;
     }
+
+    fflush(stdin);
+    scanf("%*c");
 }
 
 void report_ngram_count(Summary *summary, Config config)

@@ -23,8 +23,6 @@ void read_file(Summary *summary, Config config)
     seek_metadata(infile, summary->metadata, buffSize);
     read_metadata(infile, summary->metadata, summary->mode.index);
     read_content(infile, &summary->inData, config.numChar);
-
-    summary->tokenList = tokenize_string(summary->inData, false);
 }
 
 void seek_metadata(FILE *file, MetadataItem items[], int buffSize)

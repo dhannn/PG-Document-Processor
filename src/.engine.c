@@ -1,6 +1,7 @@
 #include "pgdocs.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 #define HELP_FILE "dat/help.txt"
@@ -11,6 +12,11 @@
 
 void initialize_config(ActiveScreen *active, Config *config)
 {
+    if(check_config_initialized()) {
+        load_config(config);
+        return;
+    }
+
     const ScreenTag CONFIG_SCREENS[] = {
         ENTER_RAW_PATH_MENU, 
         ENTER_CLEANED_PATH_MENU,
@@ -27,7 +33,7 @@ void initialize_config(ActiveScreen *active, Config *config)
         int index = CONFIG_SCREENS[i];
         
         go_to_screen(active, index);
-        display_screen(active);
+        display_screen(active, NULL);
         active->current->get_input(active);
 
         if(i < 3) {
@@ -80,9 +86,14 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config)
 {
     char *filename = active->strInput;
     // TODO: finish and call set_infile
+    set_infile(summary, *config, filename);
 
     int mode = summary->mode.index;
     int screen = MAIN_MENU;
+    
+    initialize_metadata(summary->metadata);
+    read_file(summary, *config);
+    summary->tokenList = tokenize_string(summary->inData, summary->mode.index == CLEAN);
 
     switch(mode) {
         case CLEAN:
@@ -101,7 +112,8 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config)
 
 void do_processing(ActiveScreen* active, Summary *summary, Config *config)
 {
-    summary->mode.clean_or_analyze(summary, *config);
+    set_options(summary, *config, active->nInput);
+    execute_summary(summary, *config);
 }
 
 bool check_if_exit(Screen screens[], ActiveScreen *active)

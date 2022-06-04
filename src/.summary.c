@@ -6,8 +6,21 @@
 #include <math.h>
 
 Mode MODES[] = {
-    {.index = CLEAN, .clean_or_analyze = clean_data}, 
-    {.index = ANALYZE_SINGLE, .clean_or_analyze = analyze_data__single},
+    {
+        .index = CLEAN, 
+        .clean_or_analyze = clean_data
+    }, 
+    {
+        .index = ANALYZE_SINGLE, 
+        .clean_or_analyze = analyze_data__single,
+        .commands = {
+            {
+                .name = "Word Count",
+                .execute_command = get_word_count,
+                .report_results = report_token_frequency
+            }
+        }
+    },
     {.index = ANALYZE_MULTI, .clean_or_analyze = analyze_data__multi}
 };
 
@@ -20,12 +33,22 @@ void set_mode(Summary *summary, ModeIndex mode)
     summary->mode = MODES[mode];
 }
 
+void set_infile(Summary *summary, Config config, char *filename)
+{
+    char completeFilename[MAX_CHAR];
+
+    if(summary->mode.index == CLEAN)
+        strcpy(completeFilename, config.rawDocumentPath);
+    else
+        strcpy(completeFilename, config.cleanedDocumentPath);
+
+    strcat(completeFilename, "/");
+    strcat(completeFilename, filename);
+    summary->inFile = fopen(completeFilename, "r");
+}
+
 void execute_summary(Summary *summary, Config config)
 {
-    initialize_metadata(summary->metadata);
-    read_file(summary, config);
-    tokenize_string(summary->inData, summary->mode.index == CLEAN);
-
     summary->mode.clean_or_analyze(summary, config);
 }
 

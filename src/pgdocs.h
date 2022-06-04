@@ -88,8 +88,8 @@ typedef struct {
 
 typedef struct {
     char *name;
-    void (*execute_command)(Summary*);
-    void (*report_results)(Summary*);
+    void (*execute_command)(Summary*, Config);
+    void (*report_results)(Summary*, Config);
 } Command;
 
 typedef enum {
@@ -135,19 +135,20 @@ struct _config {
 /* -------------------------------------------------------------------------- */
 
 void initialize_screens(ActiveScreen *screens);
-void display_screen(ActiveScreen *active);
+void display_screen(ActiveScreen *active, Summary *summary);
 void activate_screen(ActiveScreen* active, Screen screens[]);
 void __validate_screen_option(ActiveScreen *active);
 void go_to_screen(ActiveScreen *active, int index);
 void get_int(ActiveScreen *active);
 void get_str(ActiveScreen *active);
-void print_metadata(char *metadataName[], char *metadata[], int maxMetadata);
+void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], int maxMetadata);
 
 /* -------------------------------------------------------------------------- */
 /*                        SUMMARY.C FUNCTION PROTOTYPES                       */
 /* -------------------------------------------------------------------------- */
 // encapsulates the request and the needed variables in one structure
 void set_mode(Summary *summary, ModeIndex mode);
+void set_infile(Summary *summary, Config config, char *filename);
 void set_options(Summary *summary, Config config, int rawInput);
 void execute_summary(Summary *summary, Config config);
 void destroy_summary(Summary *summary);
@@ -176,6 +177,7 @@ void delete_metadata(MetadataItem metadata[]);
 /*                        CONFIG.C FUNCTION PROTOTYPES                        */
 /* -------------------------------------------------------------------------- */
 bool check_config_initialized();
+void load_config(Config *config);
 void set_config_path(Config *config, int index, char *path);
 void set_config_int(Config *config, int index, int data);
 
@@ -191,6 +193,7 @@ void clean_data(Summary *summary, Config config);
 
 void analyze_data__single(Summary *summary, Config config);
 void analyze_data__multi(Summary *summary, Config config);
+void report_token_frequency(Summary *summary, Config config);
 
 void get_word_count(Summary *summary, Config config);
 void get_ngram_count(Summary *summary, Config config);

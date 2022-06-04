@@ -268,19 +268,36 @@ int __get_starting_cell(int strlen)
     return start;
 }
 
-void display_screen(ActiveScreen *active)
+void display_screen(ActiveScreen *active, Summary *summary)
 {
     CLEAR();
 
+    printf("\n");
     for (int i = 0; i < 2; i++) {
         char *headerRow = active->current->header[i];
         int startingCell = __get_starting_cell(strlen(headerRow));
 
-        MOVE(1 + i, startingCell);
+        MOVE(2 + i, startingCell);
         printf("%s\n", headerRow);
     }
 
     printf("\n");
+
+    if(active->current == &active->screens[CLEAN_DOCUMENT_MENU] ||
+        active->current == &active->screens[SINGLE_ANALYZE_DOCUMENT_MENU] ||
+        active->current == &active->screens[MULTI_ANALYZE_DOCUMENT_MENU]
+    ) {
+        char metadata[MAX_METADATA][MAX_CHAR];
+        char metadataItem[MAX_METADATA][MAX_CHAR];
+
+        for(int i = 0; i < MAX_METADATA; i++) {
+            strcpy(metadata[i], summary->metadata[i].name);
+            strcpy(metadataItem[i], summary->metadata[i].data);
+        }
+
+        print_metadata(metadata, metadataItem, MAX_METADATA);
+        printf("\n");
+    }
 
     for (int i = 0; i < MAX_OPTIONS; i++){
         if (strcmp(active->current->options[i].optionName, "") != 0)
@@ -308,13 +325,15 @@ void get_str(ActiveScreen *active)
     scanf ("%s", active->strInput);
 }
 
-void print_metadata(char *metadataName[], char *metadata[], int maxMetadata)
+void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], int maxMetadata)
 {
-    printf ("************************************************\n");
+    printf ("*************************************************************************************\n");
 		
     for (int i = 0; i < maxMetadata; i++){
-        printf ("%s: %s\n", metadataName[i], metadata[i]);
+        printf ("\t%s: %s\n", metadataName[i], metadata[i]);
      }
 
-    printf ("************************************************\n");
+    printf ("*************************************************************************************\n");
 }
+
+
