@@ -107,14 +107,6 @@ void get_word_count(Summary *summary, Config config)
     destroy_hash_table(ht);
     delete_token_strings(tokensWithDuplicates);
     destroy_tokenList(tokensWithDuplicates);
-
-    // TODO: abstract away the deallocation of shit
-    // free(summary->inData); // [/]
-    // for(int i = 0; i < MAX_METADATA_ITEMS; i++) {
-    //     free(summary->metadata.metadataItems[i].data);
-    // }
-    
-    // destroy_tokenList(summary->tokenList);
 }
 
 void get_ngram_count(Summary *summary, Config config)

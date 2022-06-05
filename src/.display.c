@@ -8,9 +8,41 @@
 #define MAX_HEIGHT      35
 #define WSTRLEN_COEFFFICIENT    (0.350649351)
 
+// ansi escape codes
 #define ESC "\x1b"
 #define CLEAR() (printf("%s[2J", (ESC)))
 #define MOVE(ROW, COL) (printf("%s[%d;%df", (ESC), (ROW), (COL)))
+#define FMT(X) (printf("%s[%dm", (ESC), (X)))
+#define COLOR(X, Y) (printf("%s[%d;%dm", (ESC), (X), (Y)))
+
+enum FORMAT {
+    BOLD = 1,
+    DIM,
+    ITALIC,
+    UNDERLINE,
+};
+
+enum COLORS{
+    RESET_COLOR = 0,
+    BLACK_FG = 30,
+    RED_FG,
+    GREEN_FG,
+    YELLOW_FG,
+    BLUE_FG,
+    MAGENTA_FG,
+    CYAN_FG,
+    WHITE_FG,
+    DEFAULT_FG = 39,
+    BLACK_BG,
+    RED_BG,
+    GREEN_BG,
+    YELLOW_BG,
+    BLUE_BG,
+    MAGENTA_BG,
+    CYAN_BG,
+    WHITE_BG,
+    DEFAULT_BG
+};
 
 /* -------------------------------------------------------------------------- */
 /*                            CONSTANTS FOR HEADER                            */
@@ -336,8 +368,13 @@ void display_screen(ActiveScreen *active, Summary *summary)
     }
 
     for (int i = 0; i < MAX_OPTIONS; i++){
-        if (strcmp(active->current->options[i].optionName, "") != 0)
-            printf("\t[%d] %s\n", i + 1, active->current->options[i].optionName);
+        if (strcmp(active->current->options[i].optionName, "") != 0) {
+            FMT(YELLOW_FG);
+            printf("\t[");
+            printf("%d]", i + 1);
+            COLOR(RESET_COLOR, RESET_COLOR);
+            printf(" %s\n", active->current->options[i].optionName);
+        }
     }
 
     printf("\n\t%s\n", active->current->prompt);
@@ -353,24 +390,37 @@ void go_to_screen(ActiveScreen *active, int index)
 
 void get_int(ActiveScreen *active)
 {
+    FMT(YELLOW_FG);
     scanf ("%d", &active->nInput);
+    COLOR(RESET_COLOR, RESET_COLOR);
 }
 
 void get_str(ActiveScreen *active)
 {
+    FMT(YELLOW_FG);
     scanf ("%s", active->strInput);
+    COLOR(RESET_COLOR, RESET_COLOR);
 }
 
 void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], int maxMetadata)
 {
+    FMT(CYAN_FG);
     printf ("*************************************************************************************\n\n");
 		
     for (int i = 0; i < maxMetadata; i++){
-        if(strcmp(metadata[i], "") != 0)
-            printf ("\t%s: %s\n", metadataName[i], metadata[i]);
+        if(strcmp(metadata[i], "") != 0) { 
+            FMT(RESET_COLOR); FMT(CYAN_FG);
+            printf ("\t%s:", metadataName[i]);
+            FMT(RESET_COLOR); FMT(DIM);
+            FMT(BOLD);
+            printf (" %s\n", metadata[i]);
+        }
      }
 
+    FMT(RESET_COLOR);
+    FMT(CYAN_FG);
     printf ("\n*************************************************************************************\n");
+    FMT(RESET_COLOR);
 }
 
 void print_results(char *results, FILE *outfile)
