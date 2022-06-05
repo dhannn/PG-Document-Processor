@@ -24,10 +24,15 @@ void load_config(Config *config)
 {
     FILE *file = fopen(CONFIG_FILENAME, "r");
     int flag = 1;
-    char *arr[] = {
+    char *paths[] = {
         config->rawDocumentPath,
         config->cleanedDocumentPath,
         config->analysisOutputPath
+    };
+
+    int *ints[2] = {
+        &(config->numChar),
+        (int*)&(config->multiSelect)
     };
 
     char buff[MAX_CHAR];
@@ -36,7 +41,9 @@ void load_config(Config *config)
         flag = fscanf(file, "%s", buff);
         
         if(i < 3) {
-            strcpy(arr[i], buff);
+            strcpy(paths[i], buff);
+        } else {
+            *(ints[i - 3]) = atoi(buff);
         }
     }
 

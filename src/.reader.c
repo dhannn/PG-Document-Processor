@@ -57,7 +57,7 @@ void read_metadata(FILE *file, MetadataItem items[], ModeIndex mode)
             flag = fscanf(file, "%[^\n]s", buff);
             set_metadata(items, index, buff);
         }
-        
+
     } while(!__check_if_content_start(buff, mode) && flag != EOF);
 
 }
@@ -87,9 +87,10 @@ void read_content(FILE *file, char **inputData, int maxChar)
     *inputData = temp;
 }
 
-void clean_up_reader()
+void clean_up_reader(Summary *summary)
 {
-    
+    delete_metadata(summary->metadata);
+    free(summary->inData);
 }
 
 char *__get_starting_token(ModeIndex mode)

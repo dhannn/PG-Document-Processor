@@ -162,7 +162,7 @@ void read_file(Summary *summary, Config config);
 void seek_metadata(FILE *file, MetadataItem items[], int buffSize);
 void read_metadata(FILE *file, MetadataItem items[], ModeIndex mode);
 void read_content(FILE *file, char **inputData, int maxChar);
-void clean_up_reader();
+void clean_up_reader(Summary *summary);
 
 /* -------------------------------------------------------------------------- */
 /*                       METADATA.C FUNCTION PROTOTYPES                       */

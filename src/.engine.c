@@ -109,6 +109,9 @@ void do_processing(ActiveScreen* active, Summary *summary, Config *config)
 {
     set_options(summary, *config, active->nInput);
     execute_summary(summary, *config);
+    destroy_summary(summary);
+    
+    go_to_screen(active, MAIN_MENU);
 }
 
 bool check_if_exit(Screen screens[], ActiveScreen *active)

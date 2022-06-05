@@ -270,14 +270,14 @@ int __get_starting_cell(int strlen)
 
 void display_screen(ActiveScreen *active, Summary *summary)
 {
-    CLEAR();
+    // CLEAR();
 
     printf("\n");
     for (int i = 0; i < 2; i++) {
         char *headerRow = active->current->header[i];
         int startingCell = __get_starting_cell(strlen(headerRow));
 
-        MOVE(2 + i, startingCell);
+        // MOVE(2 + i, startingCell);
         printf("%s\n", headerRow);
     }
 

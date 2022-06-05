@@ -91,6 +91,12 @@ unsigned int _convert_multiselect_options(int rawInput)
 
 void destroy_summary(Summary *summary)
 {
+    fclose(summary->inFile);
+    // fclose(summary->outFile);
+    free(summary->inData);
+    free(summary->outData);
+    
+    delete_metadata(summary->metadata);
     delete_token_strings(summary->tokenList);
     destroy_tokenList(summary->tokenList);
 }

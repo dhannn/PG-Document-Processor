@@ -59,6 +59,7 @@ TokenList *remove_duplicate_tokens(TokenList *tl)
 
     while(currentNode != NULL) {
         char *currentTokenStr = currentNode->tokenString;
+        int len = strlen(currentTokenStr);
 
         if(*currentTokenStr == ' ') {
             currentNode = currentNode->next;
@@ -66,8 +67,10 @@ TokenList *remove_duplicate_tokens(TokenList *tl)
         }
 
         if(!contains(ht, currentTokenStr)) {
-            add_element(ht, currentTokenStr);
-            add_token(cleanedTl, currentTokenStr);
+            char *newTokenStr = malloc(len + 1);
+            strcpy(newTokenStr, currentTokenStr);
+            add_element(ht, newTokenStr);
+            add_token(cleanedTl, newTokenStr);
         }
 
         currentNode = currentNode->next;

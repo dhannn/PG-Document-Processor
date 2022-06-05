@@ -105,7 +105,8 @@ void get_word_count(Summary *summary, Config config)
     sort_tokens(summary->tokenList);
 
     destroy_hash_table(ht);
-    // delete_token_strings(tokensWithDuplicates); // keep
+    delete_token_strings(tokensWithDuplicates);
+    destroy_tokenList(tokensWithDuplicates);
 
     // TODO: abstract away the deallocation of shit
     // free(summary->inData); // [/]
@@ -113,9 +114,7 @@ void get_word_count(Summary *summary, Config config)
     //     free(summary->metadata.metadataItems[i].data);
     // }
     
-    destroy_tokenList(tokensWithDuplicates);
     // destroy_tokenList(summary->tokenList);
-    fclose(summary->inFile);
 }
 
 void get_ngram_count(Summary *summary, Config config)
@@ -150,19 +149,28 @@ void report_token_frequency(Summary *summary, Config config)
     TokenList *list = summary->tokenList;
     TokenNode *tokenNode = next_token(list);
 
-    int n = 0;
-    while(tokenNode != NULL) {
-        if(n < 10)
-            fprintf(stdout, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
+    int runningTotal = 0;
+    int currentSize = MAX_CHAR;
+    char *temp = calloc(currentSize, 1);
+    char buff[MAX_CHAR] = "";
 
-        fprintf(summary->outFile, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
-        
-        tokenNode = next_token(list);
-        n++;
+    while(tokenNode != NULL) {
+        sprintf(buff, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
+        buff[strlen(buff)] = '\0';
+
+        runningTotal += strlen(buff);
+
+        if(runningTotal + 1 > currentSize) {
+            currentSize *= 5;
+            temp = realloc(temp, currentSize);
+        }
+
+        strcat(temp, buff);
+        temp[strlen(temp)] = '\0';
+        tokenNode = tokenNode->next;
     }
 
-    fflush(stdin);
-    scanf("%*c");
+    summary->outData = temp;
 }
 
 void report_ngram_count(Summary *summary, Config config)
