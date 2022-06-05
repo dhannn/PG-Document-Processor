@@ -23,5 +23,7 @@ int main()
         activeScreen.current->options[index].do_option(&activeScreen, &summary, &config);
     } while(!check_if_exit(activeScreen.screens, &activeScreen));
 
+    //get_word_count(&summary, config);
+    
     return 0;
 }

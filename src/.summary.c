@@ -8,7 +8,29 @@
 Mode MODES[] = {
     {
         .index = CLEAN, 
-        .clean_or_analyze = clean_data
+        .clean_or_analyze = clean_data,
+        .commands = {
+            {
+                .name = "To Lowercase",
+                .execute_command = to_lowercase
+            },
+            {
+                .name = "Remove Special Characters",
+                .execute_command = remove_special
+            },
+            {
+                .name = "Remove Numbers",
+                .execute_command = remove_numbers
+            },
+            {
+                .name = "Clean Whitespace",
+                .execute_command = clean_whitespace
+            },
+            {
+                .name = "Remove Stopwords",
+                .execute_command = remove_stopword
+            }
+        }
     }, 
     {
         .index = ANALYZE_SINGLE, 

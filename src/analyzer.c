@@ -16,11 +16,6 @@ typedef enum {
     CONCORDANCE     =       0b00100
 } ANALYZER_OPTIONS_INDEX;
 
-void clean_data(Summary *summary, Config config)
-{
-    return;
-}
-
 void analyze_data__single(Summary *summary, Config config)
 {
     unsigned int options = summary->options;

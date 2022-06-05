@@ -198,6 +198,20 @@ void analyze_data__single(Summary *summary, Config config);
 void analyze_data__multi(Summary *summary, Config config);
 void report_token_frequency(Summary *summary, Config config);
 
+#define MAX_ANALYZER_OPTIONS 3
+#define MAX_CLEANER_OPTIONS 4
+
+void read_clean_file(Summary *summary, Config config, char *filename);
+TokenList *tokenize(char *input, bool includeSpace);
+
+void to_lowercase(Summary *summary, Config config);
+void remove_special(Summary *summary, Config config);
+void remove_numbers(Summary *summary, Config config);
+void clean_whitespace(Summary *summary, Config config);
+void remove_stopword(Summary *summary, Config config);
+
+TokenList *convert_to_ngrams(TokenList *tl, int n);
+void delete_tokens(TokenList *tokenList);
 void get_word_count(Summary *summary, Config config);
 void get_ngram_count(Summary *summary, Config config);
 void get_concordance(Summary *summary, Config config);
