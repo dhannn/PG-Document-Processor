@@ -197,4 +197,43 @@ void _merge_alpha_nodes (Summary *summary)
 }
 
 
-void remove_stopword (Summary *summary);
+void remove_stopword (Summary *summary)
+{
+	_merge_alpha_nodes(summary);
+	
+	FILE *file = fopen("dat/stopwords", "r");
+	TokenNode *currentNode = summary->tokenList->head;
+	TokenNode *stopwordNode;
+	char currentString[MAX_CHAR], currentStopword[MAX_CHAR];
+	bool isPreviousStopword = false; 
+	int flag;
+
+	while(currentNode != NULL) 
+	{
+		if (currentNode->tokenType == ALPHA)
+		{ 
+			flag = 0;
+			strcpy(currentString, currentNode->tokenString);
+			_convert_string_to_lowercase(currentString);
+
+			while (strcmp(currentString, currentStopword) != 0 && flag != EOF)
+				flag = fscanf(file, "%s", currentStopword);
+
+			fseek(file, 0, SEEK_SET);
+
+			if (isPreviousStopword){
+				remove_token(summary->tokenList, stopwordNode->tokenString);
+				isPreviousStopword = false;
+			} 
+
+			if (strcmp(currentString, currentStopword) == 0){
+				isPreviousStopword = true;	
+				stopwordNode = currentNode;
+			}
+		}		
+
+		currentNode = currentNode->next;
+	}		
+
+	fclose(file);
+}

@@ -4,6 +4,7 @@
 typedef struct _tokenList TokenList;
 typedef struct _hashTable HashTable;
 
+#define MAX_CHAR        1024
 #define NUM_OF_METADATA 5
 
 typedef struct {
