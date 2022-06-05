@@ -74,7 +74,7 @@ void get_filename_for_processing(
     int mode = active->nInput - 1;
     set_mode(summary, mode);
 
-    go_to_screen(active, ENTER_FILENAME_MENU);
+    go_to_screen(active, ENTER_INPUT_FILE_MENU);
 }
 
 void choose_option(ActiveScreen* active, Summary *summary, Config *config)
@@ -109,8 +109,18 @@ void do_processing(ActiveScreen* active, Summary *summary, Config *config)
 {
     set_options(summary, *config, active->nInput);
     execute_summary(summary, *config);
-    destroy_summary(summary);
     
+    go_to_screen(active, ENTER_OUTPUT_FILE_MENU);
+}
+
+void save_results(ActiveScreen* active, Summary *summary, Config *config)
+{
+    set_outfile(summary, *config, active->strInput);
+    print_results(summary->outData, summary->outFile);
+    fflush(stdin);
+    scanf("%*c");
+    destroy_summary(summary);
+
     go_to_screen(active, MAIN_MENU);
 }
 

@@ -47,6 +47,20 @@ void set_infile(Summary *summary, Config config, char *filename)
     summary->inFile = fopen(completeFilename, "r");
 }
 
+void set_outfile(Summary *summary, Config config, char *filename)
+{
+    char completeFilename[MAX_CHAR];
+
+    if(summary->mode.index == CLEAN)
+        strcpy(completeFilename, config.cleanedDocumentPath);
+    else
+        strcpy(completeFilename, config.analysisOutputPath);
+
+    strcat(completeFilename, "/");
+    strcat(completeFilename, filename);
+    summary->outFile = fopen(completeFilename, "w");
+}
+
 void execute_summary(Summary *summary, Config config)
 {
     summary->mode.clean_or_analyze(summary, config);
@@ -92,7 +106,7 @@ unsigned int _convert_multiselect_options(int rawInput)
 void destroy_summary(Summary *summary)
 {
     fclose(summary->inFile);
-    // fclose(summary->outFile);
+    fclose(summary->outFile);
     free(summary->inData);
     free(summary->outData);
     

@@ -51,7 +51,8 @@ char **HEADERS[] = {
     CONFIG_HEADER,
     CONFIG_HEADER,
     CONFIG_HEADER,
-    CONFIG_HEADER
+    CONFIG_HEADER,
+    TITLE_HEADER
 };
 
 /* -------------------------------------------------------------------------- */
@@ -72,7 +73,8 @@ char *PROMPTS[] = {
     "Enter a valid path for the cleaned document files",
     "Enter a valid path for the analysis files",
     "Enter the number of characters you want to read (enter 0 if all)",
-    "Enter 1 if you want multiselect on; 0 if otherwise"
+    "Enter 1 if you want multiselect on; 0 if otherwise",
+    "Enter a valid filename for your output"
 };
 
 /* -------------------------------------------------------------------------- */
@@ -119,6 +121,7 @@ char *OPTION_NAMES[][MAX_OPTIONS] = {
     {""},
     {""},
     {""},
+    {""},
     {""}
 };
 
@@ -134,6 +137,7 @@ int BACK_INDICES[] = {
     MAIN_MENU,
     MAIN_MENU,
     MAIN_MENU,
+    -1,
     -1,
     -1,
     -1,
@@ -162,7 +166,8 @@ void (*GET_INPUT_FUNCTIONS[])(ActiveScreen*) = {
     get_str,
     get_str,
     get_int,
-    get_int
+    get_int,
+    get_str
 };
 
 void (*DO_DEFAULT_OPTION[])(ActiveScreen*, Summary*, Config*) = {
@@ -203,6 +208,33 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
     {
         do_processing,
         do_processing
+    }, 
+    {
+        NULL
+    },
+    {
+        NULL
+    },
+    {
+        NULL
+    },
+    {
+        NULL
+    },
+    {
+        NULL
+    },
+    {
+        NULL
+    },
+    {
+        NULL
+    },
+    {
+        NULL
+    },
+    {
+        save_results
     }
 };
 
@@ -270,14 +302,14 @@ int __get_starting_cell(int strlen)
 
 void display_screen(ActiveScreen *active, Summary *summary)
 {
-    // CLEAR();
+    CLEAR();
 
     printf("\n");
     for (int i = 0; i < 2; i++) {
         char *headerRow = active->current->header[i];
         int startingCell = __get_starting_cell(strlen(headerRow));
 
-        // MOVE(2 + i, startingCell);
+        MOVE(2 + i, startingCell);
         printf("%s\n", headerRow);
     }
 
@@ -341,4 +373,25 @@ void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], in
     printf ("\n*************************************************************************************\n");
 }
 
+void print_results(char *results, FILE *outfile)
+{
+    int flag;
+    char buff[MAX_CHAR];
+    int len = 0;
+    int linesRead = 0;
+    
+    CLEAR();
+    MOVE(1, 1);
 
+    do {
+        flag = sscanf(results + len, "%[^\n]\ns", buff);
+        
+        if(linesRead < 10)
+            fprintf(stdout, "%s\n", buff);
+        
+        fprintf(outfile , "%s\n", buff);
+        
+        len += strlen(buff) + 1; // the "+ 1" accounts for the newline
+        linesRead++;
+    } while(flag != EOF);
+}

@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #define MAX_CHAR        1024
 #define MAX_OPTIONS     10
-#define MAX_SCREENS     14
+#define MAX_SCREENS     15
 #define MAX_METADATA    5
 
 /**
@@ -42,7 +42,7 @@ typedef struct _activeScreen ActiveScreen;
 typedef enum {
     CONFIG, 
     MAIN_MENU,
-    ENTER_FILENAME_MENU,
+    ENTER_INPUT_FILE_MENU,
     CLEAN_DOCUMENT_MENU,
     SINGLE_ANALYZE_DOCUMENT_MENU,
     MULTI_ANALYZE_DOCUMENT_MENU,
@@ -54,6 +54,7 @@ typedef enum {
     ENTER_ANALYSIS_PATH_MENU,
     ENTER_NUMBER_CHAR_MENU,
     ENTER_MULTISELECT_BOOL_MENU,
+    ENTER_OUTPUT_FILE_MENU,
     EXIT
 } ScreenTag;
 
@@ -142,6 +143,7 @@ void go_to_screen(ActiveScreen *active, int index);
 void get_int(ActiveScreen *active);
 void get_str(ActiveScreen *active);
 void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], int maxMetadata);
+void print_results(char *results, FILE *outfile);
 
 /* -------------------------------------------------------------------------- */
 /*                        SUMMARY.C FUNCTION PROTOTYPES                       */
@@ -149,6 +151,7 @@ void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], in
 // encapsulates the request and the needed variables in one structure
 void set_mode(Summary *summary, ModeIndex mode);
 void set_infile(Summary *summary, Config config, char *filename);
+void set_outfile(Summary *summary, Config config, char *filename);
 void set_options(Summary *summary, Config config, int rawInput);
 void execute_summary(Summary *summary, Config config);
 void destroy_summary(Summary *summary);
@@ -220,6 +223,7 @@ void return_screen(ActiveScreen* active, Summary *summary, Config *config);
 void get_filename_for_processing(ActiveScreen* active, Summary *summary, Config *config);
 void choose_option(ActiveScreen* active, Summary *summary, Config *config);
 void do_processing(ActiveScreen* active, Summary *summary, Config *config);
+void save_results(ActiveScreen* active, Summary *summary, Config *config);
 bool check_if_exit(Screen screens[], ActiveScreen *active);
 
 #endif
