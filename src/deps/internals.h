@@ -1,6 +1,8 @@
+#include "../pgdocs.h"
 #ifndef INTERNALS_H
 #define INTERNALS_H
 #include <stdbool.h>
+#include <stdio.h>
 
 typedef enum {
     ALPHA,          // alphabetic strings (e.g. "Hello", "wor", "d")
@@ -134,5 +136,6 @@ TokenList *remove_duplicate_tokens(TokenList*);
 void delete_token_strings(TokenList *tokenList);
 void swap(TokenNode *a, TokenNode *b);
 void sort_tokens(TokenList *tl);
+void fprint_metadata_item(FILE *file, const char *metadata, const char *data);
 
 #endif

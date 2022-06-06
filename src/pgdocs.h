@@ -143,7 +143,8 @@ void go_to_screen(ActiveScreen *active, int index);
 void get_int(ActiveScreen *active);
 void get_str(ActiveScreen *active);
 void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], int maxMetadata);
-void print_results(char *results, FILE *outfile);
+void print_token_frequency(FILE *outfile, char *results);
+void print_cleaned(FILE *outfile, MetadataItem metadata[], char *results);
 
 /* -------------------------------------------------------------------------- */
 /*                        SUMMARY.C FUNCTION PROTOTYPES                       */
@@ -188,7 +189,7 @@ void set_config_int(Config *config, int index, int data);
 /*                        CLEANER.C FUNCTION PROTOTYPES                       */
 /* -------------------------------------------------------------------------- */
 void clean_data(Summary *summary, Config config);
-
+void clean_all(Summary *summary, Config config);
 
 /* -------------------------------------------------------------------------- */
 /*                       ANALYZER.C FUNCTION PROTOTYPES                       */
@@ -199,7 +200,7 @@ void analyze_data__multi(Summary *summary, Config config);
 void report_token_frequency(Summary *summary, Config config);
 
 #define MAX_ANALYZER_OPTIONS 3
-#define MAX_CLEANER_OPTIONS 4
+#define MAX_CLEANER_OPTIONS 5
 
 void read_clean_file(Summary *summary, Config config, char *filename);
 TokenList *tokenize(char *input, bool includeSpace);
@@ -209,6 +210,7 @@ void remove_special(Summary *summary, Config config);
 void remove_numbers(Summary *summary, Config config);
 void clean_whitespace(Summary *summary, Config config);
 void remove_stopword(Summary *summary, Config config);
+void report_cleaned(Summary *summary, Config config);
 
 TokenList *convert_to_ngrams(TokenList *tl, int n);
 void delete_tokens(TokenList *tokenList);

@@ -15,16 +15,18 @@ typedef enum {
 
 void clean_data(Summary *summary, Config config)
 {
-	unsigned int options = summary->options;
+	unsigned int options = summary->options - 1;
 
-    for(int i = 0; i < MAX_CLEANER_OPTIONS; i++) {
-        int current = pow(2, i);
+	summary->mode.commands[options].execute_command(summary, config);
+	summary->mode.commands[options].report_results(summary, config);
+    // for(int i = 0; i < MAX_CLEANER_OPTIONS; i++) {
+    //     int current = pow(2, i);
 
-        if((current & options) != 0) {
-			summary->mode.commands[i].execute_command(summary, config);
-			summary->mode.commands[i].report_results(summary, config);
-		}
-    }
+    //     if((current & options) != 0) {
+	// 		summary->mode.commands[i].execute_command(summary, config);
+	// 		summary->mode.commands[i].report_results(summary, config);
+	// 	}
+    // }
 }
 
 /*	
@@ -150,6 +152,7 @@ void clean_whitespace (Summary *summary, Config config)
 	
 		currentNode = currentNode->next;
 	}
+	
 }
 
 /*	
@@ -227,5 +230,53 @@ void remove_stopword (Summary *summary, Config config)
 		currentNode = currentNode->next;
 	}		
 
+	clean_whitespace(summary, config);
+
 	fclose(file);
+}
+
+void clean_all(Summary *summary, Config config)
+{
+	void (*commands[])(Summary*, Config) = {
+		to_lowercase,
+		remove_special,
+		remove_numbers,
+		clean_whitespace,
+		remove_stopword
+	};
+
+	int length = sizeof(commands) / sizeof(commands[0]);
+
+	for(int i = 0; i < length; i++) {
+		commands[i](summary, config);
+	}
+}
+
+void report_cleaned(Summary *summary, Config config)
+{
+    TokenList *list = summary->tokenList;
+    TokenNode *tokenNode = next_token(list);
+
+    int runningTotal = 0;
+    int currentSize = MAX_CHAR;
+    char *temp = calloc(currentSize, 1);
+    char buff[MAX_CHAR] = "";
+
+    while(tokenNode != NULL) {
+        sprintf(buff, "%s", tokenNode->tokenString);
+        buff[strlen(buff)] = '\0';
+
+        runningTotal += strlen(buff);
+
+        if(runningTotal + 1 > currentSize) {
+            currentSize *= 5;
+            temp = realloc(temp, currentSize);
+        }
+
+        strcat(temp, buff);
+        temp[strlen(temp)] = '\0';
+        tokenNode = tokenNode->next;
+    }
+
+    summary->outData = temp;
 }

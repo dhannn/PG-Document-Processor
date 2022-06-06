@@ -81,7 +81,13 @@ void increment_token_frequency(TokenList *tokenList, char *token)
 
 void remove_token(TokenList *tokenList, char *token)
 {
-    _recurse_remove_token(&tokenList->head, token);
+    TokenNode *current = tokenList->head;
+
+    while(current != NULL) {
+        if(strcmp(current->tokenString, token) == 0) {
+            
+        }
+    }
 }
 
 void destroy_tokenList(TokenList *tokenList)

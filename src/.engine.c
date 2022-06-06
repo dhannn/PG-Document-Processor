@@ -116,7 +116,10 @@ void do_processing(ActiveScreen* active, Summary *summary, Config *config)
 void save_results(ActiveScreen* active, Summary *summary, Config *config)
 {
     set_outfile(summary, *config, active->strInput);
-    print_results(summary->outData, summary->outFile);
+    if(summary->mode.index == CLEAN)
+        print_cleaned(summary->outFile, summary->metadata, summary->outData);
+    else
+        print_token_frequency(summary->outFile, summary->outData);
     fflush(stdin);
     scanf("%*c");
     destroy_summary(summary);
