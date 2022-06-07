@@ -19,15 +19,8 @@ typedef enum {
 void analyze_data__single(Summary *summary, Config config)
 {
     unsigned int options = summary->options;
-
-    for(int i = 0; i < MAX_ANALYZER_OPTIONS; i++) {
-        int current = pow(2, i);
-
-        if((current & options) != 0) {
-            summary->mode.commands[i].execute_command(summary, config);
-            summary->mode.commands[i].report_results(summary, config);
-        }
-    }
+    summary->mode.commands[options].execute_command(summary, config);
+    summary->mode.commands[options].report_results(summary, config);
 }
 
 void analyze_data__multi(Summary *summary, Config config)
@@ -107,8 +100,9 @@ void get_word_count(Summary *summary, Config config)
 void get_ngram_count(Summary *summary, Config config)
 {
     HashTable *ht = create_hash_table();
-
-    TokenList *rawTokens = convert_to_ngrams(summary->tokenList, 2);
+    
+    int n = summary->addOpts.i[0];
+    TokenList *rawTokens = convert_to_ngrams(summary->tokenList, n);
     TokenList *ngrams = remove_duplicate_tokens(rawTokens);
 
     TokenNode *currentNode = rawTokens->head;

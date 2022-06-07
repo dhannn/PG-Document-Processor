@@ -108,9 +108,47 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config)
 void do_processing(ActiveScreen* active, Summary *summary, Config *config)
 {
     set_options(summary, *config, active->nInput);
-    execute_summary(summary, *config);
-    
+    // execute_summary(summary, *config);
+
+    if(summary->mode.index == ANALYZE_SINGLE) {
+        if(summary->options == 1) {
+            summary->addOpts.i[0] = active->nInput;
+        }
+    }
+
     go_to_screen(active, ENTER_OUTPUT_FILE_MENU);
+}
+
+void get_add_opts(ActiveScreen* active, Summary *summary, Config *config) 
+{
+    ScreenTag screen;
+    int chosenOption = active->nInput - 1;
+    set_options(summary, *config, active->nInput);
+    ModeIndex mode = summary->mode.index;
+
+    ScreenTag addOptsScreen[3][MAX_OPTIONS] = {
+        {
+            ENTER_OUTPUT_FILE_MENU,
+            ENTER_OUTPUT_FILE_MENU,
+            ENTER_OUTPUT_FILE_MENU,
+            ENTER_OUTPUT_FILE_MENU,
+            ENTER_OUTPUT_FILE_MENU,
+            ENTER_OUTPUT_FILE_MENU
+        },
+        {
+            ENTER_OUTPUT_FILE_MENU,
+            ENTER_N_MENU,
+            ENTER_KEYWORD_MENU
+        },
+        {
+            ENTER_OUTPUT_FILE_MENU,
+            ENTER_INPUT_FILE_MENU,
+            ENTER_NUMBER_CLUSTERS_MENU
+        }
+    };
+
+    screen = addOptsScreen[mode][chosenOption];
+    go_to_screen(active, screen);
 }
 
 void save_results(ActiveScreen* active, Summary *summary, Config *config)
