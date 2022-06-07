@@ -64,7 +64,7 @@ void remove_special (Summary *summary, Config config)
 			int length = strlen(currentNode->tokenString) + 1;
 			char *temp = calloc(length, 1);
 
-			strcpy(temp, currentNode->tokenString);
+			strcpy(temp, currentNode->tokenString); 
 			add_token(newTokenlist, temp);
 		} else if(previousNode->tokenType == WHITESPACE)
 			currentNode = currentNode->next;
