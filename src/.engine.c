@@ -49,10 +49,19 @@ void reset_config(ActiveScreen *active, Summary *summary, Config *config)
     remove(CONFIG_FILE);
 }
 
+//TO DO////////GWEN
 void load_help(ActiveScreen* active, Summary *summary, Config *config)
 {
+    // FILE *helpFile = fopen(HELP_FILE, "r");
+    // int i = 1, flag = 1;
+    // char buff[MAX_CHAR];
+
+    // while (flag == 1){
+    //     flag = fscanf(HELP_FILE, "%[^\n]s", buff);
     
-}
+
+    // }
+};
 
 void return_screen(ActiveScreen* active, Summary *summary, Config *config)
 {

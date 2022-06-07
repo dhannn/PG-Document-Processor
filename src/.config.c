@@ -37,7 +37,7 @@ void load_config(Config *config)
 
     char buff[MAX_CHAR];
 
-    for(int i = 0; flag != EOF; i++) {
+    for(int i = 0; flag != EOF && i < 5; i++) {
         flag = fscanf(file, "%s", buff);
         
         if(i < 3) {
