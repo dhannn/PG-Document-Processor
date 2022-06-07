@@ -12,23 +12,33 @@ Mode MODES[] = {
         .commands = {
             {
                 .name = "To Lowercase",
-                .execute_command = to_lowercase
+                .execute_command = to_lowercase,
+                .report_results = report_cleaned
             },
             {
                 .name = "Remove Special Characters",
-                .execute_command = remove_special
+                .execute_command = remove_special,
+                .report_results = report_cleaned
             },
             {
                 .name = "Remove Numbers",
-                .execute_command = remove_numbers
+                .execute_command = remove_numbers,
+                .report_results = report_cleaned
             },
             {
                 .name = "Clean Whitespace",
-                .execute_command = clean_whitespace
+                .execute_command = clean_whitespace,
+                .report_results = report_cleaned
             },
             {
                 .name = "Remove Stopwords",
-                .execute_command = remove_stopword
+                .execute_command = remove_stopword,
+                .report_results = report_cleaned
+            },
+            {
+                .name = "All",
+                .execute_command = clean_all,
+                .report_results = report_cleaned
             }
         }
     }, 
@@ -90,12 +100,7 @@ void execute_summary(Summary *summary, Config config)
 
 void set_options(Summary *summary, Config config, int rawInput)
 {
-    if(config.multiSelect == false) {
-        summary->options = (int)pow(2, rawInput - 1);
-        return;
-    }
-
-    summary->options = _convert_multiselect_options(rawInput);
+    summary->options = rawInput;
 }
 
 unsigned int _convert_multiselect_options(int rawInput)

@@ -129,3 +129,8 @@ void delete_token_strings(TokenList *tokenList)
         tokenNode = tokenNode->next;
     }
 }
+
+void fprint_metadata_item(FILE *file, const char *metadata, const char *data)
+{
+    fprintf(file, "%s: %s\n", metadata, data);
+}

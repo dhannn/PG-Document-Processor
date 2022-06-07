@@ -135,7 +135,8 @@ char *OPTION_NAMES[][MAX_OPTIONS] = {
         "Remove special characters",
         "Remove numbers",
         "Clean whitespaces",
-        "Remove stopwords"
+        "Remove stopwords",
+        "All"
     },
     {
         "Word count",
@@ -226,6 +227,7 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
         choose_option
     },
     {
+        do_processing,
         do_processing,
         do_processing,
         do_processing,
@@ -423,7 +425,7 @@ void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], in
     FMT(RESET_COLOR);
 }
 
-void print_results(char *results, FILE *outfile)
+void print_token_frequency(FILE *outfile, char *results)
 {
     int flag;
     char buff[MAX_CHAR];
@@ -444,4 +446,27 @@ void print_results(char *results, FILE *outfile)
         len += strlen(buff) + 1; // the "+ 1" accounts for the newline
         linesRead++;
     } while(flag != EOF);
+}
+
+void print_cleaned(FILE *outfile, MetadataItem metadata[], char *results)
+{
+	for(int i = 0; i < MAX_METADATA; i++) {
+		MetadataItem currentMetadata = metadata[i];
+		
+		if(currentMetadata.data != NULL) {
+			fprint_metadata_item(
+				outfile, 
+				currentMetadata.name, 
+				currentMetadata.data
+			);
+		}
+	}
+	fprintf(outfile, "Content:\n");
+
+    fprintf(outfile, "%s\n", results);
+
+    CLEAR();
+    MOVE(1, 1);
+
+    fprintf(stdout, "Finished cleaning! Press ENTER key to return to main menu.");
 }
