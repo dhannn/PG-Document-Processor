@@ -9,14 +9,16 @@
 
 #define CLEAN_CONTENT_START_SIGNIFIER "*** START"
 #define ANALYZE_CONTENT_START_SIGNIFIER "Content"
+#define CONTENT_END_SIGNIFIER "*** END"
 
 char *__get_starting_token(ModeIndex mode);
 bool __check_if_content_start(char buff[], ModeIndex mode);
+bool __check_if_content_end(char buff[], char prev[]);
 
 void read_file(Summary *summary, Config config)
 {
     FILE *infile = summary->inFile;
-    int buffSize = BUFSIZ;
+    int buffSize = MAX_CHAR;
 
     if(config.numChar != 0)
         buffSize = config.numChar;
@@ -69,10 +71,16 @@ void read_content(FILE *file, char **inputData, int maxChar)
     int runningTotal = 0;   // total number of characters
     char *temp = calloc(1, sizeof(char)); // allocation for the content string
 
-    char buff[BUFSIZ];
+    char buff[MAX_CHAR];
+    char prev[MAX_CHAR];
 
     do {
         flag = fscanf(file, "%s", buff);
+
+        if(__check_if_content_end(buff, prev)) {
+            break;
+        }
+
         runningTotal += strlen(buff) + 1; // + 1 for the space
         
         if(maxChar != 0 && runningTotal > maxChar)
@@ -82,6 +90,7 @@ void read_content(FILE *file, char **inputData, int maxChar)
 
         strcat(buff, " ");
         strcat(temp, buff);
+        strcpy(prev, buff);
     } while(flag != EOF);
 
     *inputData = temp;
@@ -109,3 +118,17 @@ bool __check_if_content_start(char buff[], ModeIndex mode)
 
     return strcmp(startingToken, buff) == 0;
 }
+
+bool __check_if_content_end(char buff[], char prev[])
+{
+    char temp[MAX_CHAR];
+    strcpy(temp, prev);
+    strcat(temp, buff);
+
+    char *startingToken = CONTENT_END_SIGNIFIER;
+    int len = strlen(startingToken);
+    temp[len] = '\0';
+
+    return strcmp(startingToken, temp) == 0;
+}
+
