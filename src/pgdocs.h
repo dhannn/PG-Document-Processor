@@ -35,6 +35,12 @@ typedef struct _config Config;
 
 typedef struct _activeScreen ActiveScreen;
 
+typedef enum {
+    ERR_FILE_NOT_FOUND,   
+} ErrorCode;
+
+
+
 /* -------------------------------------------------------------------------- */
 /*                            DISPLAY.C STRUCTURES                            */
 /* -------------------------------------------------------------------------- */

@@ -9,7 +9,7 @@
 /*                         PRIVATE FUNCTION PROTOTYPES                        */
 /* -------------------------------------------------------------------------- */
 /* ------------------ functions only visible to tokenizer.c ----------------- */
-TokenType _get_token_type(char token);
+TokenType __get_token_type(char token);
 void _destroy_tokens(TokenNode *head);
 void _recurse_add_token(TokenNode **head, char *token, TokenType type);
 void _recurse_remove_token(TokenNode **head, char *token);
@@ -32,8 +32,25 @@ TokenList *initialize_tokenlist()
 
 void add_token(TokenList *tokenList, char *token)
 {
-    TokenType type = _get_token_type(*token);
+    TokenType type = __get_token_type(*token);
+    TokenNode *node = tokenList->head;
+
+    while(node != NULL)
+        node = node->next;
     
+    TokenNode *temp = malloc(sizeof(TokenNode));
+    temp->tokenString = token;
+    temp->frequency = 1;
+    temp->tokenType = type;
+    temp->next = NULL;
+
+    node = temp;
+
+    // *head = malloc(sizeof(TokenNode));
+    // (*head)->tokenString = token;
+    // (*head)->frequency = 1;
+    // (*head)->tokenType = type;
+    // (*head)->next = NULL;
     _recurse_add_token(&tokenList->head, token, type);
     tokenList->size++;
 
@@ -81,12 +98,30 @@ void increment_token_frequency(TokenList *tokenList, char *token)
 
 void remove_token(TokenList *tokenList, char *token)
 {
-    TokenNode *current = tokenList->head;
+    if(tokenList->head == NULL) return;
+
+    TokenNode *previous = tokenList->head;
+    TokenNode *current = previous->next;
+    TokenNode *next = current->next;
 
     while(current != NULL) {
-        if(strcmp(current->tokenString, token) == 0) {
-            
+        if(strcmp(previous->tokenString, token) == 0) {
+            tokenList->head = current;
+            free(previous);
+            break;
         }
+
+        if(strcmp(current->tokenString, token) == 0) {
+            previous->next = next;
+            free(current);
+            break;
+        }
+
+        previous = previous->next;
+        current = current->next;
+
+        if(next != NULL)
+            next = next->next;
     }
 }
 
@@ -112,7 +147,7 @@ void print_tokens(TokenList *tokenList)
 /* -------------------------------------------------------------------------- */
 /* ------------------ functions only visible to tokenizer.c ----------------- */
 
-TokenType _get_token_type(char token)
+TokenType __get_token_type(char token)
 {
     if(isalpha(token) != 0)
         return ALPHA;

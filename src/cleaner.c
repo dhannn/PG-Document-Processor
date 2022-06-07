@@ -19,14 +19,6 @@ void clean_data(Summary *summary, Config config)
 
 	summary->mode.commands[options].execute_command(summary, config);
 	summary->mode.commands[options].report_results(summary, config);
-    // for(int i = 0; i < MAX_CLEANER_OPTIONS; i++) {
-    //     int current = pow(2, i);
-
-    //     if((current & options) != 0) {
-	// 		summary->mode.commands[i].execute_command(summary, config);
-	// 		summary->mode.commands[i].report_results(summary, config);
-	// 	}
-    // }
 }
 
 /*	
@@ -50,7 +42,7 @@ void to_lowercase (Summary *summary, Config config)
 	while(currentNode != NULL) {
 		char *currentTokenStr = currentNode->tokenString;
 		
-		if (currentNode->tokenType == ALPHA)					//if the node is of type alpha
+		if (currentNode->tokenType == ALPHA)	//if the node is of type alpha
 			_convert_string_to_lowercase (currentTokenStr);		
 
         currentNode = currentNode->next;		//switches current node to next  
@@ -60,107 +52,124 @@ void to_lowercase (Summary *summary, Config config)
 
 void remove_special (Summary *summary, Config config)
 {
+	TokenList *oldTokenlist = summary->tokenList;
+	TokenList *newTokenlist = initialize_tokenlist();
+
 	TokenNode *currentNode = summary->tokenList->head;
-	TokenNode *specialNode;
-	bool isPreviousSpecial = false;
+	TokenNode *previousNode = NULL;
 	
 	while(currentNode != NULL) 
 	{
-		if (currentNode->tokenType == SPECIAL){ 
-			if (isPreviousSpecial)
-				remove_token(summary->tokenList, specialNode->tokenString);
+		if (currentNode->tokenType != SPECIAL){ 
+			int length = strlen(currentNode->tokenString) + 1;
+			char *temp = calloc(length, 1);
 
-			else
-				isPreviousSpecial = true;
+			strcpy(temp, currentNode->tokenString);
+			add_token(newTokenlist, temp);
+		} else if(previousNode->tokenType == WHITESPACE)
+			currentNode = currentNode->next;
 
-			specialNode = currentNode;
-		}
-		
-		else if (currentNode->tokenType == WHITESPACE 
-				 && isPreviousSpecial){
-			remove_token(summary->tokenList, specialNode->tokenString);
-			isPreviousSpecial = false;
-		}
-
-		else if ((currentNode->tokenType == ALPHA || 
-				  currentNode->tokenType == NUMERIC) && 
-				  isPreviousSpecial){
-			strcpy(specialNode->tokenString, " ");
-			isPreviousSpecial = false;
-		}
-	
+		previousNode = currentNode;
 		currentNode = currentNode->next;
 	}
+
+	delete_token_strings(oldTokenlist);
+	destroy_tokenList(oldTokenlist);
+
+	summary->tokenList = newTokenlist;
 }
 
 
 void remove_numbers (Summary *summary, Config config)
 {
+	TokenList *oldTokenlist = summary->tokenList;
+	TokenList *newTokenlist = initialize_tokenlist();
+
 	TokenNode *currentNode = summary->tokenList->head;
 	TokenNode *numericNode;
-	int flag = 0;
+	int isNumeric = (currentNode->tokenType == NUMERIC);
 
 	while(currentNode != NULL) {
-		if (flag == 1){
-			remove_token(summary->tokenList, numericNode->tokenString);
-			flag = 0;
-		}
+		if (currentNode->tokenType != NUMERIC){
+			int length = strlen(currentNode->tokenString) + 1;
+			char *temp = calloc(length, 1);
 
-		if (currentNode->tokenType == NUMERIC){
-			numericNode = currentNode;
-			flag = 1;
-		}
+			strcpy(temp, currentNode->tokenString);
+			add_token(newTokenlist, temp);
+			isNumeric = 0;
+		} else if(currentNode->next->tokenType == WHITESPACE)
+			currentNode = currentNode->next;
 			
 		currentNode = currentNode->next;
 	}
+
+	summary->tokenList = newTokenlist;
+
+	delete_token_strings(oldTokenlist);
+	destroy_tokenList(oldTokenlist);
 }
 
 
 void clean_whitespace (Summary *summary, Config config)
 {
-	TokenNode *currentNode = summary->tokenList->head;
-	TokenNode *whitespaceNode;
-	bool isPreviousNodeWhitespace = false;
-	int flag = 0;
-	
-	// removes all leading whitespaces
-	while(currentNode->tokenType == WHITESPACE){
-		if (flag == 1)
-			remove_token(summary->tokenList, whitespaceNode->tokenString);
+	return;
+	// TokenList *oldTokenlist = summary->tokenList;
+	// TokenList *newTokenlist = initialize_tokenlist();
 
-		whitespaceNode = currentNode;
-		currentNode = currentNode->next;
-		flag = 1;
-	}
+	// TokenNode *currentNode = summary->tokenList->head;
+	// TokenNode *whitespaceNode;
 
-	if (flag == 1)
-		remove_token(summary->tokenList, whitespaceNode->tokenString);
+	// bool isPreviousNodeWhitespace = false;
+	// int isWhitespace = (currentNode->tokenType == WHITESPACE);
+	
+	// // removes all leading whitespaces
+	// while(currentNode->tokenType == WHITESPACE){
+	// 	// int length = strlen(whitespaceNode->tokenString);
+	// 	// char *temp = malloc(length);
 
-	while(currentNode != NULL) {
-		if (currentNode->tokenType == WHITESPACE){ 
-			if (isPreviousNodeWhitespace){
-				remove_token(summary->tokenList, whitespaceNode->tokenString);
-				isPreviousNodeWhitespace = false;		
-			} else{
-				whitespaceNode = currentNode;
-				isPreviousNodeWhitespace = true;
-			}
-		}
-		
-		else
-			isPreviousNodeWhitespace = false;
+	// 	// strcpy(temp, currentNode->tokenString);
+	// 	// add_token(newTokenlist, whitespaceNode->tokenString);
+
+	// 	currentNode = currentNode->next;
+	// }
+
+	// while(currentNode != NULL) {
+	// 	if (currentNode->tokenType != WHITESPACE){ 
+	// 		int length = strlen(currentNode->tokenString) + 1;
+	// 		char *temp = calloc(length, 1);
+
+	// 		strcpy(temp, currentNode->tokenString);
+	// 		add_token(newTokenlist, currentNode->tokenString);
+			
+	// 		isPreviousNodeWhitespace = false;
+	// 	}
+	// 	else {
+	// 		if (!isPreviousNodeWhitespace){
+	// 			int length = strlen(currentNode->tokenString) + 1;
+	// 			char *temp = calloc(length, 1);
+				
+	// 			strcpy(temp, currentNode->tokenString);
+	// 			add_token(newTokenlist, currentNode->tokenString);
+	// 		}
+
+	// 		isPreviousNodeWhitespace = true;
+	// 	}
 	
-		currentNode = currentNode->next;
-	}
+	// 	currentNode = currentNode->next;
+	// }
 	
+	// delete_token_strings(oldTokenlist);
+	// destroy_tokenList(oldTokenlist);
+	// summary->tokenList = newTokenlist;
 }
 
 /*	
  *	_merge_alpha_node
  *	merges all neighboring alpha nodes
- */
+ */	
 void _merge_alpha_nodes (Summary *summary)
 {
+	TokenList *newTokens = initialize_tokenlist();
 	TokenNode *currentNode = summary->tokenList->head;
 	TokenNode *alphaNode, *deleteNode;
 	bool isPreviousAlpha = false; 
@@ -170,7 +179,14 @@ void _merge_alpha_nodes (Summary *summary)
 	{
 		if (currentNode->tokenType == ALPHA){ 
 			if (isPreviousAlpha){
-				strcat(alphaNode->tokenString, currentNode->tokenString);
+				int length = strlen(alphaNode->tokenString) + strlen(currentNode->tokenString) + 1;
+
+				char *temp = calloc(length, 1);
+				strcpy(temp, alphaNode->tokenString);
+				strcat(temp, currentNode->tokenString);
+
+				add_token(newTokens, temp);
+				// strcat(alphaNode->tokenString, currentNode->tokenString);
 				deleteNode = currentNode;
 				flag = 1;
 			} else{
@@ -183,11 +199,6 @@ void _merge_alpha_nodes (Summary *summary)
 			isPreviousAlpha = false;
 		
 		currentNode = currentNode->next;
-
-		if (flag == 1){
-			remove_token(summary->tokenList, deleteNode->tokenString);
-			flag = 0;
-		}
 	}
 }
 
@@ -196,10 +207,13 @@ void remove_stopword (Summary *summary, Config config)
 {
 	_merge_alpha_nodes(summary);
 	
+	TokenList *oldTokenlist = summary->tokenList;
+	TokenList *newTokenlist = initialize_tokenlist();
+
+	TokenNode *currentNode = oldTokenlist->head;
+
 	FILE *file = fopen("dat/stopwords", "r");
-	TokenNode *currentNode = summary->tokenList->head;
-	TokenNode *stopwordNode;
-	char currentString[MAX_CHAR], currentStopword[MAX_CHAR];
+	char currentString[MAX_CHAR], matchedStopword[MAX_CHAR];
 	bool isPreviousStopword = false; 
 	int flag;
 
@@ -211,28 +225,39 @@ void remove_stopword (Summary *summary, Config config)
 			strcpy(currentString, currentNode->tokenString);
 			_convert_string_to_lowercase(currentString);
 
-			while (strcmp(currentString, currentStopword) != 0 && flag != EOF)
-				flag = fscanf(file, "%s", currentStopword);
+			while (strcmp(currentString, matchedStopword) != 0 && flag != EOF)
+				flag = fscanf(file, "%s", matchedStopword);
 
 			fseek(file, 0, SEEK_SET);
 
-			if (isPreviousStopword){
-				remove_token(summary->tokenList, stopwordNode->tokenString);
-				isPreviousStopword = false;
-			} 
+			if (strcmp(currentString, matchedStopword) != 0){
+				int length = strlen(currentNode->tokenString) + 1;
+				char *temp = calloc(length, 1);
 
-			if (strcmp(currentString, currentStopword) == 0){
-				isPreviousStopword = true;	
-				stopwordNode = currentNode;
+				strcpy(temp, currentNode->tokenString);
+				add_token(newTokenlist, temp);
+
+				isPreviousStopword = false;
+			} else if(currentNode->next->tokenType == WHITESPACE) {
+				isPreviousStopword = true;
+				currentNode = currentNode->next; // to remove extra space
 			}
-		}		
+		} else {
+			int length = strlen(currentNode->tokenString) + 1;
+			char *temp = calloc(length, 1);
+
+			strcpy(temp, currentNode->tokenString);
+			add_token(newTokenlist, temp);
+		}	
 
 		currentNode = currentNode->next;
-	}		
-
-	clean_whitespace(summary, config);
+	}
 
 	fclose(file);
+
+	delete_token_strings(oldTokenlist);
+	destroy_tokenList(oldTokenlist);
+	summary->tokenList = newTokenlist;
 }
 
 void clean_all(Summary *summary, Config config)
