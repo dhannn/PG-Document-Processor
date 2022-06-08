@@ -12,7 +12,6 @@ TokenList *tokenize_string(char *input, bool includeSpace)
     int isPrevAlpha = isalpha(*curr);
     int isCurrAlpha;
     int charCount = 1;
-    includeSpace = true;
     
     while(*curr != '\0') {
         // bypasses the current character if excluding spaces

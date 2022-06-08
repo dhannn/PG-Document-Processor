@@ -111,9 +111,11 @@ typedef struct {
     ModeIndex index;
 } Mode;
 
+#define MAX_ADD_OPTS 4
+
 typedef struct {
-    int i;                      // placeholder for int variable
-    char *s;                    // placeholder for string variable
+    int i[MAX_ADD_OPTS];                // placeholder for int variable
+    char s[MAX_ADD_OPTS][MAX_CHAR];     // placeholder for string variable
 } AdditionalOptions;
 
 struct _summary {
@@ -244,6 +246,7 @@ void load_help(ActiveScreen* active, Summary *summary, Config *config);
 void return_screen(ActiveScreen* active, Summary *summary, Config *config);
 void get_filename_for_processing(ActiveScreen* active, Summary *summary, Config *config);
 void choose_option(ActiveScreen* active, Summary *summary, Config *config);
+void get_add_opts(ActiveScreen* active, Summary *summary, Config *config);
 void do_processing(ActiveScreen* active, Summary *summary, Config *config);
 void save_results(ActiveScreen* active, Summary *summary, Config *config);
 bool check_if_exit(Screen screens[], ActiveScreen *active);

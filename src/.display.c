@@ -145,6 +145,7 @@ char *OPTION_NAMES[][MAX_OPTIONS] = {
     },
     {
         "tf-idf",
+        "Document similarity",
         "Document clustering"
     },
     {""},
@@ -236,15 +237,20 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
     },
     {
         do_processing,
-        do_processing,
-        do_processing
+        get_add_opts,
+        get_add_opts
     },
     {
         do_processing,
-        do_processing
+        get_add_opts
     }, 
     {
-        NULL
+        do_processing,
+        do_processing,
+        do_processing,
+        do_processing,
+        do_processing,
+        do_processing
     },
     {
         NULL

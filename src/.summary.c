@@ -50,10 +50,17 @@ Mode MODES[] = {
                 .name = "Word Count",
                 .execute_command = get_word_count,
                 .report_results = report_token_frequency
+            },
+            {
+                .name = "N-gram Count",
+                .execute_command = get_ngram_count,
+                .report_results = report_token_frequency
             }
         }
     },
-    {.index = ANALYZE_MULTI, .clean_or_analyze = analyze_data__multi}
+    {
+        .index = ANALYZE_MULTI, 
+        .clean_or_analyze = analyze_data__multi}
 };
 
 #define MAX_ANALYZER_OPTIONS 3

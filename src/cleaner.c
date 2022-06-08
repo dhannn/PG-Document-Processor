@@ -50,6 +50,9 @@ void to_lowercase (Summary *summary, Config config)
 }
 
 
+//void _
+
+
 void remove_special (Summary *summary, Config config)
 {
 	TokenList *oldTokenlist = summary->tokenList;
@@ -61,6 +64,18 @@ void remove_special (Summary *summary, Config config)
 	while(currentNode != NULL) 
 	{
 		if (currentNode->tokenType != SPECIAL){ 
+			// TODO: 	@Gwen extract method
+			//			takes a string as a parameter,
+			//			gets the length, allocates a string
+			//			with that length + 1 and copies the 
+			//			input string; return yung allocated memory
+			/******/
+			// int length = strlen(tokenString) + 1;
+			// char *temp = calloc(length, 1);
+
+			// strcpy(temp, tokenString);
+			// return temp;
+			/******/
 			int length = strlen(currentNode->tokenString) + 1;
 			char *temp = calloc(length, 1);
 
