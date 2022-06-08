@@ -69,10 +69,7 @@ void get_word_count(Summary *summary, Config config)
 {
     HashTable *ht = create_hash_table();
     
-    // uncleaned list = with duplicates
     TokenList *tokensWithDuplicates = summary->tokenList;
-
-    // cleaned list = without duplicates
     TokenList *tokensWithoutDuplicates = remove_duplicate_tokens(tokensWithDuplicates);
     TokenNode *currentNode = tokensWithDuplicates->head;
 
@@ -89,7 +86,7 @@ void get_word_count(Summary *summary, Config config)
     }
 
     summary->tokenList = tokensWithoutDuplicates;
-    
+
     sort_tokens(summary->tokenList);
 
     destroy_hash_table(ht);

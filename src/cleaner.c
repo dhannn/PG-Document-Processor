@@ -15,7 +15,7 @@ typedef enum {
 
 void clean_data(Summary *summary, Config config)
 {
-	unsigned int options = summary->options - 1;
+	unsigned int options = summary->options;
 
 	summary->mode.commands[options].execute_command(summary, config);
 	summary->mode.commands[options].report_results(summary, config);

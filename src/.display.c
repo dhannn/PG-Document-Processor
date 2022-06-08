@@ -187,12 +187,12 @@ int BACK_INDICES[] = {
 /* -------------------------------------------------------------------------- */
 
 void (*GET_INPUT_FUNCTIONS[])(ActiveScreen*) = {
-    get_int,
-    get_int,
+    get_choice,
+    get_choice,
     get_str,
-    get_int,
-    get_int,
-    get_int,
+    get_choice,
+    get_choice,
+    get_choice,
     get_int,
     get_str,
     get_int,
@@ -394,6 +394,13 @@ void go_to_screen(ActiveScreen *active, int index)
 {   
     Screen *screens = active->screens;
     active->current = &screens[index];
+}
+
+void get_choice(ActiveScreen *active)
+{
+    FMT(YELLOW_FG);
+    scanf ("%d", &active->choice);
+    COLOR(RESET_COLOR, RESET_COLOR);
 }
 
 void get_int(ActiveScreen *active)

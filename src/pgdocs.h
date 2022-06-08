@@ -37,6 +37,9 @@ typedef struct _activeScreen ActiveScreen;
 
 typedef enum {
     ERR_FILE_NOT_FOUND,   
+    ERR_INVALID_CHOICE,   
+    ERR_INVALID_INT,
+    ERR_MALLOC_FAILED   
 } ErrorCode;
 
 
@@ -80,6 +83,7 @@ typedef struct {
 struct _activeScreen {
     Screen *current;
     Screen screens[MAX_SCREENS];
+    int choice;
     int nInput;
     char strInput[MAX_CHAR];
 };
@@ -148,6 +152,7 @@ void display_screen(ActiveScreen *active, Summary *summary);
 void activate_screen(ActiveScreen* active, Screen screens[]);
 void __validate_screen_option(ActiveScreen *active);
 void go_to_screen(ActiveScreen *active, int index);
+void get_choice(ActiveScreen *active);
 void get_int(ActiveScreen *active);
 void get_str(ActiveScreen *active);
 void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], int maxMetadata);

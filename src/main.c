@@ -17,8 +17,8 @@ int main()
         activeScreen.current->get_input(&activeScreen);
 
         int index = 0;
-        if(activeScreen.current->get_input == get_int)
-            index = activeScreen.nInput - 1;
+        if(activeScreen.current->get_input == get_choice)
+            index = activeScreen.choice - 1;
         
         activeScreen.current->options[index].do_option(&activeScreen, &summary, &config);
     } while(!check_if_exit(activeScreen.screens, &activeScreen));
