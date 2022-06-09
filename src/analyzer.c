@@ -32,7 +32,7 @@ TokenList *convert_to_ngrams(TokenList *tl, int n)
 {
     TokenList *ngrams = initialize_tokenlist();
     TokenNode *curr = tl->head;
-    char buff[BUFSIZ];
+    char buff[MAX_CHAR];
 
     while(curr != NULL) {
         strcpy(buff, curr->tokenString);
@@ -94,10 +94,11 @@ void get_ngram_count(Summary *summary, Config config)
     HashTable *ht = create_hash_table();
     
     int n = summary->addOpts.i[0];
-    TokenList *rawTokens = convert_to_ngrams(summary->tokenList, n);
-    TokenList *ngrams = remove_duplicate_tokens(rawTokens);
+    TokenList *rawTokens = summary->tokenList;
+    TokenList *rawNgrams = convert_to_ngrams(summary->tokenList, n);
+    TokenList *ngrams = remove_duplicate_tokens(rawNgrams);
 
-    TokenNode *currentNode = rawTokens->head;
+    TokenNode *currentNode = rawNgrams->head;
     while(currentNode != NULL) {
         char *currentTokenStr = currentNode->tokenString;
 
@@ -110,11 +111,16 @@ void get_ngram_count(Summary *summary, Config config)
         currentNode = currentNode->next;
     }
 
-    destroy_tokenList(summary->tokenList);
     summary->tokenList = ngrams;
-
     sort_tokens(summary->tokenList);
+
+    destroy_hash_table(ht);
+
+    delete_token_strings(rawTokens);
     destroy_tokenList(rawTokens);
+
+    delete_token_strings(rawNgrams);
+    destroy_tokenList(rawNgrams);
 }
 
 void report_token_frequency(Summary *summary, Config config)
