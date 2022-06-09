@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "pgdocs.h"
+// #include "leak_detector_c.h"
+// #include <malloc.h>
 
 int main()
 {
@@ -23,7 +26,5 @@ int main()
         activeScreen.current->options[index].do_option(&activeScreen, &summary, &config);
     } while(!check_if_exit(activeScreen.screens, &activeScreen));
 
-    //get_word_count(&summary, config);
-    
     return 0;
 }

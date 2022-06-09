@@ -17,7 +17,7 @@ bool __check_if_content_end(char buff[], char prev[]);
 
 void read_file(Summary *summary, Config config)
 {
-    FILE *infile = summary->inFile;
+    FILE *infile = summary->infile;
     int buffSize = MAX_CHAR;
 
     if(config.numChar != 0)

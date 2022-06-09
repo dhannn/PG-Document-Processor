@@ -101,6 +101,7 @@ typedef struct {
     char *name;
     void (*execute_command)(Summary*, Config);
     void (*report_results)(Summary*, Config);
+    char *fileSuffix;
 } Command;
 
 typedef enum {
@@ -124,8 +125,9 @@ typedef struct {
 
 struct _summary {
     Mode mode;                  // processing mode (i.e. clean or analyze)
-    FILE *inFile;               // file pointer to input 
-    FILE *outFile;              // file pointer to output
+    char infilename[MAX_CHAR];
+    FILE *infile;               // file pointer to input 
+    FILE *outfile;              // file pointer to output
     unsigned int options;       // chosen option for cleaning or analysis
     MetadataItem metadata[MAX_METADATA];    // info about the document
     char *inData;               // string of data to be processed

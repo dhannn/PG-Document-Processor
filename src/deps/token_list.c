@@ -33,25 +33,19 @@ TokenList *initialize_tokenlist()
 void add_token(TokenList *tokenList, char *token)
 {
     TokenType type = __get_token_type(*token);
-    TokenNode *node = tokenList->head;
-
-    while(node != NULL)
-        node = node->next;
     
     TokenNode *temp = malloc(sizeof(TokenNode));
-    temp->tokenString = token;
+    temp->tokenString = token;  
     temp->frequency = 1;
     temp->tokenType = type;
     temp->next = NULL;
 
-    node = temp;
+    TokenNode **ptrToNode = &tokenList->head;
 
-    // *head = malloc(sizeof(TokenNode));
-    // (*head)->tokenString = token;
-    // (*head)->frequency = 1;
-    // (*head)->tokenType = type;
-    // (*head)->next = NULL;
-    _recurse_add_token(&tokenList->head, token, type);
+    while(*ptrToNode != NULL)
+        ptrToNode = &(*ptrToNode)->next;
+    
+    *ptrToNode = temp;
     tokenList->size++;
 
     if(tokenList->iterator == NULL)
@@ -127,8 +121,15 @@ void remove_token(TokenList *tokenList, char *token)
 
 void destroy_tokenList(TokenList *tokenList)
 {
-    if(tokenList->head != NULL)
-        _destroy_tokens(tokenList->head);
+    TokenNode *prev = tokenList->head;
+    TokenNode *curr;
+    
+    while(curr != NULL) {
+        curr = prev->next;
+        free(prev);
+        prev = curr;
+    }
+
     free(tokenList);
 }
 

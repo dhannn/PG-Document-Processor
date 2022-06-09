@@ -60,9 +60,9 @@ void return_screen(ActiveScreen* active, Summary *summary, Config *config)
     
     if(index == EXIT) {
         // TODO: move this code snippet to a function in display.c
-        MOVE(1, 1);
-        CLEAR();
-        exit(EXIT_SUCCESS);
+        // MOVE(1, 1);
+        // CLEAR();
+        return;
     }
 
     go_to_screen(active, index);
@@ -80,6 +80,7 @@ void get_filename_for_processing(
 void choose_option(ActiveScreen* active, Summary *summary, Config *config)
 {
     char *filename = active->strInput;
+    strcpy(summary->infilename, filename);
     set_infile(summary, *config, filename);
 
     int mode = summary->mode.index;
@@ -115,7 +116,24 @@ void do_processing(ActiveScreen* active, Summary *summary, Config *config)
     }
 
     execute_summary(summary, *config);
-    go_to_screen(active, ENTER_OUTPUT_FILE_MENU);
+    
+    if(summary->mode.index == CLEAN)
+        go_to_screen(active, ENTER_OUTPUT_FILE_MENU);
+    else {
+        char filename[MAX_CHAR] = "";
+        int option = summary->options;
+        char *suffix = summary->mode.commands[option].fileSuffix;
+        char *original = strtok(summary->infilename, ".");
+        
+        strcpy(filename, original);
+        strcat(filename, "_");
+        strcat(filename, suffix);
+        strcat(filename, ".txt");
+
+        strcpy(active->strInput, filename);
+
+        save_results(active, summary, config);
+    }
 }
 
 void get_add_opts(ActiveScreen* active, Summary *summary, Config *config) 
@@ -153,20 +171,22 @@ void get_add_opts(ActiveScreen* active, Summary *summary, Config *config)
 void save_results(ActiveScreen* active, Summary *summary, Config *config)
 {
     set_outfile(summary, *config, active->strInput);
+    
     if(summary->mode.index == CLEAN)
-        print_cleaned(summary->outFile, summary->metadata, summary->outData);
+        print_cleaned(summary->outfile, summary->metadata, summary->outData);
     else
-        print_token_frequency(summary->outFile, summary->outData);
+        print_token_frequency(summary->outfile, summary->outData);
     
     fflush(stdin);
     scanf("%*c");
     destroy_summary(summary);
 
+    active->choice = -1;
     go_to_screen(active, MAIN_MENU);
 }
 
 bool check_if_exit(Screen screens[], ActiveScreen *active)
 {
     Screen *mainScreen = &screens[MAIN_MENU];
-    return active->current == mainScreen && active->choice == mainScreen->backIndex;
+    return active->current == mainScreen && active->choice == 6;
 }
