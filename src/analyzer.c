@@ -11,9 +11,9 @@
 unsigned int _convert_multiselect_options(int rawInput);
 
 typedef enum {
-    WORD_COUNT      =       0b00001,
-    NGRAM_COUNT     =       0b00010,
-    CONCORDANCE     =       0b00100
+    WORD_COUNT,
+    NGRAM_COUNT,
+    CONCORDANCE
 } ANALYZER_OPTIONS_INDEX;
 
 void analyze_data__single(Summary *summary, Config config)
@@ -67,6 +67,7 @@ void get_word_count(Summary *summary, Config config)
     TokenList *tokensWithDuplicates = summary->tokenList;
     TokenList *tokensWithoutDuplicates = remove_duplicate_tokens(tokensWithDuplicates);
     TokenNode *currentNode = tokensWithDuplicates->head;
+    int numTokens = 0;
 
     while(currentNode != NULL) {
         char *currentTokenStr = currentNode->tokenString;
@@ -76,6 +77,9 @@ void get_word_count(Summary *summary, Config config)
         } else {
             increment_token_frequency(tokensWithoutDuplicates, currentTokenStr);
         }
+
+        numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
 
         currentNode = currentNode->next;
     }
@@ -97,6 +101,7 @@ void get_ngram_count(Summary *summary, Config config)
     TokenList *rawTokens = summary->tokenList;
     TokenList *rawNgrams = convert_to_ngrams(summary->tokenList, n);
     TokenList *ngrams = remove_duplicate_tokens(rawNgrams);
+    int numTokens = 0;
 
     TokenNode *currentNode = rawNgrams->head;
     while(currentNode != NULL) {
@@ -109,6 +114,9 @@ void get_ngram_count(Summary *summary, Config config)
         }
 
         currentNode = currentNode->next;
+
+        numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
     }
 
     summary->tokenList = ngrams;
@@ -133,6 +141,8 @@ void report_token_frequency(Summary *summary, Config config)
     char *temp = calloc(currentSize, 1);
     char buff[MAX_CHAR] = "";
 
+    int numChar = 0;
+
     while(tokenNode != NULL) {
         sprintf(buff, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
         buff[strlen(buff)] = '\0';
@@ -146,6 +156,10 @@ void report_token_frequency(Summary *summary, Config config)
 
         strcat(temp, buff);
         temp[strlen(temp)] = '\0';
+        
+		numChar++;
+		update_reporting(numChar, summary->tokenList->size);
+
         tokenNode = tokenNode->next;
     }
 

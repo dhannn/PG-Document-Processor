@@ -12,6 +12,7 @@ TokenList *tokenize_string(char *input, bool includeSpace)
     int isPrevAlpha = isalpha(*curr);
     int isCurrAlpha;
     int charCount = 1;
+    int numWords = 0;
     
     while(*curr != '\0') {
         // bypasses the current character if excluding spaces
@@ -35,6 +36,9 @@ TokenList *tokenize_string(char *input, bool includeSpace)
             // resets the pointer to the new non-alphabetic char
             ptrStartChar = curr;
             charCount = 1;
+
+            numWords++;
+            update_tokenizing(temp, numWords);
         }
 
         isPrevAlpha = isalpha(*curr);
@@ -43,9 +47,9 @@ TokenList *tokenize_string(char *input, bool includeSpace)
     
     // allocates the last token that wasn't processed 
     // due to the null byte condition
-    char *temp = calloc(charCount + 1, sizeof(char));
-    strncpy(temp, ptrStartChar, charCount);
-    add_token(tokenlist, temp);
+    // char *temp = calloc(charCount + 1, sizeof(char));
+    // strncpy(temp, ptrStartChar, charCount);
+    // add_token(tokenlist, temp);
 
     return tokenlist;
 }

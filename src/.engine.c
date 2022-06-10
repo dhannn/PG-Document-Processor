@@ -87,6 +87,7 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config)
     int screen = MAIN_MENU;
     
     initialize_metadata(summary->metadata);
+    CLEAR();
     read_file(summary, *config);
     summary->tokenList = tokenize_string(summary->inData, summary->mode.index == CLEAN);
 
@@ -115,6 +116,7 @@ void do_processing(ActiveScreen* active, Summary *summary, Config *config)
         }
     }
 
+    CLEAR();
     execute_summary(summary, *config);
     
     if(summary->mode.index == CLEAN)

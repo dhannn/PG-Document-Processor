@@ -73,6 +73,7 @@ void read_content(FILE *file, char **inputData, int maxChar)
 
     char buff[MAX_CHAR];
     char prev[MAX_CHAR] = "";
+    int numWords = 0;
 
     do {
         flag = fscanf(file, "%s", buff);
@@ -91,6 +92,9 @@ void read_content(FILE *file, char **inputData, int maxChar)
         strcat(buff, " ");
         strcat(temp, buff);
         strcpy(prev, buff);
+
+        numWords++;
+        update_reading(runningTotal, numWords);
     } while(flag != EOF);
 
     *inputData = temp;

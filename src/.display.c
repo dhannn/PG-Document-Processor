@@ -461,6 +461,90 @@ void print_token_frequency(FILE *outfile, char *results)
     } while(flag != EOF);
 }
 
+void update_reading(int characters, int words)
+{
+    if(words % 1024 == 0) {
+        MOVE(1, 1);
+        printf("Reading:\t\t");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d\t", characters);
+        FMT(RESET_COLOR);
+        printf("characters/s\n");
+
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("\t\t\t%d\t", words);
+        FMT(RESET_COLOR);
+        printf("words/s\n");
+
+        MOVE(1, 1);
+    }
+}
+
+void update_tokenizing(char *current, int words)
+{
+    if(words % 1024 == 0) {
+        MOVE(4, 1);
+        
+        printf("\x1b[2K");
+        MOVE(4, 1);
+        FMT(RESET_COLOR);
+        printf("Tokenizing data:\t");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d\t", words);
+        FMT(RESET_COLOR);
+        printf("tokens/s done\n");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("\x1b[2K\t\t\t%s\t", current);
+        FMT(RESET_COLOR);
+        
+        MOVE(4, 1);
+    }
+}
+
+void update_processing(int progress, int max)
+{
+    if(progress % 1024 == 0) {
+        MOVE(1, 1);
+        FMT(RESET_COLOR);
+        printf("Processing:\t");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d", progress);
+        FMT(RESET_COLOR);
+        printf(" out of ");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d", max);
+        FMT(RESET_COLOR);
+        printf(" tokens/s done\n");
+        MOVE(1, 1);
+    }
+}
+
+void update_reporting(int progress, int max)
+{
+    if(progress % 1024 == 0) {
+        MOVE(1, 1);
+        FMT(RESET_COLOR);
+        printf("Reporting:\t");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d", progress);
+        FMT(RESET_COLOR);
+        printf(" out of ");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d", max);
+        FMT(RESET_COLOR);
+        printf(" tokens/s done\n");
+        MOVE(1, 1);
+    }
+}
+
 void print_cleaned(FILE *outfile, MetadataItem metadata[], char *results)
 {
 	for(int i = 0; i < MAX_METADATA; i++) {
