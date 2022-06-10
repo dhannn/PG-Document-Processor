@@ -116,16 +116,7 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config)
 
 void do_processing(ActiveScreen* active, Summary *summary, Config *config)
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
     set_options(summary, *config, active->nInput);
-    execute_summary(summary, *config);
-=======
-    set_options(summary, *config, active->choice - 1);
->>>>>>> 91690d72917353b5e900b037eee42c2f3056a193
-=======
-    set_options(summary, *config, active->choice - 1);
->>>>>>> 91690d72917353b5e900b037eee42c2f3056a193
 
     if(summary->mode.index == ANALYZE_SINGLE) {
         if(summary->options == 1) {
