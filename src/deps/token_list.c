@@ -121,6 +121,7 @@ void remove_token(TokenList *tokenList, char *token)
 
 void destroy_tokenList(TokenList *tokenList)
 {
+<<<<<<< HEAD
     if(tokenList == NULL || tokenList->head == NULL) return;
 
     TokenNode *prev = tokenList->head;
@@ -130,6 +131,21 @@ void destroy_tokenList(TokenList *tokenList)
         curr = prev->next;
         free(prev);
         prev = curr;
+=======
+    if(tokenList == NULL) return;
+
+    if(tokenList->head != NULL) {
+        TokenNode *prev = tokenList->head;
+        TokenNode *curr = prev->next;
+
+        while(curr != NULL) {
+            curr = prev->next;
+            free(prev);
+            prev = curr;
+        }
+        
+        free(prev);
+>>>>>>> 91690d72917353b5e900b037eee42c2f3056a193
     }
 
     free(tokenList);

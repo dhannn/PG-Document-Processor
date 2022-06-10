@@ -30,14 +30,9 @@ void analyze_data__multi(Summary *summary, Config config)
 
 TokenList *convert_to_ngrams(TokenList *tl, int n)
 {
-    // TODO extract constant
-    if(n < 2 || n > 4) {
-        return NULL;
-    }
-
     TokenList *ngrams = initialize_tokenlist();
     TokenNode *curr = tl->head;
-    char buff[BUFSIZ];
+    char buff[MAX_CHAR];
 
     while(curr != NULL) {
         strcpy(buff, curr->tokenString);
@@ -69,10 +64,7 @@ void get_word_count(Summary *summary, Config config)
 {
     HashTable *ht = create_hash_table();
     
-    // uncleaned list = with duplicates
     TokenList *tokensWithDuplicates = summary->tokenList;
-
-    // cleaned list = without duplicates
     TokenList *tokensWithoutDuplicates = remove_duplicate_tokens(tokensWithDuplicates);
     TokenNode *currentNode = tokensWithDuplicates->head;
 
@@ -89,7 +81,7 @@ void get_word_count(Summary *summary, Config config)
     }
 
     summary->tokenList = tokensWithoutDuplicates;
-    
+
     sort_tokens(summary->tokenList);
 
     destroy_hash_table(ht);
@@ -102,10 +94,11 @@ void get_ngram_count(Summary *summary, Config config)
     HashTable *ht = create_hash_table();
     
     int n = summary->addOpts.i[0];
-    TokenList *rawTokens = convert_to_ngrams(summary->tokenList, n);
-    TokenList *ngrams = remove_duplicate_tokens(rawTokens);
+    TokenList *rawTokens = summary->tokenList;
+    TokenList *rawNgrams = convert_to_ngrams(summary->tokenList, n);
+    TokenList *ngrams = remove_duplicate_tokens(rawNgrams);
 
-    TokenNode *currentNode = rawTokens->head;
+    TokenNode *currentNode = rawNgrams->head;
     while(currentNode != NULL) {
         char *currentTokenStr = currentNode->tokenString;
 
@@ -118,11 +111,16 @@ void get_ngram_count(Summary *summary, Config config)
         currentNode = currentNode->next;
     }
 
-    destroy_tokenList(summary->tokenList);
     summary->tokenList = ngrams;
-
     sort_tokens(summary->tokenList);
+
+    destroy_hash_table(ht);
+
+    delete_token_strings(rawTokens);
     destroy_tokenList(rawTokens);
+
+    delete_token_strings(rawNgrams);
+    destroy_tokenList(rawNgrams);
 }
 
 void report_token_frequency(Summary *summary, Config config)
@@ -164,7 +162,7 @@ void report_ngram_count(Summary *summary, Config config)
         if(n < 10)
             fprintf(stdout, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
 
-        fprintf(summary->outFile, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
+        fprintf(summary->outfile, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
         
         tokenNode = next_token(list);
         n++;
@@ -183,16 +181,16 @@ void get_concordance(Summary *summary, Config config)
 
 void _set_infile(Summary *summary, char *filename)
 {
-    summary->inFile = fopen(filename, "r");
+    summary->infile = fopen(filename, "r");
 }
 
 void _set_outfile(Summary *summary, char *filename)
 {
-    summary->outFile = fopen(filename, "r");
+    summary->outfile = fopen(filename, "r");
 }
 
 void _close_files(Summary *summary)
 {
-    fclose(summary->inFile);
-    fclose(summary->outFile);
+    fclose(summary->infile);
+    fclose(summary->outfile);
 }

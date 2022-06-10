@@ -17,7 +17,7 @@ bool __check_if_content_end(char buff[], char prev[]);
 
 void read_file(Summary *summary, Config config)
 {
-    FILE *infile = summary->inFile;
+    FILE *infile = summary->infile;
     int buffSize = MAX_CHAR;
 
     if(config.numChar != 0)
@@ -72,7 +72,7 @@ void read_content(FILE *file, char **inputData, int maxChar)
     char *temp = calloc(1, sizeof(char)); // allocation for the content string
 
     char buff[MAX_CHAR];
-    char prev[MAX_CHAR];
+    char prev[MAX_CHAR] = "";
 
     do {
         flag = fscanf(file, "%s", buff);
@@ -121,7 +121,7 @@ bool __check_if_content_start(char buff[], ModeIndex mode)
 
 bool __check_if_content_end(char buff[], char prev[])
 {
-    char temp[MAX_CHAR];
+    char temp[MAX_CHAR] = "";
     strcpy(temp, prev);
     strcat(temp, buff);
 

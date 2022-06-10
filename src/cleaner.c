@@ -15,7 +15,7 @@ typedef enum {
 
 void clean_data(Summary *summary, Config config)
 {
-	unsigned int options = summary->options - 1;
+	unsigned int options = summary->options;
 
 	summary->mode.commands[options].execute_command(summary, config);
 	summary->mode.commands[options].report_results(summary, config);
@@ -158,49 +158,60 @@ void clean_whitespace (Summary *summary, Config config)
  *	_merge_alpha_node
  *	merges all neighboring alpha nodes
  */	
-void _merge_alpha_nodes (Summary *summary)
-{
-	TokenList *newTokens = initialize_tokenlist();
-	TokenNode *currentNode = summary->tokenList->head;
-	TokenNode *alphaNode, *deleteNode;
-	bool isPreviousAlpha = false; 
-	int flag = 0;
+// TokenList *__merge_alpha_nodes (Summary *summary)
+// {
+// 	TokenList *oldTokens = summary->tokenList;
+// 	TokenList *newTokens = initialize_tokenlist();
+// 	TokenNode *currentNode = oldTokens->head;
+// 	TokenNode *alphaNode;
+// 	bool isPreviousAlpha = false; 
+// 	int flag = 0;
 	
-	while(currentNode != NULL) 
-	{
-		if (currentNode->tokenType == ALPHA){ 
-			if (isPreviousAlpha){
-				int length = strlen(alphaNode->tokenString) + strlen(currentNode->tokenString) + 1;
+// 	while(currentNode != NULL) 
+// 	{
+// 		if (currentNode->tokenType == ALPHA){ 
+// 			if (isPreviousAlpha){
+// 				int length = strlen(alphaNode->tokenString) + strlen(currentNode->tokenString) + 1;
 
-				char *temp = calloc(length, 1);
-				strcpy(temp, alphaNode->tokenString);
-				strcat(temp, currentNode->tokenString);
+// 				char *temp = calloc(length + 1, 1);
+// 				strcpy(temp, alphaNode->tokenString);
+// 				strcpy(temp, " ");
+// 				strcat(temp, currentNode->tokenString);
 
-				add_token(newTokens, temp);
-				// strcat(alphaNode->tokenString, currentNode->tokenString);
-				deleteNode = currentNode;
-				flag = 1;
-			} else{
-				isPreviousAlpha = true;
-				alphaNode = currentNode;
-			}
-		}
+// 				add_token(newTokens, temp);
+// 			} else{
+// 				isPreviousAlpha = true;
+// 				alphaNode = currentNode;
+// 			}
+// 		}
 
-		else 
-			isPreviousAlpha = false;
+// 		else {
+// 			int length = strlen(alphaNode->tokenString) + strlen(currentNode->tokenString) + 1;
+
+// 			char *temp = calloc(length + 1, 1);
+// 			strcpy(temp, alphaNode->tokenString);
+// 			strcpy(temp, " ");
+// 			strcat(temp, currentNode->tokenString);
+
+// 			add_token(newTokens, temp);
+
+// 			isPreviousAlpha = false;
+// 		}
 		
-		currentNode = currentNode->next;
-	}
-}
+// 		currentNode = currentNode->next;
+// 	}
+
+// 	delete_token_strings(oldTokens);
+// 	destroy_tokenList(oldTokens);
+
+// 	return newTokens;
+// }
 
 
 void remove_stopword (Summary *summary, Config config)
-{
-	_merge_alpha_nodes(summary);
-	
+{	
 	TokenList *oldTokenlist = summary->tokenList;
 	TokenList *newTokenlist = initialize_tokenlist();
-
 	TokenNode *currentNode = oldTokenlist->head;
 
 	FILE *file = fopen("dat/stopwords", "r");
@@ -245,20 +256,21 @@ void remove_stopword (Summary *summary, Config config)
 	}
 
 	fclose(file);
+	
+	summary->tokenList = newTokenlist;
 
 	delete_token_strings(oldTokenlist);
 	destroy_tokenList(oldTokenlist);
-	summary->tokenList = newTokenlist;
 }
 
 void clean_all(Summary *summary, Config config)
 {
 	void (*commands[])(Summary*, Config) = {
+		remove_stopword,
 		to_lowercase,
 		remove_special,
 		remove_numbers,
-		clean_whitespace,
-		remove_stopword
+		clean_whitespace
 	};
 
 	int length = sizeof(commands) / sizeof(commands[0]);

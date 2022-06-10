@@ -39,7 +39,7 @@ void initialize_config(ActiveScreen *active, Config *config)
         if(i < 3) {
             set_config_path(config, i, active->strInput);
         } else {
-            set_config_int(config, i, active->nInput);
+            set_config_int(config, i, active->choice);
         }
     }
 }
@@ -69,9 +69,9 @@ void return_screen(ActiveScreen* active, Summary *summary, Config *config)
     
     if(index == EXIT) {
         // TODO: move this code snippet to a function in display.c
-        MOVE(1, 1);
-        CLEAR();
-        exit(EXIT_SUCCESS);
+        // MOVE(1, 1);
+        // CLEAR();
+        return;
     }
 
     go_to_screen(active, index);
@@ -80,7 +80,7 @@ void return_screen(ActiveScreen* active, Summary *summary, Config *config)
 void get_filename_for_processing(
     ActiveScreen* active, Summary *summary, Config *config)
 {
-    int mode = active->nInput - 1;
+    int mode = active->choice - 1;
     set_mode(summary, mode);
 
     go_to_screen(active, ENTER_INPUT_FILE_MENU);
@@ -89,7 +89,7 @@ void get_filename_for_processing(
 void choose_option(ActiveScreen* active, Summary *summary, Config *config)
 {
     char *filename = active->strInput;
-    // TODO: finish and call set_infile
+    strcpy(summary->infilename, filename);
     set_infile(summary, *config, filename);
 
     int mode = summary->mode.index;
@@ -116,8 +116,12 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config)
 
 void do_processing(ActiveScreen* active, Summary *summary, Config *config)
 {
+<<<<<<< HEAD
     set_options(summary, *config, active->nInput);
     execute_summary(summary, *config);
+=======
+    set_options(summary, *config, active->choice - 1);
+>>>>>>> 91690d72917353b5e900b037eee42c2f3056a193
 
     if(summary->mode.index == ANALYZE_SINGLE) {
         if(summary->options == 1) {
@@ -125,14 +129,32 @@ void do_processing(ActiveScreen* active, Summary *summary, Config *config)
         }
     }
 
-    go_to_screen(active, ENTER_OUTPUT_FILE_MENU);
+    execute_summary(summary, *config);
+    
+    if(summary->mode.index == CLEAN)
+        go_to_screen(active, ENTER_OUTPUT_FILE_MENU);
+    else {
+        char filename[MAX_CHAR] = "";
+        int option = summary->options;
+        char *suffix = summary->mode.commands[option].fileSuffix;
+        char *original = strtok(summary->infilename, ".");
+        
+        strcpy(filename, original);
+        strcat(filename, "_");
+        strcat(filename, suffix);
+        strcat(filename, ".txt");
+
+        strcpy(active->strInput, filename);
+
+        save_results(active, summary, config);
+    }
 }
 
 void get_add_opts(ActiveScreen* active, Summary *summary, Config *config) 
 {
     ScreenTag screen;
-    int chosenOption = active->nInput - 1;
-    set_options(summary, *config, active->nInput);
+    int chosenOption = active->choice - 1;
+    set_options(summary, *config, active->choice);
     ModeIndex mode = summary->mode.index;
 
     ScreenTag addOptsScreen[3][MAX_OPTIONS] = {
@@ -163,19 +185,22 @@ void get_add_opts(ActiveScreen* active, Summary *summary, Config *config)
 void save_results(ActiveScreen* active, Summary *summary, Config *config)
 {
     set_outfile(summary, *config, active->strInput);
+    
     if(summary->mode.index == CLEAN)
-        print_cleaned(summary->outFile, summary->metadata, summary->outData);
+        print_cleaned(summary->outfile, summary->metadata, summary->outData);
     else
-        print_token_frequency(summary->outFile, summary->outData);
+        print_token_frequency(summary->outfile, summary->outData);
+    
     fflush(stdin);
     scanf("%*c");
     destroy_summary(summary);
 
+    active->choice = -1;
     go_to_screen(active, MAIN_MENU);
 }
 
 bool check_if_exit(Screen screens[], ActiveScreen *active)
 {
     Screen *mainScreen = &screens[MAIN_MENU];
-    return active->current == mainScreen && active->nInput == mainScreen->backIndex;
+    return active->current == mainScreen && active->choice == 6;
 }

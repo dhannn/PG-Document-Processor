@@ -49,18 +49,41 @@ Mode MODES[] = {
             {
                 .name = "Word Count",
                 .execute_command = get_word_count,
-                .report_results = report_token_frequency
+                .report_results = report_token_frequency,
+                .fileSuffix = "wcount"
             },
             {
                 .name = "N-gram Count",
                 .execute_command = get_ngram_count,
-                .report_results = report_token_frequency
+                .report_results = report_token_frequency,
+                .fileSuffix = "ngram"
+            },
+            {
+                .name = "Concordance",
+                .execute_command = get_concordance,
+                .report_results = report_concordance,
+                .fileSuffix = "concord"
             }
         }
     },
     {
         .index = ANALYZE_MULTI, 
-        .clean_or_analyze = analyze_data__multi}
+        .clean_or_analyze = analyze_data__multi,
+        .commands = {
+            {
+                .name = "tf-idf",
+                // .execute_command = get_tfidf,
+                // .report_results = report_tfidf,
+                .fileSuffix = "tfidf"
+            },
+            {
+                .name = "Document similarity",
+                // .execute_command = get_document_similarity,
+                // .report_results = report_document_similarity,
+                // .fileSuffix = ""
+            }
+        }
+    }
 };
 
 #define MAX_ANALYZER_OPTIONS 3
@@ -83,7 +106,7 @@ void set_infile(Summary *summary, Config config, char *filename)
 
     strcat(completeFilename, "/");
     strcat(completeFilename, filename);
-    summary->inFile = fopen(completeFilename, "r");
+    summary->infile = fopen(completeFilename, "r");
 }
 
 void set_outfile(Summary *summary, Config config, char *filename)
@@ -97,7 +120,7 @@ void set_outfile(Summary *summary, Config config, char *filename)
 
     strcat(completeFilename, "/");
     strcat(completeFilename, filename);
-    summary->outFile = fopen(completeFilename, "w");
+    summary->outfile = fopen(completeFilename, "w");
 }
 
 void execute_summary(Summary *summary, Config config)
@@ -139,8 +162,8 @@ unsigned int _convert_multiselect_options(int rawInput)
 
 void destroy_summary(Summary *summary)
 {
-    fclose(summary->inFile);
-    fclose(summary->outFile);
+    fclose(summary->infile);
+    fclose(summary->outfile);
     free(summary->inData);
     free(summary->outData);
     
