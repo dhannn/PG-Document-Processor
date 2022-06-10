@@ -117,7 +117,7 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config)
 void do_processing(ActiveScreen* active, Summary *summary, Config *config)
 {
     set_options(summary, *config, active->nInput);
-    // execute_summary(summary, *config);
+    execute_summary(summary, *config);
 
     if(summary->mode.index == ANALYZE_SINGLE) {
         if(summary->options == 1) {

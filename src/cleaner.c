@@ -50,7 +50,14 @@ void to_lowercase (Summary *summary, Config config)
 }
 
 
-//void _
+char *_copy_string (char *str)
+{
+	int length = strlen(str) + 1;
+	char *temp = calloc(length, 1);
+
+	strcpy(temp, str);
+	return temp;
+}
 
 
 void remove_special (Summary *summary, Config config)
@@ -63,35 +70,29 @@ void remove_special (Summary *summary, Config config)
 	
 	while(currentNode != NULL) 
 	{
-		if (currentNode->tokenType != SPECIAL){ 
-			// TODO: 	@Gwen extract method
-			//			takes a string as a parameter,
-			//			gets the length, allocates a string
-			//			with that length + 1 and copies the 
-			//			input string; return yung allocated memory
-			/******/
-			// int length = strlen(tokenString) + 1;
-			// char *temp = calloc(length, 1);
+		// if special character is in between 2 alphanumeric
+		if(currentNode->tokenType == SPECIAL && (previousNode->tokenType == ALPHA || previousNode->tokenType == NUMERIC) &&
+		  (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC))	
+		{
+			strcpy(currentNode->tokenString, " ");
+			char *temp = _copy_string(currentNode->tokenString);
+			add_token(newTokenlist, temp);	
+		}
 
-			// strcpy(temp, tokenString);
-			// return temp;
-			/******/
-			int length = strlen(currentNode->tokenString) + 1;
-			char *temp = calloc(length, 1);
-
-			strcpy(temp, currentNode->tokenString);
-			add_token(newTokenlist, temp);
-		} else if(previousNode->tokenType == WHITESPACE)
-			currentNode = currentNode->next;
+		else if(currentNode->tokenType != SPECIAL)
+		{
+			char *temp = _copy_string(currentNode->tokenString);
+			add_token(newTokenlist, temp);	
+		}
 
 		previousNode = currentNode;
 		currentNode = currentNode->next;
 	}
 
+	summary->tokenList = newTokenlist;
+
 	delete_token_strings(oldTokenlist);
 	destroy_tokenList(oldTokenlist);
-
-	summary->tokenList = newTokenlist;
 }
 
 
@@ -124,58 +125,33 @@ void remove_numbers (Summary *summary, Config config)
 	destroy_tokenList(oldTokenlist);
 }
 
-
+// removes all newlines and replaces them with a single space
 void clean_whitespace (Summary *summary, Config config)
 {
-	return;
-	// TokenList *oldTokenlist = summary->tokenList;
-	// TokenList *newTokenlist = initialize_tokenlist();
+	TokenList *oldTokenlist = summary->tokenList;
+	TokenList *newTokenlist = initialize_tokenlist();
 
-	// TokenNode *currentNode = summary->tokenList->head;
-	// TokenNode *whitespaceNode;
+	TokenNode *currentNode = summary->tokenList->head;
+	TokenNode *previousNode = NULL;
 
-	// bool isPreviousNodeWhitespace = false;
-	// int isWhitespace = (currentNode->tokenType == WHITESPACE);
-	
-	// // removes all leading whitespaces
-	// while(currentNode->tokenType == WHITESPACE){
-	// 	// int length = strlen(whitespaceNode->tokenString);
-	// 	// char *temp = malloc(length);
+	while(currentNode != NULL) {
+		if(strcmp(currentNode->tokenString, "\n") == 0)
+			strcpy(currentNode->tokenString, " ");
 
-	// 	// strcpy(temp, currentNode->tokenString);
-	// 	// add_token(newTokenlist, whitespaceNode->tokenString);
+		if(((strcmp(currentNode->tokenString, " ") == 0 && strcmp(previousNode->tokenString, " ") != 0)) || 
+			 currentNode->tokenType != WHITESPACE){
+			char *temp = _copy_string(currentNode->tokenString);
+			add_token(newTokenlist, temp);
+		}
 
-	// 	currentNode = currentNode->next;
-	// }
+		previousNode = currentNode;
+		currentNode = currentNode->next;
+	}
 
-	// while(currentNode != NULL) {
-	// 	if (currentNode->tokenType != WHITESPACE){ 
-	// 		int length = strlen(currentNode->tokenString) + 1;
-	// 		char *temp = calloc(length, 1);
+	summary->tokenList = newTokenlist;
 
-	// 		strcpy(temp, currentNode->tokenString);
-	// 		add_token(newTokenlist, currentNode->tokenString);
-			
-	// 		isPreviousNodeWhitespace = false;
-	// 	}
-	// 	else {
-	// 		if (!isPreviousNodeWhitespace){
-	// 			int length = strlen(currentNode->tokenString) + 1;
-	// 			char *temp = calloc(length, 1);
-				
-	// 			strcpy(temp, currentNode->tokenString);
-	// 			add_token(newTokenlist, currentNode->tokenString);
-	// 		}
-
-	// 		isPreviousNodeWhitespace = true;
-	// 	}
-	
-	// 	currentNode = currentNode->next;
-	// }
-	
-	// delete_token_strings(oldTokenlist);
-	// destroy_tokenList(oldTokenlist);
-	// summary->tokenList = newTokenlist;
+	delete_token_strings(oldTokenlist);
+	destroy_tokenList(oldTokenlist);
 }
 
 /*	
