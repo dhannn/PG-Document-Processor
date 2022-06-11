@@ -3,6 +3,7 @@
 #include "deps/internals.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdarg.h>
 #define MAX_CHAR        1024
 #define MAX_OPTIONS     10
 #define MAX_SCREENS     15
@@ -36,12 +37,11 @@ typedef struct _config Config;
 typedef struct _activeScreen ActiveScreen;
 
 typedef enum {
-    ERR_FILE_NOT_FOUND,   
+    ERR_FILE_NOT_FOUND,
     ERR_INVALID_CHOICE,   
     ERR_INVALID_INT,
     ERR_MALLOC_FAILED   
 } ErrorCode;
-
 
 
 /* -------------------------------------------------------------------------- */
@@ -76,6 +76,8 @@ typedef struct {
     char **header;
     char *prompt;
     ScreenOption options[MAX_OPTIONS];
+    int index;
+    int numOptions;
     void (*get_input)(ActiveScreen*);
     int backIndex;
 } Screen;
@@ -99,8 +101,13 @@ typedef struct {
 
 typedef struct {
     char *name;
+    int addStrNeeded;
+    int addIntNeeded;
+    int usedAddInt;
+    int usedAddStr;
     void (*execute_command)(Summary*, Config);
     void (*report_results)(Summary*, Config);
+    void (*print_results)(Summary*);
     char *fileSuffix;
 } Command;
 
@@ -149,6 +156,8 @@ struct _config {
 /*                        DISPLAY.C FUNCTION PROTOTYPES                       */
 /* -------------------------------------------------------------------------- */
 
+void display_error(ErrorCode errorCode);
+
 void initialize_screens(ActiveScreen *screens);
 void display_screen(ActiveScreen *active, Summary *summary);
 void activate_screen(ActiveScreen* active, Screen screens[]);
@@ -157,9 +166,14 @@ void go_to_screen(ActiveScreen *active, int index);
 void get_choice(ActiveScreen *active);
 void get_int(ActiveScreen *active);
 void get_str(ActiveScreen *active);
+void update_reading(int characters, int words);
+void update_tokenizing(char *current, int words);
+void update_processing(int progress, int max);
+void update_reporting(int progress, int max);
 void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], int maxMetadata);
-void print_token_frequency(FILE *outfile, char *results);
-void print_cleaned(FILE *outfile, MetadataItem metadata[], char *results);
+void print_cleaned(Summary *summary);
+void print_token_frequency(Summary *summary);
+void print_concordance(Summary *summary);
 
 /* -------------------------------------------------------------------------- */
 /*                        SUMMARY.C FUNCTION PROTOTYPES                       */
@@ -169,6 +183,8 @@ void set_mode(Summary *summary, ModeIndex mode);
 void set_infile(Summary *summary, Config config, char *filename);
 void set_outfile(Summary *summary, Config config, char *filename);
 void set_options(Summary *summary, Config config, int rawInput);
+void set_add_str(Summary *summary, char *addStr);
+void set_add_int(Summary *summary, int addInt);
 void execute_summary(Summary *summary, Config config);
 void destroy_summary(Summary *summary);
 

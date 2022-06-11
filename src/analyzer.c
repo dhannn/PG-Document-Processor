@@ -11,9 +11,9 @@
 unsigned int _convert_multiselect_options(int rawInput);
 
 typedef enum {
-    WORD_COUNT      =       0b00001,
-    NGRAM_COUNT     =       0b00010,
-    CONCORDANCE     =       0b00100
+    WORD_COUNT,
+    NGRAM_COUNT,
+    CONCORDANCE
 } ANALYZER_OPTIONS_INDEX;
 
 void analyze_data__single(Summary *summary, Config config)
@@ -67,6 +67,7 @@ void get_word_count(Summary *summary, Config config)
     TokenList *tokensWithDuplicates = summary->tokenList;
     TokenList *tokensWithoutDuplicates = remove_duplicate_tokens(tokensWithDuplicates);
     TokenNode *currentNode = tokensWithDuplicates->head;
+    int numTokens = 0;
 
     while(currentNode != NULL) {
         char *currentTokenStr = currentNode->tokenString;
@@ -76,6 +77,9 @@ void get_word_count(Summary *summary, Config config)
         } else {
             increment_token_frequency(tokensWithoutDuplicates, currentTokenStr);
         }
+
+        numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
 
         currentNode = currentNode->next;
     }
@@ -97,6 +101,7 @@ void get_ngram_count(Summary *summary, Config config)
     TokenList *rawTokens = summary->tokenList;
     TokenList *rawNgrams = convert_to_ngrams(summary->tokenList, n);
     TokenList *ngrams = remove_duplicate_tokens(rawNgrams);
+    int numTokens = 0;
 
     TokenNode *currentNode = rawNgrams->head;
     while(currentNode != NULL) {
@@ -109,6 +114,9 @@ void get_ngram_count(Summary *summary, Config config)
         }
 
         currentNode = currentNode->next;
+
+        numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
     }
 
     summary->tokenList = ngrams;
@@ -133,6 +141,8 @@ void report_token_frequency(Summary *summary, Config config)
     char *temp = calloc(currentSize, 1);
     char buff[MAX_CHAR] = "";
 
+    int numChar = 0;
+
     while(tokenNode != NULL) {
         sprintf(buff, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
         buff[strlen(buff)] = '\0';
@@ -146,6 +156,10 @@ void report_token_frequency(Summary *summary, Config config)
 
         strcat(temp, buff);
         temp[strlen(temp)] = '\0';
+        
+		numChar++;
+		update_reporting(numChar, summary->tokenList->size);
+
         tokenNode = tokenNode->next;
     }
 
@@ -169,14 +183,89 @@ void report_ngram_count(Summary *summary, Config config)
     }
 }
 
-void report_concordance(Summary *summary, Config config)
-{
-
-}
-
 void get_concordance(Summary *summary, Config config)
 {
-    
+    AdditionalOptions addOpts = summary->addOpts;
+    char *keyword = addOpts.s[0];
+    int n = addOpts.i[0];
+
+    TokenList *oldTokenlist = summary->tokenList;
+    TokenList *newTokenlist = initialize_tokenlist();
+
+    TokenNode *curr = oldTokenlist->head;
+    TokenNode *startOfWindow = curr;
+
+    for(int i = 0; i < n && curr != NULL; i++)
+        curr = curr->next;
+
+    while(curr != NULL) {
+        if(strcmp(curr->tokenString, keyword) == 0) {
+            char buff[MAX_CHAR] = "";
+            int num = 0;
+            TokenNode *tempNode = startOfWindow;
+
+            for(int i = 0; i < n; i++) {
+                strcat(buff, tempNode->tokenString);
+                strcat(buff, " ");
+
+                tempNode = tempNode->next;
+                num++;
+            }
+
+            for(int i = 0; i <= n && (tempNode + i) != NULL; i++) {
+                strcat(buff, tempNode->tokenString);
+
+                if(i != n)
+                    strcat(buff, " ");
+                
+                tempNode = tempNode->next;
+                num++;
+            }
+
+            if(num == 2 * n + 1) {
+                int length = strlen(buff);
+                char *temp = calloc(length + 1, 1);
+                
+                strcpy(temp, buff);
+                add_token(newTokenlist, temp);
+            }
+
+        }
+
+        startOfWindow = startOfWindow->next;
+        curr = curr->next;
+    }
+
+    summary->tokenList = newTokenlist;
+
+    delete_token_strings(oldTokenlist);
+    destroy_tokenList(oldTokenlist);
+}
+
+void report_concordance(Summary *summary, Config config)
+{
+    TokenNode *curr = summary->tokenList->head;
+
+    int size = strlen(curr->tokenString);
+    char *temp = calloc(size, 1);
+    char buff[MAX_CHAR] = "";
+    int runningTotal = 0;
+
+    while(curr != NULL) {
+        int length = strlen(curr->tokenString);
+        runningTotal += length + 1;
+
+        if(runningTotal > size) {
+            size *= 2;
+            temp = realloc(temp, size);
+        }
+
+        sprintf(buff, "%s\n", curr->tokenString);
+        strcat(temp, buff);
+        curr = curr->next;
+    }
+
+    summary->outData = temp;
 }
 
 void _set_infile(Summary *summary, char *filename)

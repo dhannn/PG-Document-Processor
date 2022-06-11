@@ -38,6 +38,7 @@ void _convert_string_to_lowercase (char *str)
 void to_lowercase (Summary *summary, Config config)
 {
 	TokenNode *currentNode = summary->tokenList->head;
+    int numTokens = 0;
     
 	while(currentNode != NULL) {
 		char *currentTokenStr = currentNode->tokenString;
@@ -46,6 +47,9 @@ void to_lowercase (Summary *summary, Config config)
 			_convert_string_to_lowercase (currentTokenStr);		
 
         currentNode = currentNode->next;		//switches current node to next  
+		
+		numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
 	}
 }
 
@@ -66,17 +70,27 @@ void remove_special (Summary *summary, Config config)
 	TokenList *newTokenlist = initialize_tokenlist();
 
 	TokenNode *currentNode = summary->tokenList->head;
-	TokenNode *previousNode = NULL;
+	TokenNode *previousNode = summary->tokenList->head;
+    int numTokens = 0;
 	
 	while(currentNode != NULL) 
 	{
 		// if special character is in between 2 alphanumeric
-		if(currentNode->tokenType == SPECIAL && (previousNode->tokenType == ALPHA || previousNode->tokenType == NUMERIC) &&
-		  (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC))	
-		{
-			strcpy(currentNode->tokenString, " ");
-			char *temp = _copy_string(currentNode->tokenString);
-			add_token(newTokenlist, temp);	
+		// if(currentNode->tokenType == SPECIAL && (previousNode->tokenType == ALPHA || previousNode->tokenType == NUMERIC) &&
+		// (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC))	
+
+		if(currentNode->tokenType == SPECIAL) {
+			// @Gwen 	the program is segfaulting since you didn't check if the 
+			//			next node is NULL; thereby accessing memory illegally 
+			if(currentNode->next != NULL) {
+				if((previousNode->tokenType == ALPHA || 
+					previousNode->tokenType == NUMERIC) && (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC)) {
+						
+					strcpy(currentNode->tokenString, " ");
+					char *temp = _copy_string(currentNode->tokenString);
+					add_token(newTokenlist, temp);	
+				}
+			}
 		}
 
 		else if(currentNode->tokenType != SPECIAL)
@@ -84,6 +98,9 @@ void remove_special (Summary *summary, Config config)
 			char *temp = _copy_string(currentNode->tokenString);
 			add_token(newTokenlist, temp);	
 		}
+
+		numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
 
 		previousNode = currentNode;
 		currentNode = currentNode->next;
@@ -102,19 +119,22 @@ void remove_numbers (Summary *summary, Config config)
 	TokenList *newTokenlist = initialize_tokenlist();
 
 	TokenNode *currentNode = summary->tokenList->head;
-	TokenNode *numericNode;
-	// int isNumeric = (currentNode->tokenType == NUMERIC);
+    int numTokens = 0;
 
 	while(currentNode != NULL) {
-		if (currentNode->tokenType != NUMERIC){
-			char *temp = _copy_string(currentNode->tokenString);
+		if (currentNode->tokenType != NUMERIC) {
+			int length = strlen(currentNode->tokenString) + 1;
+			char *temp = calloc(length, 1);
+
+			strcpy(temp, currentNode->tokenString);
 			add_token(newTokenlist, temp);
-			// isNumeric = 0;
-		} 
-		
-		// else if(currentNode->next->tokenType == WHITESPACE)
-		// 	currentNode = currentNode->next;
+		} else if(currentNode->next != NULL) {
+			if(currentNode->next->tokenType == WHITESPACE)
+				currentNode = currentNode->next;
+		}
 			
+		numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
 		currentNode = currentNode->next;
 	}
 
@@ -131,7 +151,9 @@ void clean_whitespace (Summary *summary, Config config)
 	TokenList *newTokenlist = initialize_tokenlist();
 
 	TokenNode *currentNode = summary->tokenList->head;
-	TokenNode *previousNode = NULL;
+	TokenNode *previousNode = summary->tokenList->head;
+
+	int numTokens = 0;
 
 	while(currentNode != NULL) {
 		if(strcmp(currentNode->tokenString, "\n") == 0)
@@ -142,6 +164,9 @@ void clean_whitespace (Summary *summary, Config config)
 			char *temp = _copy_string(currentNode->tokenString);
 			add_token(newTokenlist, temp);
 		}
+
+		numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
 
 		previousNode = currentNode;
 		currentNode = currentNode->next;
@@ -155,68 +180,67 @@ void clean_whitespace (Summary *summary, Config config)
 
 /*	
  *	_merge_alpha_node
- *	merges all neighboring alpha nodes
- */	
-TokenList *__merge_alpha_nodes (Summary *summary)
-{
-	TokenList *oldTokens = summary->tokenList;
-	TokenList *newTokens = initialize_tokenlist();
-	TokenNode *currentNode = oldTokens->head;
-	TokenNode *alphaNode;
-	bool isPreviousAlpha = false; 
-	int flag = 0;
+//  *	merges all neighboring alpha nodes
+//  */	
+// TokenList *__merge_alpha_nodes (Summary *summary)
+// {
+// 	TokenList *oldTokens = summary->tokenList;
+// 	TokenList *newTokens = initialize_tokenlist();
+// 	TokenNode *currentNode = oldTokens->head;
+// 	TokenNode *alphaNode;
+// 	bool isPreviousAlpha = false; 
 	
-	while(currentNode != NULL) 
-	{
-		if (currentNode->tokenType == ALPHA){ 
-			if (isPreviousAlpha){
-				int length = strlen(alphaNode->tokenString) + strlen(currentNode->tokenString) + 1;
+// 	while(currentNode != NULL) 
+// 	{
+// 		if (currentNode->tokenType == ALPHA){ 
+// 			if (isPreviousAlpha){
+// 				int length = strlen(alphaNode->tokenString) + strlen(currentNode->tokenString) + 1;
 
-				char *temp = calloc(length + 1, 1);
-				strcpy(temp, alphaNode->tokenString);
-				// strcpy(temp, " ");
-				strcat(temp, currentNode->tokenString);
+// 				char *temp = calloc(length + 1, 1);
+// 				strcpy(temp, alphaNode->tokenString);
+// 				// strcpy(temp, " ");
+// 				strcat(temp, currentNode->tokenString);
 
-				add_token(newTokens, temp);
-			} else{
-				isPreviousAlpha = true;
-				alphaNode = currentNode;
-			}
-		}
+// 				add_token(newTokens, temp);
+// 			} else{
+// 				isPreviousAlpha = true;
+// 				alphaNode = currentNode;
+// 			}
+// 		}
 
-		else {
-			// int length = strlen(alphaNode->tokenString) + strlen(currentNode->tokenString) + 1;
+// 		else {
+// 			// int length = strlen(alphaNode->tokenString) + strlen(currentNode->tokenString) + 1;
 
-			// char *temp = calloc(length + 1, 1);
-			// strcpy(temp, alphaNode->tokenString);
-			// strcpy(temp, " ");
-			// strcat(temp, currentNode->tokenString);
-			char *temp = _copy_string (currentNode->tokenString);
-			add_token(newTokens, temp);
-			isPreviousAlpha = false;
-		}
+// 			// char *temp = calloc(length + 1, 1);
+// 			// strcpy(temp, alphaNode->tokenString);
+// 			// strcpy(temp, " ");
+// 			// strcat(temp, currentNode->tokenString);
+// 			char *temp = _copy_string (currentNode->tokenString);
+// 			add_token(newTokens, temp);
+// 			isPreviousAlpha = false;
+// 		}
 		
-		currentNode = currentNode->next;
-	}
+// 		currentNode = currentNode->next;
+// 	}
 
-	delete_token_strings(oldTokens);
-	destroy_tokenList(oldTokens);
+// 	delete_token_strings(oldTokens);
+// 	destroy_tokenList(oldTokens);
 
-	return newTokens;
-}
+// 	return newTokens;
+// }
 
 
 void remove_stopword (Summary *summary, Config config)
 {	
-	__merge_alpha_nodes(summary);
+	// __merge_alpha_nodes(summary);
 	TokenList *oldTokenlist = summary->tokenList;
 	TokenList *newTokenlist = initialize_tokenlist();
 	TokenNode *currentNode = oldTokenlist->head;
 
 	FILE *file = fopen("dat/stopwords", "r");
-	char currentString[MAX_CHAR], matchedStopword[MAX_CHAR];
-	bool isPreviousStopword = false; 
+	char currentString[MAX_CHAR] = "", matchedStopword[MAX_CHAR] = "";
 	int flag;
+    int numTokens = 0;
 
 	while(currentNode != NULL) 
 	{
@@ -234,16 +258,17 @@ void remove_stopword (Summary *summary, Config config)
 			if (strcmp(currentString, matchedStopword) != 0){
 				char *temp = _copy_string (currentNode->tokenString);
 				add_token(newTokenlist, temp);
-				isPreviousStopword = false;
-			} 
-			// else if(currentNode->next->tokenType == WHITESPACE){
-			// 	isPreviousStopword = true;
-			// 	// currentNode = currentNode->next; // to remove extra space
-			// }
+
+			} else if(currentNode->next->tokenType == WHITESPACE) {
+				currentNode = currentNode->next; // to remove extra space
+			}
 		} else {
 			char *temp = _copy_string(currentNode->tokenString);
 			add_token(newTokenlist, temp);
-		}	
+		}
+
+		numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
 
 		currentNode = currentNode->next;
 	}
@@ -259,9 +284,9 @@ void remove_stopword (Summary *summary, Config config)
 void clean_all(Summary *summary, Config config)
 {
 	void (*commands[])(Summary*, Config) = {
-		remove_stopword,
 		to_lowercase,
 		remove_special,
+		remove_stopword,
 		remove_numbers,
 		clean_whitespace
 	};
@@ -283,6 +308,8 @@ void report_cleaned(Summary *summary, Config config)
     char *temp = calloc(currentSize, 1);
     char buff[MAX_CHAR] = "";
 
+	int numChar = 0;
+
     while(tokenNode != NULL) {
         sprintf(buff, "%s", tokenNode->tokenString);
         buff[strlen(buff)] = '\0';
@@ -296,6 +323,10 @@ void report_cleaned(Summary *summary, Config config)
 
         strcat(temp, buff);
         temp[strlen(temp)] = '\0';
+
+		numChar++;
+		update_reporting(numChar, summary->tokenList->size);
+
         tokenNode = tokenNode->next;
     }
 

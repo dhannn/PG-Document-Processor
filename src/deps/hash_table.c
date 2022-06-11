@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#define SIZE 500
+#define SIZE 10000
 
 unsigned long _stub_get_hash();
 

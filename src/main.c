@@ -1,9 +1,21 @@
+/*******************************************************************************
+ * 
+ * This is to certify that this project is our own work, based on our personal
+ * efforts in studying and applying the concepts learned. We have constructed the
+ * functions and their respective algorithms and corresponding code by ourselves.
+ * The program was run, tested, and debugged by our own efforts. We further 
+ * certify that we have not copied in part or whole or otherwise plagiarized 
+ * the work of other students and/or persons.
+ * 
+ *                                      Daniel Ramos,   DLSU ID# 1213136
+ *                                      Gwen Roco,      DLSU ID# 1213136
+ * 
+ *******************************************************************************/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "pgdocs.h"
-// #include "leak_detector_c.h"
-// #include <malloc.h>
 
 int main()
 {
@@ -20,8 +32,15 @@ int main()
         activeScreen.current->get_input(&activeScreen);
 
         int index = 0;
-        if(activeScreen.current->get_input == get_choice)
+        if(activeScreen.current->get_input == get_choice) {
             index = activeScreen.choice - 1;
+
+            if(index < 0 || index > activeScreen.current->numOptions - 1) {
+                display_error(ERR_INVALID_CHOICE);
+                go_to_screen(&activeScreen, activeScreen.current->index);
+                continue;
+            }
+        }
         
         activeScreen.current->options[index].do_option(&activeScreen, &summary, &config);
     } while(!check_if_exit(activeScreen.screens, &activeScreen));

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 #define MAX_WIDTH       85
 #define MAX_HEIGHT      35
@@ -13,13 +14,15 @@
 #define CLEAR() (printf("%s[2J", (ESC)))
 #define MOVE(ROW, COL) (printf("%s[%d;%df", (ESC), (ROW), (COL)))
 #define FMT(X) (printf("%s[%dm", (ESC), (X)))
+#define HIDE_CURS() (printf("%s[?25l", (ESC)))
+#define SHOW_CURS() (printf("%s[?25h", (ESC)))
 #define COLOR(X, Y) (printf("%s[%d;%dm", (ESC), (X), (Y)))
 
 enum FORMAT {
     BOLD = 1,
     DIM,
     ITALIC,
-    UNDERLINE,
+    UNDERLINE
 };
 
 enum COLORS{
@@ -242,7 +245,7 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
     },
     {
         do_processing,
-        get_add_opts
+        get_add_opts,
     }, 
     {
         do_processing,
@@ -253,7 +256,7 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
         do_processing
     },
     {
-        NULL
+        do_processing
     },
     {
         NULL
@@ -286,10 +289,13 @@ void initialize_screens(ActiveScreen *screen)
     Screen *screens = screen->screens;
     
     for(int i = 0; i < MAX_SCREENS; i++) {
+        screens[i].index = i;
         screens[i].header = HEADERS[i];
         screens[i].prompt = PROMPTS[i];
         screens[i].get_input = GET_INPUT_FUNCTIONS[i];
         screens[i].backIndex = BACK_INDICES[i];
+
+        screens[i].numOptions = 0;
         __extract_options(screens, i);
     }
 }
@@ -302,9 +308,11 @@ void __extract_options(Screen *screens, int index)
     for(int i = 0; i < MAX_OPTIONS; i++) {
         ScreenOption *opt = &current->options[i];
 
+        
         if(OPTION_NAMES[index][i] != NULL) {
             strcpy(opt->optionName, OPTION_NAMES[index][i]);
             opt->do_option = DO_OPTION[index][i];
+            current->numOptions++;
             continue;
         }
 
@@ -313,8 +321,10 @@ void __extract_options(Screen *screens, int index)
             strcpy(opt->optionName, DEFAULT_OPTION_NAMES[numDefaultOpts]);
             opt->do_option = DO_DEFAULT_OPTION[numDefaultOpts];
             numDefaultOpts++;
+            current->numOptions++;
         } else 
             strcpy(opt->optionName, "");
+        
     }
 }
 
@@ -343,6 +353,7 @@ int __get_starting_cell(int strlen)
 void display_screen(ActiveScreen *active, Summary *summary)
 {
     CLEAR();
+    SHOW_CURS();
 
     printf("\n");
     for (int i = 0; i < 2; i++) {
@@ -438,8 +449,10 @@ void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], in
     FMT(RESET_COLOR);
 }
 
-void print_token_frequency(FILE *outfile, char *results)
+void print_token_frequency(Summary *summary)
 {
+    FILE *outfile = summary->outfile;
+    char *results = summary->outData;
     int flag;
     char buff[MAX_CHAR];
     int len = 0;
@@ -461,8 +474,145 @@ void print_token_frequency(FILE *outfile, char *results)
     } while(flag != EOF);
 }
 
-void print_cleaned(FILE *outfile, MetadataItem metadata[], char *results)
+void print_concordance(Summary *summary)
 {
+    FILE *outfile = summary->outfile; 
+    char *results = summary->outData;
+    int n = summary->addOpts.i[0];
+
+    int flag;
+    int length = 0;
+    int numWords = 0;
+    int linesRead = 0;
+    char buff[MAX_CHAR] = "";
+
+    MOVE(1, 1);
+    do {
+        flag = sscanf(results + length, "%s", buff);
+        numWords++;
+
+        fprintf(outfile, "%s ", buff);
+
+        if(linesRead < 10) {
+            if(numWords % (2 * n + 1) == n + 1) {
+                FMT(BOLD);
+                FMT(CYAN_FG);
+            }
+            
+            fprintf(stdout, "%s", buff);
+
+            FMT(RESET_COLOR);
+            fprintf(stdout, " ");
+        
+            if((numWords % (2 * n + 1)) == 0)
+                fprintf(stdout, "\n");
+        }
+
+        if((numWords % (2 * n + 1)) == 0) {
+            fprintf(outfile, "\n");
+            
+            linesRead++;
+        }
+        
+        length += strlen(buff) + 1;
+    } while(flag != EOF);
+}
+
+void update_reading(int characters, int words)
+{
+    if(words % 1024 == 0) {
+        HIDE_CURS();
+        MOVE(1, 1);
+        printf("Reading:\t\t");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d\t", characters);
+        FMT(RESET_COLOR);
+        printf("characters/s\n");
+
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("\t\t\t%d\t", words);
+        FMT(RESET_COLOR);
+        printf("words/s\n");
+
+        MOVE(1, 1);
+    }
+}
+
+void update_tokenizing(char *current, int words)
+{
+    if(words % 1024 == 0) {
+        HIDE_CURS();
+        MOVE(4, 1);
+        
+        printf("\x1b[2K");
+        MOVE(4, 1);
+        FMT(RESET_COLOR);
+        printf("Tokenizing data:\t");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d\t", words);
+        FMT(RESET_COLOR);
+        printf("tokens/s done\n");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("\x1b[2K\t\t\t%s\t", current);
+        FMT(RESET_COLOR);
+        
+        MOVE(4, 1);
+    }
+}
+
+void update_processing(int progress, int max)
+{
+    if(progress % 1024 == 0) {
+        MOVE(1, 1);
+        FMT(RESET_COLOR);
+        printf("Processing:\t");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d", progress);
+        FMT(RESET_COLOR);
+        printf(" out of ");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d", max);
+        FMT(RESET_COLOR);
+        printf(" tokens/s done\n");
+        MOVE(1, 1);
+    }
+}
+
+void update_reporting(int progress, int max)
+{
+    if(progress % 1024 == 0) {
+        HIDE_CURS();
+        MOVE(1, 1);
+        FMT(RESET_COLOR);
+        printf("Reporting:\t");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d", progress);
+        FMT(RESET_COLOR);
+        HIDE_CURS();
+        printf(" out of ");
+        FMT(BOLD);
+        FMT(CYAN_FG);
+        printf("%d", max);
+        FMT(RESET_COLOR);
+        HIDE_CURS();
+        printf(" tokens/s done\n");
+        MOVE(1, 1);
+    }
+}
+
+void print_cleaned(Summary *summary)
+{
+    FILE *outfile = summary->outfile; 
+    MetadataItem *metadata = summary->metadata; 
+    char *results = summary->outData;
+
 	for(int i = 0; i < MAX_METADATA; i++) {
 		MetadataItem currentMetadata = metadata[i];
 		
@@ -474,6 +624,7 @@ void print_cleaned(FILE *outfile, MetadataItem metadata[], char *results)
 			);
 		}
 	}
+    
 	fprintf(outfile, "Content:\n");
 
     fprintf(outfile, "%s\n", results);
@@ -481,5 +632,44 @@ void print_cleaned(FILE *outfile, MetadataItem metadata[], char *results)
     CLEAR();
     MOVE(1, 1);
 
-    fprintf(stdout, "Finished cleaning! Press ENTER key to return to main menu.");
+    HIDE_CURS();
+    fprintf(stdout, "Finished cleaning! \nPress ENTER key to return to main menu.");
+}
+
+void display_error(ErrorCode errorCode)
+{
+    char *errorMessage[] = {
+        "File not found",
+        "Invalid choice",
+        "Invalid value of N",
+        "Memory allocation failed. No memory left"
+    };
+
+    char *errorSuggestion[] = {
+        "Try entering a file that exists or re-configure paths in dat/config",
+        "Try entering a valid choice",
+        "Try entering a number from 1 to 4",
+        "Try limiting the number of characters to be read in dat/config"
+    };
+
+    CLEAR();
+    MOVE(1, 1);
+    FMT(BOLD); FMT(RED_FG);
+    fprintf(stderr, "ERROR");
+
+    FMT(RESET_COLOR);
+    fprintf(stderr, "\t\t");
+    fprintf(stderr, "%s!\n", errorMessage[errorCode]);
+
+    FMT(RESET_COLOR);
+    fprintf(stderr, "\t\t");
+    FMT(YELLOW_FG);
+    fprintf(stderr, "%s.", errorSuggestion[errorCode]);
+
+    HIDE_CURS();
+    fflush(stdin);
+    scanf("%*c");
+
+    SHOW_CURS();
+    FMT(RESET_COLOR);
 }

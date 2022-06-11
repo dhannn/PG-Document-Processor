@@ -29,7 +29,6 @@ void initialize_config(ActiveScreen *active, Config *config)
     fclose(configFile);
 
     for(int i = 0; i < 5; i++) {
-        
         int index = CONFIG_SCREENS[i];
         
         go_to_screen(active, index);
@@ -49,19 +48,10 @@ void reset_config(ActiveScreen *active, Summary *summary, Config *config)
     remove(CONFIG_FILE);
 }
 
-//TO DO////////GWEN
 void load_help(ActiveScreen* active, Summary *summary, Config *config)
 {
-    // FILE *helpFile = fopen(HELP_FILE, "r");
-    // int i = 1, flag = 1;
-    // char buff[MAX_CHAR];
-
-    // while (flag == 1){
-    //     flag = fscanf(HELP_FILE, "%[^\n]s", buff);
     
-
-    // }
-};
+}
 
 void return_screen(ActiveScreen* active, Summary *summary, Config *config)
 {
@@ -69,8 +59,8 @@ void return_screen(ActiveScreen* active, Summary *summary, Config *config)
     
     if(index == EXIT) {
         // TODO: move this code snippet to a function in display.c
-        // MOVE(1, 1);
-        // CLEAR();
+        MOVE(1, 1);
+        CLEAR();
         return;
     }
 
@@ -92,10 +82,19 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config)
     strcpy(summary->infilename, filename);
     set_infile(summary, *config, filename);
 
+    if(summary->infile == NULL) {
+        display_error(ERR_FILE_NOT_FOUND);
+        go_to_screen(active, ENTER_INPUT_FILE_MENU);
+
+        return;
+    }
+
     int mode = summary->mode.index;
     int screen = MAIN_MENU;
     
     initialize_metadata(summary->metadata);
+    
+    CLEAR();
     read_file(summary, *config);
     summary->tokenList = tokenize_string(summary->inData, summary->mode.index == CLEAN);
 
@@ -116,14 +115,20 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config)
 
 void do_processing(ActiveScreen* active, Summary *summary, Config *config)
 {
-    set_options(summary, *config, active->nInput);
+    set_options(summary, *config, active->choice - 1);
 
-    if(summary->mode.index == ANALYZE_SINGLE) {
-        if(summary->options == 1) {
-            summary->addOpts.i[0] = active->nInput;
-        }
+    if(active->current->get_input == get_str) {
+        set_add_str(summary, active->strInput);
+    } else if(active->current->get_input == get_int) {
+        set_add_int(summary, active->nInput);
     }
 
+    if(summary->mode.commands[summary->options].addIntNeeded - summary->mode.commands[summary->options].usedAddInt != 0 || summary->mode.commands[summary->options].addStrNeeded - summary->mode.commands[summary->options].usedAddStr != 0) {
+        get_add_opts(active, summary, config);
+        return;
+    }
+    
+    CLEAR();
     execute_summary(summary, *config);
     
     if(summary->mode.index == CLEAN)
@@ -152,28 +157,29 @@ void get_add_opts(ActiveScreen* active, Summary *summary, Config *config)
     set_options(summary, *config, active->choice);
     ModeIndex mode = summary->mode.index;
 
-    ScreenTag addOptsScreen[3][MAX_OPTIONS] = {
+    ScreenTag addOptsScreen[3][MAX_OPTIONS][MAX_ADD_OPTS] = {
         {
-            ENTER_OUTPUT_FILE_MENU,
-            ENTER_OUTPUT_FILE_MENU,
-            ENTER_OUTPUT_FILE_MENU,
-            ENTER_OUTPUT_FILE_MENU,
-            ENTER_OUTPUT_FILE_MENU,
-            ENTER_OUTPUT_FILE_MENU
+            {ENTER_OUTPUT_FILE_MENU},
+            {ENTER_OUTPUT_FILE_MENU},
+            {ENTER_OUTPUT_FILE_MENU},
+            {ENTER_OUTPUT_FILE_MENU},
+            {ENTER_OUTPUT_FILE_MENU},
+            {ENTER_OUTPUT_FILE_MENU}
         },
         {
-            ENTER_OUTPUT_FILE_MENU,
-            ENTER_N_MENU,
-            ENTER_KEYWORD_MENU
+            {ENTER_OUTPUT_FILE_MENU},
+            {ENTER_N_MENU},
+            {ENTER_KEYWORD_MENU, ENTER_N_MENU}
         },
         {
-            ENTER_OUTPUT_FILE_MENU,
-            ENTER_INPUT_FILE_MENU,
-            ENTER_NUMBER_CLUSTERS_MENU
+            {ENTER_OUTPUT_FILE_MENU},
+            {ENTER_INPUT_FILE_MENU},
+            {ENTER_NUMBER_CLUSTERS_MENU}
         }
     };
 
-    screen = addOptsScreen[mode][chosenOption];
+    int usedInt = summary->mode.commands[chosenOption].usedAddStr;
+    screen = addOptsScreen[mode][chosenOption][usedInt];
     go_to_screen(active, screen);
 }
 
@@ -181,10 +187,7 @@ void save_results(ActiveScreen* active, Summary *summary, Config *config)
 {
     set_outfile(summary, *config, active->strInput);
     
-    if(summary->mode.index == CLEAN)
-        print_cleaned(summary->outfile, summary->metadata, summary->outData);
-    else
-        print_token_frequency(summary->outfile, summary->outData);
+    summary->mode.commands[summary->options].print_results(summary);
     
     fflush(stdin);
     scanf("%*c");
