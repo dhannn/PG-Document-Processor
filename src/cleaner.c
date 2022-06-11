@@ -53,17 +53,6 @@ void to_lowercase (Summary *summary, Config config)
 	}
 }
 
-
-char *_copy_string (char *str)
-{
-	int length = strlen(str) + 1;
-	char *temp = calloc(length, 1);
-
-	strcpy(temp, str);
-	return temp;
-}
-
-
 void remove_special (Summary *summary, Config config)
 {
 	TokenList *oldTokenlist = summary->tokenList;
@@ -87,7 +76,7 @@ void remove_special (Summary *summary, Config config)
 					previousNode->tokenType == NUMERIC) && (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC)) {
 						
 					strcpy(currentNode->tokenString, " ");
-					char *temp = _copy_string(currentNode->tokenString);
+					char *temp = create_string(currentNode->tokenString);
 					add_token(newTokenlist, temp);	
 				}
 			}
@@ -95,7 +84,7 @@ void remove_special (Summary *summary, Config config)
 
 		else if(currentNode->tokenType != SPECIAL)
 		{
-			char *temp = _copy_string(currentNode->tokenString);
+			char *temp = create_string(currentNode->tokenString);
 			add_token(newTokenlist, temp);	
 		}
 
@@ -161,7 +150,7 @@ void clean_whitespace (Summary *summary, Config config)
 
 		if(((strcmp(currentNode->tokenString, " ") == 0 && strcmp(previousNode->tokenString, " ") != 0)) || 
 			 currentNode->tokenType != WHITESPACE){
-			char *temp = _copy_string(currentNode->tokenString);
+			char *temp = create_string(currentNode->tokenString);
 			add_token(newTokenlist, temp);
 		}
 

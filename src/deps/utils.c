@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * 
+ * FILE             utils.c
+ * LAST MODIFIED    04-19-2022
+ * 
+ * DESCRIPTION
+ *      This file contains function implementations that does not belong
+ *      to other logical units of the source code
+ * 
+ ******************************************************************************/
+
 #include "../pgdocs.h"
 #include "internals.h"
 #include <stdlib.h>
@@ -81,11 +92,10 @@ TokenList *remove_duplicate_tokens(TokenList *tl)
     }
 
     destroy_hash_table(ht);
-
     return cleanedTl;
 }
 
-void sort_tokens(TokenList *tl)
+void sort_tokens_by_freq(TokenList *tl)
 {
     TokenNode *sortedNode = tl->head;
 
@@ -120,6 +130,15 @@ void swap(TokenNode *a, TokenNode *b)
     TokenType tempType = a->tokenType;
     a->tokenType = b->tokenType;
     b->tokenType = tempType;
+}
+
+char *create_string(char *str)
+{
+	int length = strlen(str) + 1;
+	char *temp = calloc(length, sizeof(char));
+
+	strcpy(temp, str);
+	return temp;
 }
 
 void delete_token_strings(TokenList *tokenList)

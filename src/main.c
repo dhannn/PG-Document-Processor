@@ -12,6 +12,18 @@
  * 
  *******************************************************************************/
 
+/*******************************************************************************
+ * 
+ * FILE             main.c
+ * LAST MODIFIED    06-
+ * AUTHORS          Ramos, Daniel III
+ *                  Roco, Gwen
+ * 
+ * DESCRIPTION
+ *      The main program logic that uses the modules.
+ * 
+ ******************************************************************************/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

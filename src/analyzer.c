@@ -86,7 +86,7 @@ void get_word_count(Summary *summary, Config config)
 
     summary->tokenList = tokensWithoutDuplicates;
 
-    sort_tokens(summary->tokenList);
+    sort_tokens_by_freq(summary->tokenList);
 
     destroy_hash_table(ht);
     delete_token_strings(tokensWithDuplicates);
@@ -120,7 +120,7 @@ void get_ngram_count(Summary *summary, Config config)
     }
 
     summary->tokenList = ngrams;
-    sort_tokens(summary->tokenList);
+    sort_tokens_by_freq(summary->tokenList);
 
     destroy_hash_table(ht);
 

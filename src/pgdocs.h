@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * 
+ * FILE             pgdocs.h
+ * LAST MODIFIED    06-11-2022
+ * 
+ * DESCRIPTION
+ *      This file contains the function, structure and constants declarations
+ *      used throughout the program.
+ * 
+ ******************************************************************************/
+
 #ifndef PG_DOCS_H
 #define PG_DOCS_H
 #include "deps/internals.h"
@@ -8,28 +19,6 @@
 #define MAX_OPTIONS     10
 #define MAX_SCREENS     15
 #define MAX_METADATA    5
-
-/**
- * Basic Program Structure
- * 
- * Engine               Combines all the modules
- * |
- * + Config             Sets config structure
- * |
- * + Display            Acts as the "view" and "controller" of the software
- * |
- * + Summary            
- *   |
- *   + Analyzer
- *   |
- *   + Cleaner
- *   |
- *   + Reader
- *     |
- *     + Metadata
- */
-
-
 
 typedef struct _summary Summary;
 typedef struct _config Config;

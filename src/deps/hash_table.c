@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * 
+ * FILE             hash_table.c
+ * LAST MODIFIED    04-19-2022
+ * 
+ * DESCRIPTION
+ *      This file contains function implementations that creates, modifies
+ *      and handles hash tables.
+ * 
+ * ACKNOWLEDGMENTS 
+ *      Stannis, Filip. (n.d.). 008 - djb2 hash | The Art in Code
+ *      https://theartincode.stanis.me/008-djb2/
+ *          This website contains the hash function we used for strings.
+ * 
+ ******************************************************************************/
+
 #include "../pgdocs.h"
 #include "internals.h"
 
@@ -5,15 +21,22 @@
 #include <stdio.h>
 #define SIZE 10000
 
-unsigned long _stub_get_hash();
+/* -------------------------------------------------------------------------- */
+/*                         PRIVATE FUNCTION PROTOTYPES                        */
+/* -------------------------------------------------------------------------- */
+/* ----------------- functions only visible to hash_table.c ----------------- */
+unsigned long __stub_get_hash();
 
+/* -------------------------------------------------------------------------- */
+/*                              PUBLIC FUNCTIONS                              */
+/* -------------------------------------------------------------------------- */
+/* ------------------ functions visible to outside modules ------------------ */
 HashTable *create_hash_table()
 {
     HashTable *hashTable = malloc(sizeof(HashTable) * SIZE);
 
-    for(int i = 0; i < SIZE; i++) {
+    for(int i = 0; i < SIZE; i++)
         hashTable[i].tokenList = initialize_tokenlist();
-    }
 
     hashTable->size = 0;
 
@@ -28,11 +51,14 @@ bool contains(HashTable *hashTable, char *item)
     return is_token_found(tokens, item);
 }
 
-// Pre-condition: item is unique
 int add_element(HashTable *hashTable, char *item)
 {
+    // we used the linked list implementation of the hash table 
+    // to prevent collisions via chaining
+
     unsigned long index = get_hash(item);
     add_token(hashTable[index].tokenList, item);
+    
     return index;
 }
 
@@ -65,22 +91,21 @@ void destroy_hash_table(HashTable *hashTable)
     free(hashTable);
 }
 
-unsigned long _stub_get_hash()
-{
-    return 1;
-}
-
 unsigned long get_hash(char *key)
 {
-    // https://theartincode.stanis.me/008-djb2/
-
-    unsigned long hash = 5381;
+    // based on Daniel Bernstein's hash function, djb2
+    unsigned long hash = 5381; 
     int c = *key;
 
     while(c != '\0') {
-        hash = ((hash << 5) + hash) + c; // hash =  hash * 33 + c
+        hash = ((hash << 5) + hash) + c;
         c = *key++;
     }
 
     return hash % SIZE;
+}
+
+unsigned long __stub_get_hash()
+{
+    return 1;
 }
