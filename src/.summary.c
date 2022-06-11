@@ -195,7 +195,6 @@ void set_options(Summary *summary, Config config, int rawInput)
 void set_add_str(Summary *summary, char *addStr)
 {
     int option = summary->options;
-    int mode = summary->mode.index;
     Command command = summary->mode.commands[option];
 
     if(command.addStrNeeded == 0)
@@ -212,7 +211,6 @@ void set_add_str(Summary *summary, char *addStr)
 void set_add_int(Summary *summary, int addInt)
 {
     int option = summary->options;
-    int mode = summary->mode.index;
     Command command = summary->mode.commands[option];
 
     if(command.addIntNeeded == 0)

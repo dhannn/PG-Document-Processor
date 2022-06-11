@@ -1,13 +1,13 @@
 # Compiler Information
 CC=gcc
-CFLAGS=-g -std=gnu99
+CFLAGS=-g -std=gnu99 -Wall
 EXEC=.exe
 
 # Directories
 SRC_DIR=src
 
 BIN_DIR=bin
-BIN=$(BIN_DIR)/recall$(EXEC)
+BIN=$(BIN_DIR)/pg_doc_processor$(EXEC)
 
 DOC_DIR=docs
 DOCS=$(wildcard $(docs)/*)
@@ -28,7 +28,7 @@ MAIN_SRC=$(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/.*.c)
 all: $(BIN)
 
 $(BIN): $(OBJS)
-	$(CC) $(CFLAGS) -std=c99 $(MAIN_SRC) $? -o $(BIN) -lm
+	$(CC) $(CFLAGS) $(MAIN_SRC) $? -o "$(BIN)" -lm
 
 $(OBJ_DIR)/%.o: $(INCLUDE_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

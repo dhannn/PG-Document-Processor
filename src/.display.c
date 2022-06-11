@@ -624,6 +624,7 @@ void print_cleaned(Summary *summary)
 			);
 		}
 	}
+    
 	fprintf(outfile, "Content:\n");
 
     fprintf(outfile, "%s\n", results);

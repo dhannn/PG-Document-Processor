@@ -90,6 +90,9 @@ void remove_special (Summary *summary, Config config)
 			add_token(newTokenlist, temp);	
 		}
 
+		numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
+
 		previousNode = currentNode;
 		currentNode = currentNode->next;
 	}
@@ -107,8 +110,6 @@ void remove_numbers (Summary *summary, Config config)
 	TokenList *newTokenlist = initialize_tokenlist();
 
 	TokenNode *currentNode = summary->tokenList->head;
-	TokenNode *numericNode;
-	int isNumeric = (currentNode->tokenType == NUMERIC);
     int numTokens = 0;
 
 	while(currentNode != NULL) {
@@ -118,7 +119,6 @@ void remove_numbers (Summary *summary, Config config)
 
 			strcpy(temp, currentNode->tokenString);
 			add_token(newTokenlist, temp);
-			isNumeric = 0;
 		} else if(currentNode->next->tokenType == WHITESPACE)
 			currentNode = currentNode->next;
 			
@@ -142,6 +142,8 @@ void clean_whitespace (Summary *summary, Config config)
 	TokenNode *currentNode = summary->tokenList->head;
 	TokenNode *previousNode = NULL;
 
+	int numTokens = 0;
+
 	while(currentNode != NULL) {
 		if(strcmp(currentNode->tokenString, "\n") == 0)
 			strcpy(currentNode->tokenString, " ");
@@ -151,6 +153,9 @@ void clean_whitespace (Summary *summary, Config config)
 			char *temp = _copy_string(currentNode->tokenString);
 			add_token(newTokenlist, temp);
 		}
+
+		numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
 
 		previousNode = currentNode;
 		currentNode = currentNode->next;
@@ -224,7 +229,6 @@ void remove_stopword (Summary *summary, Config config)
 
 	FILE *file = fopen("dat/stopwords", "r");
 	char currentString[MAX_CHAR] = "", matchedStopword[MAX_CHAR] = "";
-	bool isPreviousStopword = false;
 	int flag;
     int numTokens = 0;
 
@@ -248,9 +252,7 @@ void remove_stopword (Summary *summary, Config config)
 				strcpy(temp, currentNode->tokenString);
 				add_token(newTokenlist, temp);
 
-				isPreviousStopword = false;
 			} else if(currentNode->next->tokenType == WHITESPACE) {
-				isPreviousStopword = true;
 				currentNode = currentNode->next; // to remove extra space
 			}
 		} else {
@@ -259,7 +261,10 @@ void remove_stopword (Summary *summary, Config config)
 
 			strcpy(temp, currentNode->tokenString);
 			add_token(newTokenlist, temp);
-		}	
+		}
+
+		numTokens++;
+        update_processing(numTokens, summary->tokenList->size);
 
 		currentNode = currentNode->next;
 	}
@@ -285,8 +290,7 @@ void clean_all(Summary *summary, Config config)
 	int length = sizeof(commands) / sizeof(commands[0]);
 
 	for(int i = 0; i < length; i++) {
-		if(i != 2)
-			commands[i](summary, config);
+		commands[i](summary, config);
 	}
 }
 
