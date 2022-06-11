@@ -66,18 +66,15 @@ void read_metadata(FILE *file, MetadataItem items[], ModeIndex mode)
 
 void read_content(FILE *file, char **inputData, int maxChar)
 {
-    int flag;               // flag to determine if EOF
-
     int runningTotal = 0;   // total number of characters
     char *temp = calloc(1, sizeof(char)); // allocation for the content string
 
     char buff[MAX_CHAR];
     char prev[MAX_CHAR] = "";
+    int flag = fscanf(file, "%s", buff); // flag to determine if EOF
     int numWords = 0;
 
-    do {
-        flag = fscanf(file, "%s", buff);
-
+    while(flag != EOF) {
         if(__check_if_content_end(buff, prev)) {
             break;
         }
@@ -95,7 +92,9 @@ void read_content(FILE *file, char **inputData, int maxChar)
 
         numWords++;
         update_reading(runningTotal, numWords);
-    } while(flag != EOF);
+
+        flag = fscanf(file, "%s", buff);
+    };
 
     *inputData = temp;
 }

@@ -76,12 +76,21 @@ void remove_special (Summary *summary, Config config)
 	while(currentNode != NULL) 
 	{
 		// if special character is in between 2 alphanumeric
-		if(currentNode->tokenType == SPECIAL && (previousNode->tokenType == ALPHA || previousNode->tokenType == NUMERIC) &&
-		  (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC))	
-		{
-			strcpy(currentNode->tokenString, " ");
-			char *temp = _copy_string(currentNode->tokenString);
-			add_token(newTokenlist, temp);	
+		// if(currentNode->tokenType == SPECIAL && (previousNode->tokenType == ALPHA || previousNode->tokenType == NUMERIC) &&
+		// (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC))	
+
+		if(currentNode->tokenType == SPECIAL) {
+			// @Gwen 	the program is segfaulting since you didn't check if the 
+			//			next node is NULL; thereby accessing memory illegally 
+			if(currentNode->next != NULL) {
+				if((previousNode->tokenType == ALPHA || 
+					previousNode->tokenType == NUMERIC) && (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC)) {
+						
+					strcpy(currentNode->tokenString, " ");
+					char *temp = _copy_string(currentNode->tokenString);
+					add_token(newTokenlist, temp);	
+				}
+			}
 		}
 
 		else if(currentNode->tokenType != SPECIAL)
@@ -113,14 +122,16 @@ void remove_numbers (Summary *summary, Config config)
     int numTokens = 0;
 
 	while(currentNode != NULL) {
-		if (currentNode->tokenType != NUMERIC){
+		if (currentNode->tokenType != NUMERIC) {
 			int length = strlen(currentNode->tokenString) + 1;
 			char *temp = calloc(length, 1);
 
 			strcpy(temp, currentNode->tokenString);
 			add_token(newTokenlist, temp);
-		} else if(currentNode->next->tokenType == WHITESPACE)
-			currentNode = currentNode->next;
+		} else if(currentNode->next != NULL) {
+			if(currentNode->next->tokenType == WHITESPACE)
+				currentNode = currentNode->next;
+		}
 			
 		numTokens++;
         update_processing(numTokens, summary->tokenList->size);
@@ -140,7 +151,7 @@ void clean_whitespace (Summary *summary, Config config)
 	TokenList *newTokenlist = initialize_tokenlist();
 
 	TokenNode *currentNode = summary->tokenList->head;
-	TokenNode *previousNode = NULL;
+	TokenNode *previousNode = summary->tokenList->head;
 
 	int numTokens = 0;
 
