@@ -54,4 +54,4 @@ language and either model the document set for predictive classification
 purposes or populate a database or search index with the information extracted. 
 The document is the basic element while starting with text mining. Here, we 
 define a document as a unit of textual data, which normally exists in many types 
-of collections.[3]
+of collections

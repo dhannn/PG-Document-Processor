@@ -53,17 +53,6 @@ void to_lowercase (Summary *summary, Config config)
 	}
 }
 
-
-char *_copy_string (char *str)
-{
-	int length = strlen(str) + 1;
-	char *temp = calloc(length, 1);
-
-	strcpy(temp, str);
-	return temp;
-}
-
-
 void remove_special (Summary *summary, Config config)
 {
 	TokenList *oldTokenlist = summary->tokenList;
@@ -87,7 +76,7 @@ void remove_special (Summary *summary, Config config)
 					previousNode->tokenType == NUMERIC) && (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC)) {
 						
 					strcpy(currentNode->tokenString, " ");
-					char *temp = _copy_string(currentNode->tokenString);
+					char *temp = create_string(currentNode->tokenString);
 					add_token(newTokenlist, temp);	
 				}
 			}
@@ -95,7 +84,7 @@ void remove_special (Summary *summary, Config config)
 
 		else if(currentNode->tokenType != SPECIAL)
 		{
-			char *temp = _copy_string(currentNode->tokenString);
+			char *temp = create_string(currentNode->tokenString);
 			add_token(newTokenlist, temp);	
 		}
 
@@ -161,7 +150,7 @@ void clean_whitespace (Summary *summary, Config config)
 
 		if(((strcmp(currentNode->tokenString, " ") == 0 && strcmp(previousNode->tokenString, " ") != 0)) || 
 			 currentNode->tokenType != WHITESPACE){
-			char *temp = _copy_string(currentNode->tokenString);
+			char *temp = create_string(currentNode->tokenString);
 			add_token(newTokenlist, temp);
 		}
 
@@ -201,14 +190,14 @@ TokenList *__merge_alpha_nodes (Summary *summary)
 
 			if((currentNode->next != NULL && currentNode->next->tokenType != ALPHA) ||
 				currentNode->next == NULL){
-				char *temp = _copy_string(word);
+				char *temp = create_string(word);
 				add_token(newTokens, temp);
 				strcpy(word, "");
 			}
 		} 
 
 		else {
-			char *temp = _copy_string (currentNode->tokenString);
+			char *temp = create_string (currentNode->tokenString);
 			add_token(newTokens, temp);
 		}
 
@@ -248,14 +237,14 @@ void remove_stopword (Summary *summary, Config config)
 			fseek(file, 0, SEEK_SET);
 
 			if (strcmp(currentString, matchedStopword) != 0){
-				char *temp = _copy_string (currentNode->tokenString);
+				char *temp = create_string (currentNode->tokenString);
 				add_token(newTokenlist, temp);
 
 			} else if(currentNode->next->tokenType == WHITESPACE) {
 				currentNode = currentNode->next; // to remove extra space
 			}
 		} else {
-			char *temp = _copy_string(currentNode->tokenString);
+			char *temp = create_string(currentNode->tokenString);
 			add_token(newTokenlist, temp);
 		}
 
