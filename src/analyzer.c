@@ -183,14 +183,89 @@ void report_ngram_count(Summary *summary, Config config)
     }
 }
 
-void report_concordance(Summary *summary, Config config)
-{
-
-}
-
 void get_concordance(Summary *summary, Config config)
 {
-    
+    AdditionalOptions addOpts = summary->addOpts;
+    char *keyword = addOpts.s[0];
+    int n = addOpts.i[0];
+
+    TokenList *oldTokenlist = summary->tokenList;
+    TokenList *newTokenlist = initialize_tokenlist();
+
+    TokenNode *curr = oldTokenlist->head;
+    TokenNode *startOfWindow = curr;
+
+    for(int i = 0; i < n && curr != NULL; i++)
+        curr = curr->next;
+
+    while(curr != NULL) {
+        if(strcmp(curr->tokenString, keyword) == 0) {
+            char buff[MAX_CHAR] = "";
+            int num = 0;
+            TokenNode *tempNode = startOfWindow;
+
+            for(int i = 0; i < n; i++) {
+                strcat(buff, tempNode->tokenString);
+                strcat(buff, " ");
+
+                tempNode = tempNode->next;
+                num++;
+            }
+
+            for(int i = 0; i <= n && (tempNode + i) != NULL; i++) {
+                strcat(buff, tempNode->tokenString);
+
+                if(i != n)
+                    strcat(buff, " ");
+                
+                tempNode = tempNode->next;
+                num++;
+            }
+
+            if(num == 2 * n + 1) {
+                int length = strlen(buff);
+                char *temp = calloc(length + 1, 1);
+                
+                strcpy(temp, buff);
+                add_token(newTokenlist, temp);
+            }
+
+        }
+
+        startOfWindow = startOfWindow->next;
+        curr = curr->next;
+    }
+
+    summary->tokenList = newTokenlist;
+
+    delete_token_strings(oldTokenlist);
+    destroy_tokenList(oldTokenlist);
+}
+
+void report_concordance(Summary *summary, Config config)
+{
+    TokenNode *curr = summary->tokenList->head;
+
+    int size = strlen(curr->tokenString);
+    char *temp = calloc(size, 1);
+    char buff[MAX_CHAR] = "";
+    int runningTotal = 0;
+
+    while(curr != NULL) {
+        int length = strlen(curr->tokenString);
+        runningTotal += length + 1;
+
+        if(runningTotal > size) {
+            size *= 2;
+            temp = realloc(temp, size);
+        }
+
+        sprintf(buff, "%s\n", curr->tokenString);
+        strcat(temp, buff);
+        curr = curr->next;
+    }
+
+    summary->outData = temp;
 }
 
 void _set_infile(Summary *summary, char *filename)

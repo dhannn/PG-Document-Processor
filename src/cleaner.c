@@ -265,7 +265,7 @@ void remove_stopword (Summary *summary, Config config)
 
 	FILE *file = fopen("dat/stopwords", "r");
 	char currentString[MAX_CHAR] = "", matchedStopword[MAX_CHAR] = "";
-	bool isPreviousStopword = false; 
+	bool isPreviousStopword = false;
 	int flag;
     int numTokens = 0;
 
@@ -326,7 +326,8 @@ void clean_all(Summary *summary, Config config)
 	int length = sizeof(commands) / sizeof(commands[0]);
 
 	for(int i = 0; i < length; i++) {
-		commands[i](summary, config);
+		if(i != 2)
+			commands[i](summary, config);
 	}
 }
 

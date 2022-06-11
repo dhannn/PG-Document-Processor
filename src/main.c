@@ -20,8 +20,15 @@ int main()
         activeScreen.current->get_input(&activeScreen);
 
         int index = 0;
-        if(activeScreen.current->get_input == get_choice)
+        if(activeScreen.current->get_input == get_choice) {
             index = activeScreen.choice - 1;
+
+            if(index < 0 || index > activeScreen.current->numOptions - 1) {
+                display_error(ERR_INVALID_CHOICE);
+                go_to_screen(&activeScreen, activeScreen.current->index);
+                continue;
+            }
+        }
         
         activeScreen.current->options[index].do_option(&activeScreen, &summary, &config);
     } while(!check_if_exit(activeScreen.screens, &activeScreen));

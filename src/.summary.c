@@ -13,32 +13,68 @@ Mode MODES[] = {
             {
                 .name = "To Lowercase",
                 .execute_command = to_lowercase,
-                .report_results = report_cleaned
+                .report_results = report_cleaned,
+                .print_results = print_cleaned,
+                .addIntNeeded = 0,
+                .addStrNeeded = 0,
+                .usedAddInt = 0,
+                .usedAddStr = 0,
+                .fileSuffix = ""
             },
             {
                 .name = "Remove Special Characters",
                 .execute_command = remove_special,
-                .report_results = report_cleaned
+                .report_results = report_cleaned,
+                .print_results = print_cleaned,
+                .addIntNeeded = 0,
+                .addStrNeeded = 0,
+                .usedAddInt = 0,
+                .usedAddStr = 0,
+                .fileSuffix = ""
             },
             {
                 .name = "Remove Numbers",
                 .execute_command = remove_numbers,
-                .report_results = report_cleaned
+                .report_results = report_cleaned,
+                .print_results = print_cleaned,
+                .addIntNeeded = 0,
+                .addStrNeeded = 0,
+                .usedAddInt = 0,
+                .usedAddStr = 0,
+                .fileSuffix = ""
             },
             {
                 .name = "Clean Whitespace",
                 .execute_command = clean_whitespace,
-                .report_results = report_cleaned
+                .report_results = report_cleaned,
+                .print_results = print_cleaned,
+                .addIntNeeded = 0,
+                .addStrNeeded = 0,
+                .usedAddInt = 0,
+                .usedAddStr = 0,
+                .fileSuffix = ""
             },
             {
                 .name = "Remove Stopwords",
                 .execute_command = remove_stopword,
-                .report_results = report_cleaned
+                .report_results = report_cleaned,
+                .print_results = print_cleaned,
+                .addIntNeeded = 0,
+                .addStrNeeded = 0,
+                .usedAddInt = 0,
+                .usedAddStr = 0,
+                .fileSuffix = ""
             },
             {
                 .name = "All",
                 .execute_command = clean_all,
-                .report_results = report_cleaned
+                .report_results = report_cleaned, 
+                .print_results = print_cleaned,
+                .addIntNeeded = 0,
+                .addStrNeeded = 0,
+                .usedAddInt = 0,
+                .usedAddStr = 0,
+                .fileSuffix = ""
             }
         }
     }, 
@@ -50,19 +86,34 @@ Mode MODES[] = {
                 .name = "Word Count",
                 .execute_command = get_word_count,
                 .report_results = report_token_frequency,
-                .fileSuffix = "wcount"
+                .print_results = print_token_frequency,
+                .fileSuffix = "wcount",
+                .usedAddInt = 0,
+                .usedAddStr = 0,
+                .addIntNeeded = 0,
+                .addStrNeeded = 0
             },
             {
                 .name = "N-gram Count",
                 .execute_command = get_ngram_count,
                 .report_results = report_token_frequency,
-                .fileSuffix = "ngram"
+                .print_results = print_token_frequency,
+                .fileSuffix = "ngram",
+                .usedAddInt = 0,
+                .usedAddStr = 0,
+                .addIntNeeded = 1,
+                .addStrNeeded = 0
             },
             {
                 .name = "Concordance",
                 .execute_command = get_concordance,
                 .report_results = report_concordance,
-                .fileSuffix = "concord"
+                .print_results = print_concordance,
+                .fileSuffix = "concord",
+                .usedAddInt = 0,
+                .usedAddStr = 0,
+                .addIntNeeded = 1,
+                .addStrNeeded = 1
             }
         }
     },
@@ -74,13 +125,21 @@ Mode MODES[] = {
                 .name = "tf-idf",
                 // .execute_command = get_tfidf,
                 // .report_results = report_tfidf,
-                .fileSuffix = "tfidf"
+                .fileSuffix = "tfidf",
+                .usedAddInt = 0,
+                .usedAddStr = 0,
+                .addIntNeeded = 0,
+                .addStrNeeded = 0
             },
             {
                 .name = "Document similarity",
                 // .execute_command = get_document_similarity,
                 // .report_results = report_document_similarity,
-                // .fileSuffix = ""
+                .fileSuffix = "",
+                .usedAddInt = 0,
+                .usedAddStr = 0,
+                .addIntNeeded = 0,
+                .addStrNeeded = 1
             }
         }
     }
@@ -131,6 +190,38 @@ void execute_summary(Summary *summary, Config config)
 void set_options(Summary *summary, Config config, int rawInput)
 {
     summary->options = rawInput;
+}
+
+void set_add_str(Summary *summary, char *addStr)
+{
+    int option = summary->options;
+    int mode = summary->mode.index;
+    Command command = summary->mode.commands[option];
+
+    if(command.addStrNeeded == 0)
+        return;
+    
+    int strUsed = command.usedAddStr;
+    int len = strlen(addStr);
+
+    strcpy(summary->addOpts.s[strUsed], addStr);
+    summary->addOpts.s[strUsed][len] = '\0';
+    summary->mode.commands[option].usedAddStr++;
+}
+
+void set_add_int(Summary *summary, int addInt)
+{
+    int option = summary->options;
+    int mode = summary->mode.index;
+    Command command = summary->mode.commands[option];
+
+    if(command.addIntNeeded == 0)
+        return;
+    
+    int intUsed = command.usedAddInt;
+
+    summary->addOpts.i[intUsed] = addInt;
+    summary->mode.commands[option].usedAddInt++;
 }
 
 unsigned int _convert_multiselect_options(int rawInput)
