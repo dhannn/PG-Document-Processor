@@ -21,7 +21,7 @@ void initialize_metadata(MetadataItem metadataItems[])
 {
     for(int i = 0; i < MAX_METADATA; i++) {
         metadataItems[i].data = NULL;
-        metadataItems[i].name = METADATA_ITEM_NAMES[i];
+        metadataItems[i].fieldName = METADATA_ITEM_NAMES[i];
     }
 }
 
@@ -32,13 +32,13 @@ void set_metadata(MetadataItem items[], int metadataIndex, char *data)
     items[metadataIndex].data = temp;
 }
 
-int get_metadata_index(MetadataItem metadataItems[], char *str)
+int get_metadata_index(MetadataItem metadataItems[], char *fieldName)
 {
     int i;
     int flag = NOT_METADATA;
     
     for(i = 0; i < MAX_METADATA && flag == NOT_METADATA; i++) {
-        if(strcmp(metadataItems[i].name, str) == 0)
+        if(strcmp(metadataItems[i].fieldName, fieldName) == 0)
             flag = i;
     }
     

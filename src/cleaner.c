@@ -13,20 +13,19 @@ typedef enum {
     CLEAN_WHITESPACE 	=		0b01000
 } CLEANER_OPTIONS_INDEX;
 
-void clean_data(Summary *summary, Config config)
+void clean_data(Summary *summary)
 {
-	unsigned int options = summary->options;
-
-	summary->mode.commands[options].execute_command(summary, config);
-	summary->mode.commands[options].report_results(summary, config);
+	unsigned int options = summary->option;
+	summary->mode.commands[options].execute_command(summary);
+	summary->mode.commands[options].report_results(summary);
 }
 
 /*	
- *	_convert_string_to_lowercase
+ *	__convert_string_to_lowercase
  *	converts a string to lowercase
  *  precondition: all string elements are alpha
  */
-void _convert_string_to_lowercase (char *str)
+void __convert_string_to_lowercase (char *str)
 {
 	for (int i = 0; i < (strlen(str)); i++){
    		if (str[i] < 'a')
@@ -35,7 +34,7 @@ void _convert_string_to_lowercase (char *str)
 }
 
 
-void to_lowercase (Summary *summary, Config config)
+void to_lowercase (Summary *summary)
 {
 	TokenNode *currentNode = summary->tokenList->head;
     int numTokens = 0;
@@ -44,7 +43,7 @@ void to_lowercase (Summary *summary, Config config)
 		char *currentTokenStr = currentNode->tokenString;
 		
 		if (currentNode->tokenType == ALPHA)	//if the node is of type alpha
-			_convert_string_to_lowercase (currentTokenStr);		
+			__convert_string_to_lowercase (currentTokenStr);		
 
         currentNode = currentNode->next;		//switches current node to next  
 		
@@ -53,7 +52,7 @@ void to_lowercase (Summary *summary, Config config)
 	}
 }
 
-void remove_special (Summary *summary, Config config)
+void remove_special_char (Summary *summary)
 {
 	TokenList *oldTokenlist = summary->tokenList;
 	TokenList *newTokenlist = initialize_tokenlist();
@@ -102,7 +101,7 @@ void remove_special (Summary *summary, Config config)
 }
 
 
-void remove_numbers (Summary *summary, Config config)
+void remove_numbers (Summary *summary)
 {
 	TokenList *oldTokenlist = summary->tokenList;
 	TokenList *newTokenlist = initialize_tokenlist();
@@ -134,7 +133,7 @@ void remove_numbers (Summary *summary, Config config)
 }
 
 // removes all newlines and replaces them with a single space
-void clean_whitespace (Summary *summary, Config config)
+void clean_whitespace (Summary *summary)
 {
 	TokenList *oldTokenlist = summary->tokenList;
 	TokenList *newTokenlist = initialize_tokenlist();
@@ -221,7 +220,7 @@ void clean_whitespace (Summary *summary, Config config)
 // }
 
 
-void remove_stopword (Summary *summary, Config config)
+void remove_stopwords (Summary *summary)
 {	
 	TokenList *oldTokenlist = summary->tokenList;
 	TokenList *newTokenlist = initialize_tokenlist();
@@ -238,7 +237,7 @@ void remove_stopword (Summary *summary, Config config)
 		{ 
 			flag = 0;
 			strcpy(currentString, currentNode->tokenString);
-			_convert_string_to_lowercase(currentString);
+			__convert_string_to_lowercase(currentString);
 
 			while (strcmp(currentString, matchedStopword) != 0 && flag != EOF)
 				flag = fscanf(file, "%s", matchedStopword);
@@ -277,12 +276,12 @@ void remove_stopword (Summary *summary, Config config)
 	destroy_tokenList(oldTokenlist);
 }
 
-void clean_all(Summary *summary, Config config)
+void clean_all(Summary *summary)
 {
-	void (*commands[])(Summary*, Config) = {
+	void (*commands[])(Summary*) = {
 		to_lowercase,
-		remove_special,
-		remove_stopword,
+		remove_special_char,
+		remove_stopwords,
 		remove_numbers,
 		clean_whitespace
 	};
@@ -290,11 +289,11 @@ void clean_all(Summary *summary, Config config)
 	int length = sizeof(commands) / sizeof(commands[0]);
 
 	for(int i = 0; i < length; i++) {
-		commands[i](summary, config);
+		commands[i](summary);
 	}
 }
 
-void report_cleaned(Summary *summary, Config config)
+void report_cleaned(Summary *summary)
 {
     TokenList *list = summary->tokenList;
     TokenNode *tokenNode = next_token(list);

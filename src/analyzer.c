@@ -16,19 +16,21 @@ typedef enum {
     CONCORDANCE
 } ANALYZER_OPTIONS_INDEX;
 
-void analyze_data__single(Summary *summary, Config config)
+TokenList *__convert_to_ngrams(TokenList *tl, int n);
+
+void analyze_data__single(Summary *summary)
 {
-    unsigned int options = summary->options;
-    summary->mode.commands[options].execute_command(summary, config);
-    summary->mode.commands[options].report_results(summary, config);
+    unsigned int options = summary->option;
+    summary->mode.commands[options].execute_command(summary);
+    summary->mode.commands[options].report_results(summary);
 }
 
-void analyze_data__multi(Summary *summary, Config config)
+void analyze_data__multi(Summary *summary)
 {
     return;
 }
 
-TokenList *convert_to_ngrams(TokenList *tl, int n)
+TokenList *__convert_to_ngrams(TokenList *tl, int n)
 {
     TokenList *ngrams = initialize_tokenlist();
     TokenNode *curr = tl->head;
@@ -60,7 +62,7 @@ TokenList *convert_to_ngrams(TokenList *tl, int n)
     return ngrams;
 }
 
-void get_word_count(Summary *summary, Config config)
+void get_word_count(Summary *summary)
 {
     HashTable *ht = create_hash_table();
     
@@ -93,13 +95,13 @@ void get_word_count(Summary *summary, Config config)
     destroy_tokenList(tokensWithDuplicates);
 }
 
-void get_ngram_count(Summary *summary, Config config)
+void get_ngram_count(Summary *summary)
 {
     HashTable *ht = create_hash_table();
     
     int n = summary->addOpts.i[0];
     TokenList *rawTokens = summary->tokenList;
-    TokenList *rawNgrams = convert_to_ngrams(summary->tokenList, n);
+    TokenList *rawNgrams = __convert_to_ngrams(summary->tokenList, n);
     TokenList *ngrams = remove_duplicate_tokens(rawNgrams);
     int numTokens = 0;
 
@@ -131,7 +133,7 @@ void get_ngram_count(Summary *summary, Config config)
     destroy_tokenList(rawNgrams);
 }
 
-void report_token_frequency(Summary *summary, Config config)
+void report_token_frequency(Summary *summary)
 {
     TokenList *list = summary->tokenList;
     TokenNode *tokenNode = next_token(list);
@@ -166,7 +168,7 @@ void report_token_frequency(Summary *summary, Config config)
     summary->outData = temp;
 }
 
-void report_ngram_count(Summary *summary, Config config)
+void report_ngram_count(Summary *summary)
 {
     TokenList *list = summary->tokenList;
     TokenNode *tokenNode = next_token(list);
@@ -183,7 +185,7 @@ void report_ngram_count(Summary *summary, Config config)
     }
 }
 
-void get_concordance(Summary *summary, Config config)
+void get_concordance(Summary *summary)
 {
     AdditionalOptions addOpts = summary->addOpts;
     char *keyword = addOpts.s[0];
@@ -242,7 +244,7 @@ void get_concordance(Summary *summary, Config config)
     destroy_tokenList(oldTokenlist);
 }
 
-void report_concordance(Summary *summary, Config config)
+void report_concordance(Summary *summary)
 {
     TokenNode *curr = summary->tokenList->head;
 
@@ -266,20 +268,4 @@ void report_concordance(Summary *summary, Config config)
     }
 
     summary->outData = temp;
-}
-
-void _set_infile(Summary *summary, char *filename)
-{
-    summary->infile = fopen(filename, "r");
-}
-
-void _set_outfile(Summary *summary, char *filename)
-{
-    summary->outfile = fopen(filename, "r");
-}
-
-void _close_files(Summary *summary)
-{
-    fclose(summary->infile);
-    fclose(summary->outfile);
 }

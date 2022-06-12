@@ -14,24 +14,21 @@
 char *__get_starting_token(ModeIndex mode);
 bool __check_if_content_start(char buff[], ModeIndex mode);
 bool __check_if_content_end(char buff[], char prev[]);
+bool __check_if_max_char_reached(int numCharRead, int numCharMax);
 
 void read_file(Summary *summary, Config config)
 {
     FILE *infile = summary->infile;
-    int buffSize = MAX_CHAR;
 
-    if(config.numChar != 0)
-        buffSize = config.numChar;
-
-    seek_metadata(infile, summary->metadata, buffSize);
+    seek_metadata(infile, summary->metadata);
     read_metadata(infile, summary->metadata, summary->mode.index);
     read_content(infile, &summary->inData, config.numChar);
 }
 
-void seek_metadata(FILE *file, MetadataItem items[], int buffSize)
+void seek_metadata(FILE *file, MetadataItem items[])
 {
     int flag = NOT_METADATA;
-    char buff[buffSize];
+    char buff[MAX_CHAR];
 
     // increments the pointer until a metadata item is found
     while(flag == NOT_METADATA) {
@@ -66,32 +63,31 @@ void read_metadata(FILE *file, MetadataItem items[], ModeIndex mode)
 
 void read_content(FILE *file, char **inputData, int maxChar)
 {
-    int runningTotal = 0;   // total number of characters
-    char *temp = calloc(1, sizeof(char)); // allocation for the content string
+    int runningTotal = 0;                   // total number of characters
+    char *temp = calloc(1, sizeof(char));   // allocation for the content string
 
     char buff[MAX_CHAR];
-    char prev[MAX_CHAR] = "";
-    int flag = fscanf(file, "%s", buff); // flag to determine if EOF
-    int numWords = 0;
+    char prev[MAX_CHAR] = "";               // to test for "*** END" signifier
+    int numWords = 0;                       // number of words read for update()
+
+    int flag = fscanf(file, "%s", buff);    // flag to determine if EOF
 
     while(flag != EOF) {
-        if(__check_if_content_end(buff, prev)) {
-            break;
-        }
+        bool isContentEnd = __check_if_content_end(buff, prev);
+        bool isMaxReached = __check_if_max_char_reached(runningTotal, maxChar);
 
-        runningTotal += strlen(buff) + 1; // + 1 for the space
-        
-        if(maxChar != 0 && runningTotal > maxChar)
+        if(isContentEnd || isMaxReached)
             break;
-
-        temp = realloc(temp, runningTotal + 1); // + 1 for null byte
 
         strcat(buff, " ");
-        strcat(temp, buff);
-        strcpy(prev, buff);
+        runningTotal += strlen(buff);
 
-        numWords++;
+        temp = realloc(temp, runningTotal + 1); // + 1 for null byte
+        strcat(temp, buff);
+
         update_reading(runningTotal, numWords);
+        strcpy(prev, buff);
+        numWords++;
 
         flag = fscanf(file, "%s", buff);
     };
@@ -120,6 +116,11 @@ bool __check_if_content_start(char buff[], ModeIndex mode)
     buff[len] = '\0';
 
     return strcmp(startingToken, buff) == 0;
+}
+
+bool __check_if_max_char_reached(int numCharRead, int numCharMax)
+{
+    return numCharMax != 0 && numCharRead > numCharMax;
 }
 
 bool __check_if_content_end(char buff[], char prev[])

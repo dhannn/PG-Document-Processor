@@ -23,7 +23,7 @@ Mode MODES[] = {
             },
             {
                 .name = "Remove Special Characters",
-                .execute_command = remove_special,
+                .execute_command = remove_special_char,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
                 .addIntNeeded = 0,
@@ -56,7 +56,7 @@ Mode MODES[] = {
             },
             {
                 .name = "Remove Stopwords",
-                .execute_command = remove_stopword,
+                .execute_command = remove_stopwords,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
                 .addIntNeeded = 0,
@@ -182,19 +182,19 @@ void set_outfile(Summary *summary, Config config, char *filename)
     summary->outfile = fopen(completeFilename, "w");
 }
 
-void execute_summary(Summary *summary, Config config)
+void execute_summary(Summary *summary)
 {
-    summary->mode.clean_or_analyze(summary, config);
+    summary->mode.clean_or_analyze(summary);
 }
 
-void set_options(Summary *summary, Config config, int rawInput)
+void set_option(Summary *summary, Config config, int rawInput)
 {
-    summary->options = rawInput;
+    summary->option = rawInput;
 }
 
 void set_add_str(Summary *summary, char *addStr)
 {
-    int option = summary->options;
+    int option = summary->option;
     Command command = summary->mode.commands[option];
 
     if(command.addStrNeeded == 0)
@@ -210,7 +210,7 @@ void set_add_str(Summary *summary, char *addStr)
 
 void set_add_int(Summary *summary, int addInt)
 {
-    int option = summary->options;
+    int option = summary->option;
     Command command = summary->mode.commands[option];
 
     if(command.addIntNeeded == 0)
