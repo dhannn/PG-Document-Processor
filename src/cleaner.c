@@ -64,13 +64,7 @@ void remove_special (Summary *summary, Config config)
 	
 	while(currentNode != NULL) 
 	{
-		// if special character is in between 2 alphanumeric
-		// if(currentNode->tokenType == SPECIAL && (previousNode->tokenType == ALPHA || previousNode->tokenType == NUMERIC) &&
-		// (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC))	
-
 		if(currentNode->tokenType == SPECIAL) {
-			// @Gwen 	the program is segfaulting since you didn't check if the 
-			//			next node is NULL; thereby accessing memory illegally 
 			if(currentNode->next != NULL) {
 				if((previousNode->tokenType == ALPHA || 
 					previousNode->tokenType == NUMERIC) && (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC)) {
