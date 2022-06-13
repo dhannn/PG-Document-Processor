@@ -687,6 +687,21 @@ void report_document_similarity(Summary *summary);
 /*                        ENGINE.C FUNCTION PROTOTYPES                        */
 /* -------------------------------------------------------------------------- */
 
+void do_clean(ActiveScreen *active, Summary *summary, Config *config);
+void do_s_analyze(ActiveScreen *active, Summary *summary, Config *config);
+void do_m_analyze(ActiveScreen *active, Summary *summary, Config *config);
+void do_clean_options(ActiveScreen *active, Summary *summary, Config *config);
+void do_remove_special(ActiveScreen *active, Summary *summary, Config *config);
+void do_remove_numbers(ActiveScreen *active, Summary *summary, Config *config);
+void do_clean_whitespace(ActiveScreen *active, Summary *summary, Config *config);
+void do_remove_stopwords(ActiveScreen *active, Summary *summary, Config *config);
+void do_clean_all(ActiveScreen *active, Summary *summary, Config *config);
+void do_word_count(ActiveScreen *active, Summary *summary, Config *config);
+void do_ngram_count(ActiveScreen *active, Summary *summary, Config *config);
+void do_concordance(ActiveScreen *active, Summary *summary, Config *config);
+void do_tfidf(ActiveScreen *active, Summary *summary, Config *config);
+void do_doc_similarity(ActiveScreen *active, Summary *summary, Config *config);
+
 void initialize_config(ActiveScreen *active, Config *config);
 void choose_option(ActiveScreen* active, Summary *summary, Config *config);
 void reset_config(ActiveScreen *active, Summary *summary, Config *config);

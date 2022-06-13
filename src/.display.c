@@ -231,21 +231,21 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
         choose_option
     },
     {
-        do_processing,
-        do_processing,
-        do_processing,
-        do_processing,
-        do_processing,
-        do_processing
+        do_clean_options,
+        do_clean_options,
+        do_clean_options,
+        do_clean_options,
+        do_clean_options,
+        do_clean_all
     },
     {
-        do_processing,
-        get_add_opts,
-        get_add_opts
+        do_word_count,
+        do_ngram_count,
+        do_concordance
     },
     {
-        do_processing,
-        get_add_opts,
+        do_tfidf,
+        do_doc_similarity
     }, 
     {
         do_processing,

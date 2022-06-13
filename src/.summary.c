@@ -147,8 +147,6 @@ Mode MODES[] = {
 
 #define MAX_ANALYZER_OPTIONS 3
 
-unsigned int _convert_multiselect_options(int rawInput);
-
 void set_mode(Summary *summary, ModeIndex mode)
 {
     summary->mode = MODES[mode];
@@ -212,41 +210,11 @@ void set_add_int(Summary *summary, int addInt)
 {
     int option = summary->option;
     Command command = summary->mode.commands[option];
-
-    if(command.addIntNeeded == 0)
-        return;
     
     int intUsed = command.usedAddInt;
 
     summary->addOpts.i[intUsed] = addInt;
     summary->mode.commands[option].usedAddInt++;
-}
-
-unsigned int _convert_multiselect_options(int rawInput)
-{
-    // a lookup table to prevent duplicates
-    bool isEntered[MAX_ANALYZER_OPTIONS];
-
-    for(int i = 0; i < MAX_ANALYZER_OPTIONS; i++) 
-        isEntered[i] = false;
-
-    
-    unsigned int options = 0;
-    while(rawInput > 0) {
-        // gets rightmost digit
-        int currDigit = rawInput % 10;
-
-        // only adds the option to bitfield only when not added
-        if(isEntered[currDigit] == false) {
-            options += (int)pow(2, currDigit - 1);
-            isEntered[currDigit] = true;
-        }
-
-        // removes rightmost digit
-        rawInput /= 10;
-    }
-
-    return options;
 }
 
 void destroy_summary(Summary *summary)
