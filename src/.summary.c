@@ -23,7 +23,7 @@ Mode MODES[] = {
             },
             {
                 .name = "Remove Special Characters",
-                .execute_command = remove_special,
+                .execute_command = remove_special_char,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
                 .addIntNeeded = 0,
@@ -56,7 +56,7 @@ Mode MODES[] = {
             },
             {
                 .name = "Remove Stopwords",
-                .execute_command = remove_stopword,
+                .execute_command = remove_stopwords,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
                 .addIntNeeded = 0,
@@ -147,8 +147,6 @@ Mode MODES[] = {
 
 #define MAX_ANALYZER_OPTIONS 3
 
-unsigned int _convert_multiselect_options(int rawInput);
-
 void set_mode(Summary *summary, ModeIndex mode)
 {
     summary->mode = MODES[mode];
@@ -182,19 +180,19 @@ void set_outfile(Summary *summary, Config config, char *filename)
     summary->outfile = fopen(completeFilename, "w");
 }
 
-void execute_summary(Summary *summary, Config config)
+void execute_summary(Summary *summary)
 {
-    summary->mode.clean_or_analyze(summary, config);
+    summary->mode.clean_or_analyze(summary);
 }
 
-void set_options(Summary *summary, Config config, int rawInput)
+void set_option(Summary *summary, Config config, int rawInput)
 {
-    summary->options = rawInput;
+    summary->option = rawInput;
 }
 
 void set_add_str(Summary *summary, char *addStr)
 {
-    int option = summary->options;
+    int option = summary->option;
     Command command = summary->mode.commands[option];
 
     if(command.addStrNeeded == 0)
@@ -210,43 +208,13 @@ void set_add_str(Summary *summary, char *addStr)
 
 void set_add_int(Summary *summary, int addInt)
 {
-    int option = summary->options;
+    int option = summary->option;
     Command command = summary->mode.commands[option];
-
-    if(command.addIntNeeded == 0)
-        return;
     
     int intUsed = command.usedAddInt;
 
     summary->addOpts.i[intUsed] = addInt;
     summary->mode.commands[option].usedAddInt++;
-}
-
-unsigned int _convert_multiselect_options(int rawInput)
-{
-    // a lookup table to prevent duplicates
-    bool isEntered[MAX_ANALYZER_OPTIONS];
-
-    for(int i = 0; i < MAX_ANALYZER_OPTIONS; i++) 
-        isEntered[i] = false;
-
-    
-    unsigned int options = 0;
-    while(rawInput > 0) {
-        // gets rightmost digit
-        int currDigit = rawInput % 10;
-
-        // only adds the option to bitfield only when not added
-        if(isEntered[currDigit] == false) {
-            options += (int)pow(2, currDigit - 1);
-            isEntered[currDigit] = true;
-        }
-
-        // removes rightmost digit
-        rawInput /= 10;
-    }
-
-    return options;
 }
 
 void destroy_summary(Summary *summary)

@@ -10,6 +10,126 @@
 #define CLEAR() (printf("%s[2J", (ESC)))
 #define MOVE(ROW, COL) (printf("%s[%d;%df", (ESC), (ROW), (COL)))
 
+void do_clean(ActiveScreen *active, Summary *summary, Config *config)
+{
+    
+}
+
+void do_s_analyze(ActiveScreen *active, Summary *summary, Config *config) 
+{
+    
+}
+
+void do_m_analyze(ActiveScreen *active, Summary *summary, Config *config) 
+{
+    
+}
+
+void do_clean_options(ActiveScreen *active, Summary *summary, Config *config) 
+{
+    int choice = active->choice - 1;
+    set_option(summary, *config, choice);
+
+    CLEAR();
+    execute_summary(summary);
+    
+    char in; 
+    CLEAR();
+    MOVE(1, 1);
+    printf("Continue cleaning? [Y or N]: ");
+    scanf(" %c", &in);
+
+    while(in == 'Y') {
+        go_to_screen(active, CLEAN_DOCUMENT_MENU);
+        display_screen(active, summary);
+
+        get_choice(active);
+        set_option(summary, *config, choice);
+
+        execute_summary(summary);
+
+        CLEAR();
+        MOVE(1, 1);
+        printf("Continue cleaning? [Y or N]: ");
+        scanf(" %c", &in);
+    }
+
+    go_to_screen(active, ENTER_OUTPUT_FILE_MENU);
+}
+
+void do_clean_all(ActiveScreen *active, Summary *summary, Config *config)
+{
+    int choice = active->choice - 1;
+    set_option(summary, *config, choice);
+
+    CLEAR();
+    execute_summary(summary);
+
+    go_to_screen(active, ENTER_OUTPUT_FILE_MENU);
+}
+
+void do_word_count(ActiveScreen *active, Summary *summary, Config *config) 
+{
+    int choice = active->choice - 1;
+    set_option(summary, *config, choice);
+
+    execute_summary(summary);
+
+    save_results(active, summary, config);
+    go_to_screen(active, MAIN_MENU);
+}
+
+void do_ngram_count(ActiveScreen *active, Summary *summary, Config *config) 
+{
+    int choice = active->choice - 1;
+    set_option(summary, *config, choice);
+
+    go_to_screen(active, ENTER_N_MENU);
+    display_screen(active, summary);
+    get_int(active);
+    set_add_int(summary, active->nInput);
+
+    CLEAR();
+    execute_summary(summary);
+
+    save_results(active, summary, config);
+    go_to_screen(active, MAIN_MENU);
+}
+
+void do_concordance(ActiveScreen *active, Summary *summary, Config *config) 
+{
+    int choice = active->choice - 1;
+    set_option(summary, *config, choice);
+
+    go_to_screen(active, ENTER_N_MENU);
+    display_screen(active, summary);
+    get_int(active);
+    set_add_int(summary, active->nInput);
+
+    go_to_screen(active, ENTER_KEYWORD_MENU);
+    display_screen(active, summary);
+    get_str(active);
+    set_add_str(summary, active->strInput);
+
+    CLEAR();
+    execute_summary(summary);
+
+    save_results(active, summary, config);
+    go_to_screen(active, MAIN_MENU);
+}
+
+void do_tfidf(ActiveScreen *active, Summary *summary, Config *config) 
+{
+    int choice = active->choice - 1;
+    set_option(summary, *config, choice);    
+}
+
+void do_doc_similarity(ActiveScreen *active, Summary *summary, Config *config) 
+{
+    
+}
+
+
 void initialize_config(ActiveScreen *active, Config *config)
 {
     if(check_config_initialized()) {
@@ -67,8 +187,7 @@ void return_screen(ActiveScreen* active, Summary *summary, Config *config)
     go_to_screen(active, index);
 }
 
-void get_filename_for_processing(
-    ActiveScreen* active, Summary *summary, Config *config)
+void get_filename(ActiveScreen* active, Summary *summary, Config *config)
 {
     int mode = active->choice - 1;
     set_mode(summary, mode);
@@ -115,7 +234,7 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config)
 
 void do_processing(ActiveScreen* active, Summary *summary, Config *config)
 {
-    set_options(summary, *config, active->choice - 1);
+    set_option(summary, *config, active->choice - 1);
 
     if(active->current->get_input == get_str) {
         set_add_str(summary, active->strInput);
@@ -123,19 +242,19 @@ void do_processing(ActiveScreen* active, Summary *summary, Config *config)
         set_add_int(summary, active->nInput);
     }
 
-    if(summary->mode.commands[summary->options].addIntNeeded - summary->mode.commands[summary->options].usedAddInt != 0 || summary->mode.commands[summary->options].addStrNeeded - summary->mode.commands[summary->options].usedAddStr != 0) {
+    if(summary->mode.commands[summary->option].addIntNeeded - summary->mode.commands[summary->option].usedAddInt != 0 || summary->mode.commands[summary->option].addStrNeeded - summary->mode.commands[summary->option].usedAddStr != 0) {
         get_add_opts(active, summary, config);
         return;
     }
     
     CLEAR();
-    execute_summary(summary, *config);
+    execute_summary(summary);
     
     if(summary->mode.index == CLEAN)
         go_to_screen(active, ENTER_OUTPUT_FILE_MENU);
     else {
         char filename[MAX_CHAR] = "";
-        int option = summary->options;
+        int option = summary->option;
         char *suffix = summary->mode.commands[option].fileSuffix;
         char *original = strtok(summary->infilename, ".");
         
@@ -154,7 +273,7 @@ void get_add_opts(ActiveScreen* active, Summary *summary, Config *config)
 {
     ScreenTag screen;
     int chosenOption = active->choice - 1;
-    set_options(summary, *config, active->choice);
+    set_option(summary, *config, active->choice);
     ModeIndex mode = summary->mode.index;
 
     ScreenTag addOptsScreen[3][MAX_OPTIONS][MAX_ADD_OPTS] = {
@@ -187,7 +306,7 @@ void save_results(ActiveScreen* active, Summary *summary, Config *config)
 {
     set_outfile(summary, *config, active->strInput);
     
-    summary->mode.commands[summary->options].print_results(summary);
+    summary->mode.commands[summary->option].print_results(summary);
     
     fflush(stdin);
     scanf("%*c");

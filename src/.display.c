@@ -223,29 +223,29 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
         reset_config
     },
     {
-        get_filename_for_processing,
-        get_filename_for_processing,
-        get_filename_for_processing
+        get_filename,
+        get_filename,
+        get_filename
     },
     {
         choose_option
     },
     {
-        do_processing,
-        do_processing,
-        do_processing,
-        do_processing,
-        do_processing,
-        do_processing
+        do_clean_options,
+        do_clean_options,
+        do_clean_options,
+        do_clean_options,
+        do_clean_options,
+        do_clean_all
     },
     {
-        do_processing,
-        get_add_opts,
-        get_add_opts
+        do_word_count,
+        do_ngram_count,
+        do_concordance
     },
     {
-        do_processing,
-        get_add_opts,
+        do_tfidf,
+        do_doc_similarity
     }, 
     {
         do_processing,
@@ -281,6 +281,7 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
     }
 };
 
+void __validate_screen_option(ActiveScreen *active);
 void __extract_options(Screen *screens, int index);
 void __extract_back_index(Screen *screens, int index);
 
@@ -374,7 +375,7 @@ void display_screen(ActiveScreen *active, Summary *summary)
         char metadataItem[MAX_METADATA][MAX_CHAR];
 
         for(int i = 0; i < MAX_METADATA; i++) {
-            strcpy(metadata[i], summary->metadata[i].name);
+            strcpy(metadata[i], summary->metadata[i].fieldName);
             
             if(summary->metadata[i].data != NULL) 
                 strcpy(metadataItem[i], summary->metadata[i].data);
@@ -382,7 +383,7 @@ void display_screen(ActiveScreen *active, Summary *summary)
                 strcpy(metadataItem[i], "");
         }
 
-        print_metadata(metadata, metadataItem, MAX_METADATA);
+        print_metadata(metadata, metadataItem);
         printf("\n");
     }
 
@@ -428,18 +429,18 @@ void get_str(ActiveScreen *active)
     COLOR(RESET_COLOR, RESET_COLOR);
 }
 
-void print_metadata(char metadataName[][MAX_CHAR], char metadata[][MAX_CHAR], int maxMetadata)
+void print_metadata(char fieldName[][MAX_CHAR], char data[][MAX_CHAR])
 {
     FMT(CYAN_FG);
     printf ("*************************************************************************************\n\n");
 		
-    for (int i = 0; i < maxMetadata; i++){
-        if(strcmp(metadata[i], "") != 0) { 
+    for (int i = 0; i < MAX_METADATA; i++){
+        if(strcmp(data[i], "") != 0) { 
             FMT(RESET_COLOR); FMT(CYAN_FG);
-            printf ("\t%s:", metadataName[i]);
+            printf ("\t%s:", fieldName[i]);
             FMT(RESET_COLOR); FMT(DIM);
             FMT(BOLD);
-            printf (" %s\n", metadata[i]);
+            printf (" %s\n", data[i]);
         }
      }
 
@@ -619,7 +620,7 @@ void print_cleaned(Summary *summary)
 		if(currentMetadata.data != NULL) {
 			fprint_metadata_item(
 				outfile, 
-				currentMetadata.name, 
+				currentMetadata.fieldName, 
 				currentMetadata.data
 			);
 		}
