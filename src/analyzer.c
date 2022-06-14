@@ -27,7 +27,9 @@ void analyze_data__single(Summary *summary)
 
 void analyze_data__multi(Summary *summary)
 {
-    return;
+    unsigned int options = summary->option;
+    summary->mode.commands[options].execute_command(summary);
+    summary->mode.commands[options].report_results(summary);
 }
 
 TokenList *__convert_to_ngrams(TokenList *tl, int n)
@@ -265,6 +267,75 @@ void report_concordance(Summary *summary)
         sprintf(buff, "%s\n", curr->tokenString);
         strcat(temp, buff);
         curr = curr->next;
+    }
+
+    summary->outData = temp;
+}
+
+float __get_idf(TokenList **corpusTokens, char *tokenString)
+{
+    float idf = 0;
+    int numDocsWithKeyword = 0;
+
+    int i;
+    for(i = 0; corpusTokens[i] != NULL; i++) {
+        if(is_token_found(corpusTokens[i], tokenString))
+            numDocsWithKeyword++;
+    }
+
+    if(numDocsWithKeyword != 0)
+        idf = log10f((float)i / numDocsWithKeyword);
+
+    return idf;
+}
+
+void get_tfidf(Summary *summary)
+{
+    get_word_count(summary);
+
+    TokenNode *currentNode = summary->tokenList->head;
+
+    while(currentNode != NULL) {
+        float tf = (float)currentNode->frequency;
+        float idf = __get_idf(summary->corpusTokens, currentNode->tokenString);
+
+        currentNode->tfidf = tf * idf;
+        currentNode = currentNode->next;
+    }
+
+    sort_tokens_by_tfidf(summary->tokenList);
+}
+
+void report_tfidf(Summary *summary)
+{
+    TokenList *list = summary->tokenList;
+    TokenNode *tokenNode = next_token(list);
+
+    int runningTotal = 0;
+    int currentSize = MAX_CHAR;
+    char *temp = calloc(currentSize, 1);
+    char buff[MAX_CHAR] = "";
+
+    int numChar = 0;
+
+    while(tokenNode != NULL) {
+        sprintf(buff, "%s: %.2f\n", tokenNode->tokenString, tokenNode->tfidf);
+        buff[strlen(buff)] = '\0';
+
+        runningTotal += strlen(buff);
+
+        if(runningTotal + 1 > currentSize) {
+            currentSize *= 5;
+            temp = realloc(temp, currentSize);
+        }
+
+        strcat(temp, buff);
+        temp[strlen(temp)] = '\0';
+        
+		numChar++;
+		update_reporting(numChar, summary->tokenList->size);
+
+        tokenNode = tokenNode->next;
     }
 
     summary->outData = temp;

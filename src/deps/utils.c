@@ -115,6 +115,26 @@ void sort_tokens_by_freq(TokenList *tl)
     }
 }
 
+void sort_tokens_by_tfidf(TokenList *tl)
+{
+    TokenNode *sortedNode = tl->head;
+
+    while(sortedNode != NULL) {
+        TokenNode *max = sortedNode;
+
+        TokenNode *curr = max->next;
+        while(curr != NULL) {
+            if(curr->tfidf > max->tfidf)
+                max = curr;
+
+            curr = curr->next;
+        }
+
+        swap(sortedNode, max);
+        sortedNode = sortedNode->next;
+    }
+}
+
 void swap(TokenNode *a, TokenNode *b)
 {
     if(a == NULL || b == NULL) return;

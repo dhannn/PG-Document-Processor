@@ -76,9 +76,26 @@ void do_m_analyze(ActiveScreen *active, Summary *summary, Config *config)
     MOVE(1, 1);
 
     initialize_metadata(summary->metadata);
+    initialize_corpus(summary, *config);
+    
     read_file(summary, *config);
+    read_corpus(summary, *config);
+
     summary->tokenList = tokenize_string(summary->inData, false);
 
+    TokenList **tokenlists = malloc(sizeof(TokenList*));
+    int i;
+
+    for(i = 0; summary->corpusData[i] != NULL; i++) {
+        char *corpusData = summary->corpusData[i];
+
+        tokenlists = realloc(tokenlists, sizeof(TokenList*) * (i + 1));
+        tokenlists[i] = tokenize_string(corpusData, false);
+    }
+    tokenlists[i] = NULL;
+
+    summary->corpusTokens = tokenlists;
+    
     go_to_screen(active, summary, MULTI_ANALYZE_DOCUMENT_MENU);
 }
 

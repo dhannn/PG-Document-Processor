@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <math.h>
+#include <dirent.h>
 
 Mode MODES[] = {
     {
@@ -15,8 +15,6 @@ Mode MODES[] = {
                 .execute_command = to_lowercase,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -26,8 +24,6 @@ Mode MODES[] = {
                 .execute_command = remove_special_char,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -37,8 +33,6 @@ Mode MODES[] = {
                 .execute_command = remove_numbers,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -48,8 +42,6 @@ Mode MODES[] = {
                 .execute_command = clean_whitespace,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -59,8 +51,6 @@ Mode MODES[] = {
                 .execute_command = remove_stopwords,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -70,8 +60,6 @@ Mode MODES[] = {
                 .execute_command = clean_all,
                 .report_results = report_cleaned, 
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -89,9 +77,7 @@ Mode MODES[] = {
                 .print_results = print_token_frequency,
                 .fileSuffix = "wcount",
                 .usedAddInt = 0,
-                .usedAddStr = 0,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0
+                .usedAddStr = 0
             },
             {
                 .name = "N-gram Count",
@@ -100,9 +86,7 @@ Mode MODES[] = {
                 .print_results = print_token_frequency,
                 .fileSuffix = "ngram",
                 .usedAddInt = 0,
-                .usedAddStr = 0,
-                .addIntNeeded = 1,
-                .addStrNeeded = 0
+                .usedAddStr = 0
             },
             {
                 .name = "Concordance",
@@ -111,9 +95,7 @@ Mode MODES[] = {
                 .print_results = print_concordance,
                 .fileSuffix = "concord",
                 .usedAddInt = 0,
-                .usedAddStr = 0,
-                .addIntNeeded = 1,
-                .addStrNeeded = 1
+                .usedAddStr = 0
             }
         }
     },
@@ -123,13 +105,12 @@ Mode MODES[] = {
         .commands = {
             {
                 .name = "tf-idf",
-                // .execute_command = get_tfidf,
-                // .report_results = report_tfidf,
+                .execute_command = get_tfidf,
+                .report_results = report_tfidf,
+                .print_results = print_token_frequency,
                 .fileSuffix = "tfidf",
                 .usedAddInt = 0,
-                .usedAddStr = 0,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0
+                .usedAddStr = 0
             },
             {
                 .name = "Document similarity",
@@ -137,9 +118,7 @@ Mode MODES[] = {
                 // .report_results = report_document_similarity,
                 .fileSuffix = "",
                 .usedAddInt = 0,
-                .usedAddStr = 0,
-                .addIntNeeded = 0,
-                .addStrNeeded = 1
+                .usedAddStr = 0
             }
         }
     }
@@ -164,6 +143,51 @@ void set_infile(Summary *summary, Config config, char *filename)
     strcat(completeFilename, "/");
     strcat(completeFilename, filename);
     summary->infile = fopen(completeFilename, "r");
+}
+
+bool __check_if_txt_file(char *filename)
+{
+    int length = strlen(filename) - 4;
+    char *fileExtension = filename + length;
+
+    return strcmp(fileExtension, ".txt") == 0;
+}
+
+void initialize_corpus(Summary *summary, Config config) 
+{
+    char *corpusPath = config.cleanedDocumentPath;
+
+    int filesRead = 0;
+    FILE **corpus = malloc(sizeof(FILE*));
+
+    DIR *corpusDir = opendir(corpusPath);
+    struct dirent *entity = readdir(corpusDir);
+
+    FILE *tempFile;
+
+    while(entity != NULL && filesRead < config.numDocs) {
+        if(__check_if_txt_file(entity->d_name) && 
+            strcmp(entity->d_name, summary->infilename) != 0)
+        {
+            char tempName[MAX_CHAR] = "";
+            
+            strcpy(tempName, corpusPath);
+            strcat(tempName, "/");
+            strcat(tempName, entity->d_name);
+
+            tempFile = fopen(tempName, "r");
+
+            corpus = realloc(corpus, sizeof(FILE*) * (filesRead + 1));
+            corpus[filesRead] = tempFile;
+            
+            filesRead++;
+        }
+
+        entity = readdir(corpusDir);
+    }
+
+    corpus[filesRead] = NULL;
+    summary->corpus = corpus;
 }
 
 void set_outfile(Summary *summary, Config config, char *filename)
@@ -195,8 +219,6 @@ void set_add_str(Summary *summary, char *addStr)
     int option = summary->option;
     Command command = summary->mode.commands[option];
 
-    if(command.addStrNeeded == 0)
-        return;
     
     int strUsed = command.usedAddStr;
     int len = strlen(addStr);

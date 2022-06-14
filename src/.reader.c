@@ -27,15 +27,23 @@ void read_file(Summary *summary, Config config)
 
 void read_corpus(Summary *summary, Config config) 
 {
-    char *corpusPath = config.cleanedDocumentPath;
-    DIR *dir = opendir(corpusPath);
+    MetadataItem *dummyMetadata = summary->metadata;
+    int maxChar = config.numChar;
 
-    struct dirent *entity = readdir(dir);
+    FILE **corpus = summary->corpus;
+    char **temp = malloc(sizeof(char*));
 
-    FILE *temp;
-    int filesRead = 0;
-    while(entity != NULL && filesRead < config.numDocs) {
+    int i;
+    for(i = 0; corpus[i] != NULL; i++) {
+        temp = realloc(temp, sizeof(char*) * (i + 1));
+
+        seek_metadata(corpus[i], dummyMetadata);
+        read_content(corpus[i], &temp[i], maxChar);
     }
+
+    temp[i] = NULL;
+
+    summary->corpusData = temp;
 }
 
 void seek_metadata(FILE *file, MetadataItem items[])

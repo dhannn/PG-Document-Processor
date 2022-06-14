@@ -101,6 +101,8 @@ typedef struct {
     void (*report_results)(Summary*);
     void (*print_results)(Summary*);
     char *fileSuffix;
+    int usedAddInt;
+    int usedAddStr;
 } Command;
 
 typedef enum {
@@ -131,6 +133,7 @@ struct _summary {
     char *inData;               // string of data to be processed
     char **corpusData;          // string of data of the corpus
     TokenList *tokenList;       // tokenized version of the input
+    TokenList **corpusTokens;   // tokenized version of the corpus
     char *outData;              // string of data to be reported
     AdditionalOptions addOpts;  // additional options
 };
@@ -395,6 +398,9 @@ void set_add_int(Summary *summary, int addInt);
  * @param       Config              structure containing the configurations
  */
 void read_file(Summary *summary, Config config);
+
+void initialize_corpus(Summary *summary, Config config);
+void read_corpus(Summary *summary, Config config);
 
 /**
  * seek_metadata()

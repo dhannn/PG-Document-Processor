@@ -27,6 +27,7 @@ typedef enum {
 typedef struct tk_n {
     char *tokenString;      // the string associated with the node
     int frequency;          // the frequency of the token
+    float tfidf;
     TokenType tokenType;    // the type of the token
     struct tk_n *next;      // pointer for the next node
 } TokenNode;
@@ -263,6 +264,8 @@ void swap(TokenNode *a, TokenNode *b);
  * @param       TokenList*      pointer to the tokenlist
  */
 void sort_tokens_by_freq(TokenList *tl);
+
+void sort_tokens_by_tfidf(TokenList *tl);
 
 /**
  * sort_tokens_by_alpha()

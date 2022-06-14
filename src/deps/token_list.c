@@ -108,7 +108,7 @@ void print_tokens(TokenList *tokenList)
     TokenNode *tokenNode = tokenList->head;
 
     while(tokenNode != NULL) {
-        printf("%s (%d)\n", tokenNode->tokenString, tokenNode->frequency);
+        printf("%s (%d %f)\n", tokenNode->tokenString, tokenNode->frequency, tokenNode->tfidf);
         tokenNode = tokenNode->next;
     }
 }
