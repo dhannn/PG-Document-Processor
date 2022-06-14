@@ -77,7 +77,7 @@ Mode MODES[] = {
                 .print_results = print_token_frequency,
                 .fileSuffix = "wcount",
                 .usedAddInt = 0,
-                .usedAddStr = 0
+                .usedAddStr = 0,
             },
             {
                 .name = "N-gram Count",
@@ -86,7 +86,7 @@ Mode MODES[] = {
                 .print_results = print_token_frequency,
                 .fileSuffix = "ngram",
                 .usedAddInt = 0,
-                .usedAddStr = 0
+                .usedAddStr = 0,
             },
             {
                 .name = "Concordance",
@@ -95,7 +95,7 @@ Mode MODES[] = {
                 .print_results = print_concordance,
                 .fileSuffix = "concord",
                 .usedAddInt = 0,
-                .usedAddStr = 0
+                .usedAddStr = 0,
             }
         }
     },
@@ -110,7 +110,7 @@ Mode MODES[] = {
                 .print_results = print_token_frequency,
                 .fileSuffix = "tfidf",
                 .usedAddInt = 0,
-                .usedAddStr = 0
+                .usedAddStr = 0,
             },
             {
                 .name = "Document similarity",
@@ -118,7 +118,7 @@ Mode MODES[] = {
                 // .report_results = report_document_similarity,
                 .fileSuffix = "",
                 .usedAddInt = 0,
-                .usedAddStr = 0
+                .usedAddStr = 0,
             }
         }
     }
@@ -143,6 +143,7 @@ void set_infile(Summary *summary, Config config, char *filename)
     strcat(completeFilename, "/");
     strcat(completeFilename, filename);
     summary->infile = fopen(completeFilename, "r");
+    strcpy(summary->infilename, filename);
 }
 
 bool __check_if_txt_file(char *filename)
@@ -218,7 +219,6 @@ void set_add_str(Summary *summary, char *addStr)
 {
     int option = summary->option;
     Command command = summary->mode.commands[option];
-
     
     int strUsed = command.usedAddStr;
     int len = strlen(addStr);

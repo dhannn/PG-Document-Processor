@@ -36,6 +36,7 @@ typedef enum {
     ERR_FILE_NOT_FOUND,
     ERR_INVALID_CHOICE,   
     ERR_INVALID_INT,
+    ERR_INVALID_KEYWORD,
     ERR_MALLOC_FAILED   
 } ErrorCode;
 

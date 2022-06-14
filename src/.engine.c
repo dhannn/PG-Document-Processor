@@ -22,6 +22,38 @@ void __validate_file(ActiveScreen *active, Summary *summary, Config config)
     }
 }
 
+void __validate_n (ActiveScreen *active, Summary *summary)
+{
+    while(active->nInput > 4 || active->nInput < 1) {
+        display_error(ERR_INVALID_INT);
+        go_to_screen(active, summary, ENTER_N_MENU);
+    }
+}
+
+void __validate_keyword (ActiveScreen *active, Summary *summary)
+{
+    while(!is_token_found(summary->tokenList, active->strInput)) {
+        display_error(ERR_INVALID_KEYWORD);
+        go_to_screen(active, summary, ENTER_KEYWORD_MENU);
+    }
+}
+
+void __get_analyzer_outfile_name(ActiveScreen *active, Summary *summary)
+{
+    char filename[MAX_CHAR] = "";
+    int option = summary->option;
+    char *suffix = summary->mode.commands[option].fileSuffix;
+    char *original = strtok(summary->infilename, ".");
+    
+    strcpy(filename, original);
+    strcat(filename, "_");
+    strcat(filename, suffix);
+    strcat(filename, ".txt");
+
+    strcpy(active->strInput, filename);
+}
+
+
 void do_clean(ActiveScreen *active, Summary *summary, Config *config)
 {
     int mode = active->choice - 1;
@@ -160,9 +192,11 @@ void do_word_count(ActiveScreen *active, Summary *summary, Config *config)
     MOVE(1, 1);
     execute_summary(summary);
 
+    __get_analyzer_outfile_name(active, summary);
+    set_outfile(summary, *config, active->strInput);
+
     save_results(active, summary, config);
     destroy_summary(summary);
-
     go_to_screen(active, summary, MAIN_MENU);
 }
 
@@ -173,12 +207,15 @@ void do_ngram_count(ActiveScreen *active, Summary *summary, Config *config)
 
     go_to_screen(active, summary, ENTER_N_MENU);
 
-    // TODO: finish __validate_n
+    __validate_n(active, summary);
     set_add_int(summary, active->nInput);
 
     CLEAR();
     MOVE(1, 1);
     execute_summary(summary);
+
+    __get_analyzer_outfile_name(active, summary);
+    set_outfile(summary, *config, active->strInput);
 
     save_results(active, summary, config);
     destroy_summary(summary);
@@ -192,18 +229,20 @@ void do_concordance(ActiveScreen *active, Summary *summary, Config *config)
     set_option(summary, *config, choice);
 
     go_to_screen(active, summary, ENTER_KEYWORD_MENU);
-
-    // TODO: finish __validate_keyword
+    
+    __validate_keyword (active, summary);
     set_add_str(summary, active->strInput);
 
     go_to_screen(active, summary, ENTER_N_MENU);
-    display_screen(active, summary);
-    get_int(active);
-    set_add_int(summary, active->nInput);
+   __validate_n(active, summary);
+    set_add_int(summary, active->nInput); 
 
     CLEAR();
     MOVE(1, 1);
     execute_summary(summary);
+
+    __get_analyzer_outfile_name(active, summary);
+    set_outfile(summary, *config, active->strInput);
 
     save_results(active, summary, config);
     destroy_summary(summary);

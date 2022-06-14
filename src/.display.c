@@ -654,6 +654,7 @@ void display_error(ErrorCode errorCode)
         "File not found",
         "Invalid choice",
         "Invalid value of N",
+        "Keyword not found in text",
         "Memory allocation failed. No memory left"
     };
 
@@ -661,6 +662,7 @@ void display_error(ErrorCode errorCode)
         "Try entering a file that exists or re-configure paths in dat/config",
         "Try entering a valid choice",
         "Try entering a number from 1 to 4",
+        "Try entering another keyword",
         "Try limiting the number of characters to be read in dat/config"
     };
 
