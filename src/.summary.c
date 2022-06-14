@@ -142,6 +142,7 @@ void set_infile(Summary *summary, Config config, char *filename)
     strcat(completeFilename, "/");
     strcat(completeFilename, filename);
     summary->infile = fopen(completeFilename, "r");
+    strcpy(summary->infilename, filename);
 }
 
 void set_outfile(Summary *summary, Config config, char *filename)

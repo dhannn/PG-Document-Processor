@@ -32,7 +32,7 @@ void read_corpus(Summary *summary, Config config)
 
     struct dirent *entity = readdir(dir);
 
-    FILE *temp;
+    // FILE *temp;
     int filesRead = 0;
     while(entity != NULL && filesRead < config.numDocs) {
     }
