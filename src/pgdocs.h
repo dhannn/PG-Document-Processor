@@ -97,14 +97,12 @@ typedef struct {
 
 typedef struct {
     char *name;
-    int addStrNeeded;
-    int addIntNeeded;
-    int usedAddInt;
-    int usedAddStr;
     void (*execute_command)(Summary*);
     void (*report_results)(Summary*);
     void (*print_results)(Summary*);
     char *fileSuffix;
+    int usedAddInt;
+    int usedAddStr;
 } Command;
 
 typedef enum {
@@ -128,10 +126,12 @@ struct _summary {
     Mode mode;                  // processing mode (i.e. clean or analyze)
     char infilename[MAX_CHAR];
     FILE *infile;               // file pointer to input 
+    FILE **corpus;              // array of file pointers to the files
     FILE *outfile;              // file pointer to output
-    unsigned int option;       // chosen option for cleaning or analysis
+    unsigned int option;        // chosen option for cleaning or analysis
     MetadataItem metadata[MAX_METADATA];    // info about the document
     char *inData;               // string of data to be processed
+    char **corpusData;          // string of data of the corpus
     TokenList *tokenList;       // tokenized version of the input
     char *outData;              // string of data to be reported
     AdditionalOptions addOpts;  // additional options
@@ -143,7 +143,7 @@ struct _config {
     char cleanedDocumentPath[MAX_CHAR];  // path of cleaned documents
     char analysisOutputPath[MAX_CHAR];   // path of output files
     int numChar;                // number of character to be read from content
-    bool multiSelect;           // allow to choose more than one option
+    int numDocs;                // number of documents to be read from corpus
 };
 
 /* -------------------------------------------------------------------------- */
@@ -166,7 +166,7 @@ void initialize_screens(ActiveScreen *screen);
  * @param       ActiveScreen*   pointer of the current screen
  * @param       int             the index of the screen to be set
  */
-void go_to_screen(ActiveScreen *active, int index);
+void go_to_screen(ActiveScreen *active, Summary *summary, int index);
 
 /**
  * display_screen()

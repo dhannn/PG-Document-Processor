@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <math.h>
+#include <dirent.h>
 
 #define NOT_METADATA -1
 
@@ -23,6 +23,19 @@ void read_file(Summary *summary, Config config)
     seek_metadata(infile, summary->metadata);
     read_metadata(infile, summary->metadata, summary->mode.index);
     read_content(infile, &summary->inData, config.numChar);
+}
+
+void read_corpus(Summary *summary, Config config) 
+{
+    char *corpusPath = config.cleanedDocumentPath;
+    DIR *dir = opendir(corpusPath);
+
+    struct dirent *entity = readdir(dir);
+
+    FILE *temp;
+    int filesRead = 0;
+    while(entity != NULL && filesRead < config.numDocs) {
+    }
 }
 
 void seek_metadata(FILE *file, MetadataItem items[])

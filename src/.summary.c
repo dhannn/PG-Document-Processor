@@ -15,8 +15,6 @@ Mode MODES[] = {
                 .execute_command = to_lowercase,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -26,8 +24,6 @@ Mode MODES[] = {
                 .execute_command = remove_special_char,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -37,8 +33,6 @@ Mode MODES[] = {
                 .execute_command = remove_numbers,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -48,8 +42,6 @@ Mode MODES[] = {
                 .execute_command = clean_whitespace,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -59,8 +51,6 @@ Mode MODES[] = {
                 .execute_command = remove_stopwords,
                 .report_results = report_cleaned,
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -70,8 +60,6 @@ Mode MODES[] = {
                 .execute_command = clean_all,
                 .report_results = report_cleaned, 
                 .print_results = print_cleaned,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0,
                 .usedAddInt = 0,
                 .usedAddStr = 0,
                 .fileSuffix = ""
@@ -90,8 +78,6 @@ Mode MODES[] = {
                 .fileSuffix = "wcount",
                 .usedAddInt = 0,
                 .usedAddStr = 0,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0
             },
             {
                 .name = "N-gram Count",
@@ -101,8 +87,6 @@ Mode MODES[] = {
                 .fileSuffix = "ngram",
                 .usedAddInt = 0,
                 .usedAddStr = 0,
-                .addIntNeeded = 1,
-                .addStrNeeded = 0
             },
             {
                 .name = "Concordance",
@@ -112,8 +96,6 @@ Mode MODES[] = {
                 .fileSuffix = "concord",
                 .usedAddInt = 0,
                 .usedAddStr = 0,
-                .addIntNeeded = 1,
-                .addStrNeeded = 1
             }
         }
     },
@@ -128,8 +110,6 @@ Mode MODES[] = {
                 .fileSuffix = "tfidf",
                 .usedAddInt = 0,
                 .usedAddStr = 0,
-                .addIntNeeded = 0,
-                .addStrNeeded = 0
             },
             {
                 .name = "Document similarity",
@@ -138,8 +118,6 @@ Mode MODES[] = {
                 .fileSuffix = "",
                 .usedAddInt = 0,
                 .usedAddStr = 0,
-                .addIntNeeded = 0,
-                .addStrNeeded = 1
             }
         }
     }
@@ -195,8 +173,8 @@ void set_add_str(Summary *summary, char *addStr)
     int option = summary->option;
     Command command = summary->mode.commands[option];
 
-    if(command.addStrNeeded == 0)
-        return;
+    // if(command.addStrNeeded == 0)
+    //     return;
     
     int strUsed = command.usedAddStr;
     int len = strlen(addStr);
