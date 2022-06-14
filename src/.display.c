@@ -223,12 +223,12 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
         reset_config
     },
     {
-        get_filename,
-        get_filename,
-        get_filename
+        do_clean,
+        do_s_analyze,
+        do_m_analyze
     },
     {
-        choose_option
+        NULL
     },
     {
         do_clean_options,
@@ -248,15 +248,10 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
         do_doc_similarity
     }, 
     {
-        do_processing,
-        do_processing,
-        do_processing,
-        do_processing,
-        do_processing,
-        do_processing
+        NULL
     },
     {
-        do_processing
+        NULL
     },
     {
         NULL
@@ -284,6 +279,14 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
 void __validate_screen_option(ActiveScreen *active);
 void __extract_options(Screen *screens, int index);
 void __extract_back_index(Screen *screens, int index);
+
+bool __validate_choice(ActiveScreen *active)
+{   
+    int choice = active->choice;
+    int maxNumOptions = active->current->numOptions;
+
+    return choice < 0 || choice > maxNumOptions - 1;
+}
 
 void initialize_screens(ActiveScreen *screen)
 {
@@ -354,6 +357,7 @@ int __get_starting_cell(int strlen)
 void display_screen(ActiveScreen *active, Summary *summary)
 {
     CLEAR();
+    MOVE(1, 1);
     SHOW_CURS();
 
     printf("\n");
@@ -402,10 +406,17 @@ void display_screen(ActiveScreen *active, Summary *summary)
 }
 
 
-void go_to_screen(ActiveScreen *active, int index)
+void go_to_screen(ActiveScreen *active, Summary *summary, int index)
 {   
     Screen *screens = active->screens;
     active->current = &screens[index];
+
+    display_screen(active, summary);
+    active->current->get_input(active);
+
+    if(active->current->get_input == get_choice) {
+        __validate_choice(active);
+    }
 }
 
 void get_choice(ActiveScreen *active)

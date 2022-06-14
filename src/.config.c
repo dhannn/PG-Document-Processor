@@ -32,7 +32,7 @@ void load_config(Config *config)
 
     int *ints[2] = {
         &(config->numChar),
-        (int*)&(config->multiSelect)
+        &(config->numDocs)
     };
 
     char buff[MAX_CHAR];
@@ -75,7 +75,7 @@ void set_config_int(Config *config, int index, int data)
             config->numChar = data;
             break;
         case 5:
-            config->multiSelect = data;
+            config->numDocs = data;
     }
 
     char buff[MAX_CHAR];

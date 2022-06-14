@@ -310,8 +310,9 @@ void report_cleaned(Summary *summary)
         tokenNode = tokenNode->next;
     }
 
-	if(summary->outData != NULL)
-		free(summary->outData);
-
+	char *oldOutdata = summary->outData;
     summary->outData = temp;
+	
+	if(summary->outData != NULL)
+		free(oldOutdata);
 }
