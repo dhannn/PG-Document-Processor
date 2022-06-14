@@ -167,8 +167,7 @@ void initialize_corpus(Summary *summary, Config config)
     FILE *tempFile;
 
     while(entity != NULL && filesRead < config.numDocs) {
-        if(__check_if_txt_file(entity->d_name) && 
-            strcmp(entity->d_name, summary->infilename) != 0)
+        if(__check_if_txt_file(entity->d_name))
         {
             char tempName[MAX_CHAR] = "";
             

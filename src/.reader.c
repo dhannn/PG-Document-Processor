@@ -27,17 +27,25 @@ void read_file(Summary *summary, Config config)
 
 void read_corpus(Summary *summary, Config config) 
 {
-    MetadataItem *dummyMetadata = summary->metadata;
     int maxChar = config.numChar;
 
     FILE **corpus = summary->corpus;
     char **temp = malloc(sizeof(char*));
 
     int i;
+
+    char buff[MAX_CHAR] = "";
+    
     for(i = 0; corpus[i] != NULL; i++) {
+        fscanf(corpus[i] , "%s", buff);
+
+        while(!__check_if_content_start(strtok(buff, ":"), ANALYZE_MULTI)){
+            fscanf(corpus[i] , "%s", buff);
+        }
+        
         temp = realloc(temp, sizeof(char*) * (i + 1));
 
-        seek_metadata(corpus[i], dummyMetadata);
+
         read_content(corpus[i], &temp[i], maxChar);
     }
 

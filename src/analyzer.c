@@ -277,7 +277,7 @@ float __get_idf(TokenList **corpusTokens, char *tokenString)
     float idf = 0;
     int numDocsWithKeyword = 0;
 
-    int i;
+    int i = 0;
     for(i = 0; corpusTokens[i] != NULL; i++) {
         if(is_token_found(corpusTokens[i], tokenString))
             numDocsWithKeyword++;

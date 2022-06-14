@@ -150,6 +150,10 @@ void swap(TokenNode *a, TokenNode *b)
     TokenType tempType = a->tokenType;
     a->tokenType = b->tokenType;
     b->tokenType = tempType;
+
+    float tempTfidf = a->tfidf;
+    a->tfidf = b->tfidf;
+    b->tfidf = tempTfidf;
 }
 
 char *create_string(char *str)

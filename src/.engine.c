@@ -255,6 +255,9 @@ void do_tfidf(ActiveScreen *active, Summary *summary, Config *config)
     int choice = active->choice - 1;
     set_option(summary, *config, choice);
 
+    __get_analyzer_outfile_name(active, summary);
+    set_outfile(summary, *config, active->strInput);
+
     CLEAR();
     MOVE(1, 1);
     execute_summary(summary);
