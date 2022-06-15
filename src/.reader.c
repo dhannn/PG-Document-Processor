@@ -97,7 +97,9 @@ void read_content(FILE *file, char **inputData, int maxChar)
 {
     int runningTotal = 0;                   // total number of characters
     int currentSize = MAX_CHAR;
-    char *temp = calloc(1, sizeof(char));   // allocation for the content string
+
+    // allocation for the content string
+    char *temp = calloc(currentSize, sizeof(char));   
 
     char buff[MAX_CHAR];
     char prev[MAX_CHAR] = "";               // to test for "*** END" signifier

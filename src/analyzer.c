@@ -199,8 +199,12 @@ void get_concordance(Summary *summary)
     TokenNode *curr = oldTokenlist->head;
     TokenNode *startOfWindow = curr;
 
-    for(int i = 0; i < n && curr != NULL; i++)
+    for(int i = 0; i < n && curr != NULL; i++) {
         curr = curr->next;
+
+        if(curr->tokenType == SPECIAL)
+            i--;
+    }
 
     while(curr != NULL) {
         if(strcmp(curr->tokenString, keyword) == 0) {
@@ -209,14 +213,24 @@ void get_concordance(Summary *summary)
             TokenNode *tempNode = startOfWindow;
 
             for(int i = 0; i < n; i++) {
+                if(tempNode->tokenType == SPECIAL) {
+                    i--;
+                    num--;
+                }
+
                 strcat(buff, tempNode->tokenString);
                 strcat(buff, " ");
-
+                
                 tempNode = tempNode->next;
                 num++;
             }
 
             for(int i = 0; i <= n && (tempNode + i) != NULL; i++) {
+                if(tempNode->tokenType == SPECIAL) {
+                    i--;
+                    num--;
+                }
+
                 strcat(buff, tempNode->tokenString);
 
                 if(i != n)
@@ -237,6 +251,7 @@ void get_concordance(Summary *summary)
         }
 
         startOfWindow = startOfWindow->next;
+
         curr = curr->next;
     }
 
