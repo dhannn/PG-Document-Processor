@@ -153,12 +153,12 @@ void report_token_frequency(Summary *summary)
 
         runningTotal += strlen(buff);
 
-        if(runningTotal + 1 > currentSize) {
+        if(runningTotal >= currentSize) {
             currentSize *= 5;
             temp = realloc(temp, currentSize);
         }
 
-        strcat(temp, buff);
+        strcat(temp, buff);                
         temp[strlen(temp)] = '\0';
         
 		numChar++;

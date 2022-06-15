@@ -165,6 +165,7 @@ void initialize_corpus(Summary *summary, Config config)
     struct dirent *entity = readdir(corpusDir);
 
     FILE *tempFile;
+    int numFile = 1;
 
     while(entity != NULL && filesRead < config.numDocs) {
         if(__check_if_txt_file(entity->d_name))
@@ -177,7 +178,11 @@ void initialize_corpus(Summary *summary, Config config)
 
             tempFile = fopen(tempName, "r");
 
-            corpus = realloc(corpus, sizeof(FILE*) * (filesRead + 1));
+            if(filesRead >= numFile) {
+                numFile *= 4;
+                corpus = realloc(corpus, sizeof(FILE*) * numFile);
+            }
+
             corpus[filesRead] = tempFile;
             
             filesRead++;

@@ -33,6 +33,7 @@ void read_corpus(Summary *summary, Config config)
     char **temp = malloc(sizeof(char*));
 
     int i;
+    int aBeautifulVariableName = 1;
 
     char buff[MAX_CHAR] = "";
     
@@ -43,8 +44,10 @@ void read_corpus(Summary *summary, Config config)
             fscanf(corpus[i] , "%s", buff);
         }
         
-        temp = realloc(temp, sizeof(char*) * (i + 1));
-
+        if(i >= aBeautifulVariableName) {
+            aBeautifulVariableName *= 5;
+            temp = realloc(temp, sizeof(char*) * aBeautifulVariableName);
+        }
 
         read_content(corpus[i], &temp[i], maxChar);
     }
@@ -93,6 +96,7 @@ void read_metadata(FILE *file, MetadataItem items[], ModeIndex mode)
 void read_content(FILE *file, char **inputData, int maxChar)
 {
     int runningTotal = 0;                   // total number of characters
+    int currentSize = MAX_CHAR;
     char *temp = calloc(1, sizeof(char));   // allocation for the content string
 
     char buff[MAX_CHAR];
@@ -111,7 +115,11 @@ void read_content(FILE *file, char **inputData, int maxChar)
         strcat(buff, " ");
         runningTotal += strlen(buff);
 
-        temp = realloc(temp, runningTotal + 1); // + 1 for null byte
+        if(runningTotal >= currentSize) {
+            currentSize *= 5;
+            temp = realloc(temp, currentSize); 
+        }
+
         strcat(temp, buff);
 
         update_reading(runningTotal, numWords);
@@ -119,7 +127,7 @@ void read_content(FILE *file, char **inputData, int maxChar)
         numWords++;
 
         flag = fscanf(file, "%s", buff);
-    };
+    }
 
     *inputData = temp;
 }

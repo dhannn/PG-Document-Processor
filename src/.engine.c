@@ -112,13 +112,18 @@ void do_m_analyze(ActiveScreen *active, Summary *summary, Config *config)
 
     summary->tokenList = tokenize_string(summary->inData, false);
 
-    TokenList **tokenlists = malloc(sizeof(TokenList*));
     int i;
+    int numTokenList = 1;
+    TokenList **tokenlists = malloc(sizeof(TokenList*));
 
     for(i = 0; summary->corpusData[i] != NULL; i++) {
         char *corpusData = summary->corpusData[i];
 
-        tokenlists = realloc(tokenlists, sizeof(TokenList*) * (i + 1));
+        if(i >= numTokenList) {
+            numTokenList *= 4;
+            tokenlists = realloc(tokenlists, sizeof(TokenList*) * numTokenList);
+        }
+                        
         tokenlists[i] = tokenize_string(corpusData, false);
     }
     tokenlists[i] = NULL;
