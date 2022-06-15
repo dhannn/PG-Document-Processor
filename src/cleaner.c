@@ -58,25 +58,22 @@ void remove_special_char (Summary *summary)
 	TokenList *newTokenlist = initialize_tokenlist();
 
 	TokenNode *currentNode = summary->tokenList->head;
-	TokenNode *previousNode = summary->tokenList->head;
+	TokenNode *nextNode;
     int numTokens = 0;
 	
 	while(currentNode != NULL) 
 	{
+		nextNode = currentNode->next;
+
 		if(currentNode->tokenType == SPECIAL) {
-			if(currentNode->next != NULL) {
-				if((previousNode->tokenType == ALPHA || 
-					previousNode->tokenType == NUMERIC) && (currentNode->next->tokenType == ALPHA || currentNode->next->tokenType == NUMERIC)) {
-						
+			if(nextNode != NULL && (nextNode->tokenType == ALPHA || nextNode->tokenType == NUMERIC)) {
 					strcpy(currentNode->tokenString, " ");
 					char *temp = create_string(currentNode->tokenString);
 					add_token(newTokenlist, temp);	
 				}
 			}
-		}
 
-		else if(currentNode->tokenType != SPECIAL)
-		{
+		else if(currentNode->tokenType != SPECIAL || nextNode == NULL){
 			char *temp = create_string(currentNode->tokenString);
 			add_token(newTokenlist, temp);	
 		}
@@ -84,7 +81,6 @@ void remove_special_char (Summary *summary)
 		numTokens++;
         update_processing(numTokens, summary->tokenList->size);
 
-		previousNode = currentNode;
 		currentNode = currentNode->next;
 	}
 
@@ -92,6 +88,7 @@ void remove_special_char (Summary *summary)
 
 	delete_token_strings(oldTokenlist);
 	destroy_tokenList(oldTokenlist);
+	clean_whitespace (summary);
 }
 
 
@@ -124,6 +121,7 @@ void remove_numbers (Summary *summary)
 
 	delete_token_strings(oldTokenlist);
 	destroy_tokenList(oldTokenlist);
+	clean_whitespace (summary);
 }
 
 // removes all newlines and replaces them with a single space
@@ -138,9 +136,6 @@ void clean_whitespace (Summary *summary)
 	int numTokens = 0;
 
 	while(currentNode != NULL) {
-		if(strcmp(currentNode->tokenString, "\n") == 0)
-			strcpy(currentNode->tokenString, " ");
-
 		if(((strcmp(currentNode->tokenString, " ") == 0 && strcmp(previousNode->tokenString, " ") != 0)) || 
 			 currentNode->tokenType != WHITESPACE){
 			char *temp = create_string(currentNode->tokenString);
@@ -253,6 +248,7 @@ void remove_stopwords (Summary *summary)
 
 	delete_token_strings(oldTokenlist);
 	destroy_tokenList(oldTokenlist);
+	clean_whitespace (summary);
 }
 
 void clean_all(Summary *summary)
