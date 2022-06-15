@@ -687,3 +687,9 @@ void display_error(ErrorCode errorCode)
     SHOW_CURS();
     FMT(RESET_COLOR);
 }
+
+void restart_screen()
+{
+    MOVE(1, 1);
+    CLEAR();  
+}

@@ -64,8 +64,7 @@ void do_clean(ActiveScreen *active, Summary *summary, Config *config)
 
     __validate_file(active, summary, *config);
     
-    CLEAR();
-    MOVE(1, 1);
+    restart_screen();
 
     initialize_metadata(summary->metadata);
     read_file(summary, *config);
@@ -84,8 +83,7 @@ void do_s_analyze(ActiveScreen *active, Summary *summary, Config *config)
 
     __validate_file(active, summary, *config);
     
-    CLEAR();
-    MOVE(1, 1);
+    restart_screen();
 
     initialize_metadata(summary->metadata);
     read_file(summary, *config);
@@ -104,8 +102,7 @@ void do_m_analyze(ActiveScreen *active, Summary *summary, Config *config)
 
     __validate_file(active, summary, *config);
     
-    CLEAR();
-    MOVE(1, 1);
+    restart_screen();
 
     initialize_metadata(summary->metadata);
     initialize_corpus(summary, *config);
@@ -140,8 +137,7 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
     execute_summary(summary);
     
     char in; 
-    CLEAR();
-    MOVE(1, 1);
+    restart_screen();
     printf("Continue cleaning? [Y or N]: ");
     scanf(" %c", &in);
 
@@ -151,8 +147,7 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
         set_option(summary, *config, choice);
         execute_summary(summary);
 
-        CLEAR();
-        MOVE(1, 1);
+        restart_screen();
         printf("Continue cleaning? [Y or N]: ");
         scanf(" %c", &in);
     }
@@ -188,8 +183,7 @@ void do_word_count(ActiveScreen *active, Summary *summary, Config *config)
     int choice = active->choice - 1;
     set_option(summary, *config, choice);
 
-    CLEAR();
-    MOVE(1, 1);
+    restart_screen();
     execute_summary(summary);
 
     __get_analyzer_outfile_name(active, summary);
@@ -210,8 +204,7 @@ void do_ngram_count(ActiveScreen *active, Summary *summary, Config *config)
     __validate_n(active, summary);
     set_add_int(summary, active->nInput);
 
-    CLEAR();
-    MOVE(1, 1);
+    restart_screen();
     execute_summary(summary);
 
     __get_analyzer_outfile_name(active, summary);
@@ -237,8 +230,7 @@ void do_concordance(ActiveScreen *active, Summary *summary, Config *config)
    __validate_n(active, summary);
     set_add_int(summary, active->nInput); 
 
-    CLEAR();
-    MOVE(1, 1);
+    restart_screen();
     execute_summary(summary);
 
     __get_analyzer_outfile_name(active, summary);
@@ -257,9 +249,8 @@ void do_tfidf(ActiveScreen *active, Summary *summary, Config *config)
 
     __get_analyzer_outfile_name(active, summary);
     set_outfile(summary, *config, active->strInput);
-
-    CLEAR();
-    MOVE(1, 1);
+    
+    restart_screen();
     execute_summary(summary);
 
     save_results(active, summary, config);
@@ -320,12 +311,8 @@ void return_screen(ActiveScreen* active, Summary *summary, Config *config)
 {
     int index = active->current->backIndex;
     
-    if(index == EXIT) {
-        // TODO: move this code snippet to a function in display.c
-        MOVE(1, 1);
-        CLEAR();
-        return;
-    }
+    if(index == EXIT) 
+        restart_screen();
 
     go_to_screen(active, summary, index);
 }

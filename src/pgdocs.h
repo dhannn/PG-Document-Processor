@@ -187,6 +187,8 @@ void display_screen(ActiveScreen *active, Summary *summary);
  */
 void display_error(ErrorCode errorCode);
 
+void restart_screen();
+
 /* ----------------------------- Input Functions ---------------------------- */
 /**
  * get_choice()
