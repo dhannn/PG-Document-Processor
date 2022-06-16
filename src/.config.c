@@ -1,12 +1,34 @@
+/*******************************************************************************
+ * 
+ * FILE             .config.c
+ * LAST MODIFIED    06-17-2022
+ * 
+ * DESCRIPTION
+ *      This file contains function implementations that handles config
+ * 
+ ******************************************************************************/
+
 #include "pgdocs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #define CONFIG_FILENAME "dat/config"
 
+/* -------------------------------------------------------------------------- */
+/*                         PRIVATE FUNCTION PROTOTYPES                        */
+/* -------------------------------------------------------------------------- */
+/**
+ * write_config()
+ * writes to the config file a specified data
+ * 
+ * @param           int         the index of the config item
+ * @param           char*       the data in the config item
+ */
 void __write_config(int index, char *str);
-void __insert_int(int index, int data);
 
+/* -------------------------------------------------------------------------- */
+/*                              PUBLIC FUNCTIONS                              */
+/* -------------------------------------------------------------------------- */
 bool check_config_initialized()
 {
     FILE *configFile = fopen(CONFIG_FILENAME, "r");

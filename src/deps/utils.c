@@ -1,10 +1,10 @@
 /*******************************************************************************
  * 
  * FILE             utils.c
- * LAST MODIFIED    04-19-2022
+ * LAST MODIFIED    06-16-2022
  * 
  * DESCRIPTION
- *      This file contains function implementations that does not belong
+ *      This file contains function implementations that do not belong
  *      to other logical units of the source code
  * 
  ******************************************************************************/
@@ -64,6 +64,28 @@ TokenList *tokenize_string(char *input, bool includeSpace)
     // add_token(tokenlist, temp);
 
     return tokenlist;
+}
+
+TokenList **tokenize_corpus(char **corpusData)
+{
+    int i;
+    int numTokenList = 1;
+    TokenList **tokenlists = malloc(sizeof(TokenList*));
+
+    for(i = 0; corpusData[i] != NULL; i++) {
+        char *currentCorpusStr = corpusData[i];
+
+        if(i >= numTokenList) {
+            numTokenList *= 4;
+            tokenlists = realloc(tokenlists, sizeof(TokenList*) * numTokenList);
+        }
+                        
+        tokenlists[i] = tokenize_string(currentCorpusStr, false);
+    }
+
+    tokenlists[i] = NULL;
+    
+    return tokenlists;
 }
 
 TokenList *remove_duplicate_tokens(TokenList *tl)

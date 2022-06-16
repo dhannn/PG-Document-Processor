@@ -1,40 +1,44 @@
+/*******************************************************************************
+ * 
+ * FILE				cleaner.c
+ * LAST MODIFIED	06-17-2022
+ * 
+ * DESCRIPTION
+ * 		This file contains function implementations that filter irrelevant 
+ * 		features in a text data as preparation for analyzer.
+ * 
+ ******************************************************************************/
+
 #include "pgdocs.h"
 #include "deps/internals.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <math.h>
 
-typedef enum {
-    TO_LOWERCASE   	 	=       0b00001,
-    REMOVE_SPECIAL 		=       0b00010,
-    REMOVE_NUMBER   	=     	0b00100,
-    CLEAN_WHITESPACE 	=		0b01000
-} CLEANER_OPTIONS_INDEX;
-
-void clean_data(Summary *summary)
-{
-	unsigned int options = summary->option;
-	summary->mode.commands[options].execute_command(summary);
-	summary->mode.commands[options].report_results(summary);
-}
-
-/*	
- *	__convert_string_to_lowercase
- *	converts a string to lowercase
- *  precondition: all string elements are alpha
+/* -------------------------------------------------------------------------- */
+/*                         PRIVATE FUNCTION PROTOTYPES                        */
+/* -------------------------------------------------------------------------- */
+/**
+ * convert_string_to_lowercase()
+ * converts a specified string to its lowercase format
+ * 
+ * @pre			string is alphabetic
+ * @param		char*			string to be modified
  */
-void __convert_string_to_lowercase (char *str)
-{
-	for (int i = 0; i < (strlen(str)); i++){
-   		if (str[i] < 'a')
-   			str[i] += 32;
-   	}
-}
+void __convert_string_to_lowercase(char *str);
+/**
+ * merge_alpha_nodes()
+ * combines consecutive alphabetic tokens to one
+ * 
+ * @param		Summary*		contains inputs necessary for processing
+ * @return		a modified version of the tokenlist
+ */
+TokenList *__merge_alpha_nodes(Summary *summary);
 
-
-void to_lowercase (Summary *summary)
+/* -------------------------------------------------------------------------- */
+/*                              PUBLIC FUNCTIONS                              */
+/* -------------------------------------------------------------------------- */
+void to_lowercase(Summary *summary)
 {
 	TokenNode *currentNode = summary->tokenList->head;
     int numTokens = 0;
@@ -42,17 +46,17 @@ void to_lowercase (Summary *summary)
 	while(currentNode != NULL) {
 		char *currentTokenStr = currentNode->tokenString;
 		
-		if (currentNode->tokenType == ALPHA)	//if the node is of type alpha
-			__convert_string_to_lowercase (currentTokenStr);		
+		if(currentNode->tokenType == ALPHA)	//if the node is of type alpha
+			__convert_string_to_lowercase(currentTokenStr);		
 
-        currentNode = currentNode->next;		//switches current node to next  
+        currentNode = currentNode->next;		//switches current node to next 
 		
 		numTokens++;
         update_processing(numTokens, summary->tokenList->size);
 	}
 }
 
-void remove_special_char (Summary *summary)
+void remove_special_char(Summary *summary)
 {
 	TokenList *oldTokenlist = summary->tokenList;
 	TokenList *newTokenlist = initialize_tokenlist();
@@ -66,7 +70,7 @@ void remove_special_char (Summary *summary)
 		nextNode = currentNode->next;
 
 		if(currentNode->tokenType == SPECIAL) {
-			if(nextNode != NULL && (nextNode->tokenType == ALPHA || nextNode->tokenType == NUMERIC)) {
+			if(nextNode != NULL &&(nextNode->tokenType == ALPHA || nextNode->tokenType == NUMERIC)) {
 					strcpy(currentNode->tokenString, " ");
 					char *temp = create_string(currentNode->tokenString);
 					add_token(newTokenlist, temp);	
@@ -88,11 +92,10 @@ void remove_special_char (Summary *summary)
 
 	delete_token_strings(oldTokenlist);
 	destroy_tokenList(oldTokenlist);
-	clean_whitespace (summary);
+	clean_whitespace(summary);
 }
 
-
-void remove_numbers (Summary *summary)
+void remove_numbers(Summary *summary)
 {
 	TokenList *oldTokenlist = summary->tokenList;
 	TokenList *newTokenlist = initialize_tokenlist();
@@ -101,7 +104,7 @@ void remove_numbers (Summary *summary)
     int numTokens = 0;
 
 	while(currentNode != NULL) {
-		if (currentNode->tokenType != NUMERIC) {
+		if(currentNode->tokenType != NUMERIC) {
 			int length = strlen(currentNode->tokenString) + 1;
 			char *temp = calloc(length, 1);
 
@@ -121,11 +124,10 @@ void remove_numbers (Summary *summary)
 
 	delete_token_strings(oldTokenlist);
 	destroy_tokenList(oldTokenlist);
-	clean_whitespace (summary);
+	clean_whitespace(summary);
 }
 
-// removes all newlines and replaces them with a single space
-void clean_whitespace (Summary *summary)
+void clean_whitespace(Summary *summary)
 {
 	TokenList *oldTokenlist = summary->tokenList;
 	TokenList *newTokenlist = initialize_tokenlist();
@@ -155,52 +157,7 @@ void clean_whitespace (Summary *summary)
 	destroy_tokenList(oldTokenlist);
 }
 
-/*	
- *	_merge_alpha_node
- *	merges all neighboring alpha nodes
- */	
-TokenList *__merge_alpha_nodes (Summary *summary)
-{
-	TokenList *oldTokens = summary->tokenList;
-	TokenList *newTokens = initialize_tokenlist();
-	TokenNode *currentNode = oldTokens->head;
-	TokenNode *previousNode = oldTokens->head;
-	char word[MAX_CHAR] = "";
-	
-	while(currentNode != NULL) 
-	{
-		if(currentNode->tokenType == ALPHA){
-			if(previousNode->tokenType != ALPHA)
-				strcpy(word, currentNode->tokenString);
-
-			if(previousNode->tokenType == ALPHA) 
-				strcat(word, currentNode->tokenString);
-
-			if((currentNode->next != NULL && currentNode->next->tokenType != ALPHA) ||
-				currentNode->next == NULL){
-				char *temp = create_string(word);
-				add_token(newTokens, temp);
-				strcpy(word, "");
-			}
-		} 
-
-		else {
-			char *temp = create_string (currentNode->tokenString);
-			add_token(newTokens, temp);
-		}
-
-		previousNode = currentNode;
-		currentNode = currentNode->next;
-	}
-
-	delete_token_strings(oldTokens);
-	destroy_tokenList(oldTokens);
-
-	return newTokens;
-}
-
-
-void remove_stopwords (Summary *summary)
+void remove_stopwords(Summary *summary)
 {	
 	TokenList *oldTokenlist = __merge_alpha_nodes(summary);
 	TokenList *newTokenlist = initialize_tokenlist();
@@ -213,19 +170,19 @@ void remove_stopwords (Summary *summary)
 
 	while(currentNode != NULL) 
 	{
-		if (currentNode->tokenType == ALPHA)
+		if(currentNode->tokenType == ALPHA)
 		{ 
 			flag = 0;
 			strcpy(currentString, currentNode->tokenString);
 			__convert_string_to_lowercase(currentString);
 
-			while (strcmp(currentString, matchedStopword) != 0 && flag != EOF)
+			while(strcmp(currentString, matchedStopword) != 0 && flag != EOF)
 				flag = fscanf(file, "%s", matchedStopword);
 
 			fseek(file, 0, SEEK_SET);
 
-			if (strcmp(currentString, matchedStopword) != 0){
-				char *temp = create_string (currentNode->tokenString);
+			if(strcmp(currentString, matchedStopword) != 0){
+				char *temp = create_string(currentNode->tokenString);
 				add_token(newTokenlist, temp);
 
 			} else if(currentNode->next->tokenType == WHITESPACE) {
@@ -248,12 +205,12 @@ void remove_stopwords (Summary *summary)
 
 	delete_token_strings(oldTokenlist);
 	destroy_tokenList(oldTokenlist);
-	clean_whitespace (summary);
+	clean_whitespace(summary);
 }
 
 void clean_all(Summary *summary)
 {
-	void (*commands[])(Summary*) = {
+	void(*commands[])(Summary*) = {
 		to_lowercase,
 		remove_special_char,
 		remove_numbers,
@@ -305,4 +262,56 @@ void report_cleaned(Summary *summary)
 	}
 	
     summary->outData = temp;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              PRIVATE FUNCTIONS                             */
+/* -------------------------------------------------------------------------- */
+
+void __convert_string_to_lowercase(char *str)
+{
+	for(int i = 0; i <(strlen(str)); i++) {
+   		if(str[i] < 'a')
+   			str[i] += 32;
+   	}
+}
+
+TokenList *__merge_alpha_nodes(Summary *summary)
+{
+	TokenList *oldTokens = summary->tokenList;
+	TokenList *newTokens = initialize_tokenlist();
+	TokenNode *currentNode = oldTokens->head;
+	TokenNode *previousNode = oldTokens->head;
+	char word[MAX_CHAR] = "";
+	
+	while(currentNode != NULL) 
+	{
+		if(currentNode->tokenType == ALPHA){
+			if(previousNode->tokenType != ALPHA)
+				strcpy(word, currentNode->tokenString);
+
+			if(previousNode->tokenType == ALPHA) 
+				strcat(word, currentNode->tokenString);
+
+			if((currentNode->next != NULL && currentNode->next->tokenType != ALPHA) ||
+				currentNode->next == NULL){
+				char *temp = create_string(word);
+				add_token(newTokens, temp);
+				strcpy(word, "");
+			}
+		} 
+
+		else {
+			char *temp = create_string(currentNode->tokenString);
+			add_token(newTokens, temp);
+		}
+
+		previousNode = currentNode;
+		currentNode = currentNode->next;
+	}
+
+	delete_token_strings(oldTokens);
+	destroy_tokenList(oldTokens);
+
+	return newTokens;
 }

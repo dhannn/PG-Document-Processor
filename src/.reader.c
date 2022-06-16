@@ -1,3 +1,14 @@
+/*******************************************************************************
+ *                                                                             
+ * FILE             .reader.c
+ * LAST MODIFIED    06-16-2020
+ * 
+ * DESCRIPTION
+ *      This file contains the function implementations involving reading
+ *      metadata and content from the specified text files.
+ * 
+ ******************************************************************************/
+
 #include "pgdocs.h"
 #include <string.h>
 #include <stdio.h>
@@ -11,10 +22,48 @@
 #define ANALYZE_CONTENT_START_SIGNIFIER "Content"
 #define CONTENT_END_SIGNIFIER "*** END"
 
+/* -------------------------------------------------------------------------- */
+/*                         PRIVATE FUNCTION PROTOTYPES                        */
+/* -------------------------------------------------------------------------- */
+/**
+ * get_starting_token()
+ * gets the token signifying the start of content given the mode
+ * 
+ * @param           ModeIndex       the mode of the reading
+ * @return          string of the starting token
+ */
 char *__get_starting_token(ModeIndex mode);
+/**
+ * check_if_content_start()
+ * checks if the current pointer to file is the start of the content
+ * 
+ * @param           char[]          current string token
+ * @param           ModeIndex       the mode of the reading
+ * @return          true if pointer is content start; false if otherwise
+ */
 bool __check_if_content_start(char buff[], ModeIndex mode);
+/**
+ * check_if_content_end()
+ * checks if the current pointer to file is the end of the content
+ * 
+ * @param           char[]          current string token
+ * @param           char[]          previous string token
+ * @return          true if pointer is content end; false if otherwise
+ */
 bool __check_if_content_end(char buff[], char prev[]);
+/**
+ * check_if_max_char_reached()
+ * checks if the reader reached the maximum number of characters
+ * 
+ * @param           int             number of characters read
+ * @param           int             maximum number of characters
+ * @return          true if maximum character is reached; false if otherwise
+ */
 bool __check_if_max_char_reached(int numCharRead, int numCharMax);
+
+/* -------------------------------------------------------------------------- */
+/*                              PUBLIC FUNCTIONS                              */
+/* -------------------------------------------------------------------------- */
 
 void read_file(Summary *summary, Config config)
 {
@@ -50,6 +99,11 @@ void read_corpus(Summary *summary, Config config)
         }
 
         read_content(corpus[i], &temp[i], maxChar);
+    }
+        
+    if(i >= aBeautifulVariableName) {
+        aBeautifulVariableName *= 5;
+        temp = realloc(temp, sizeof(char*) * aBeautifulVariableName);
     }
 
     temp[i] = NULL;
@@ -139,6 +193,10 @@ void clean_up_reader(Summary *summary)
     delete_metadata(summary->metadata);
     free(summary->inData);
 }
+
+/* -------------------------------------------------------------------------- */
+/*                              PRIVATE FUNCTIONS                             */
+/* -------------------------------------------------------------------------- */
 
 char *__get_starting_token(ModeIndex mode)
 {

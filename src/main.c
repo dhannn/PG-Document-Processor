@@ -15,7 +15,7 @@
 /*******************************************************************************
  * 
  * FILE             main.c
- * LAST MODIFIED    06-
+ * LAST MODIFIED    06-15-2022
  * AUTHORS          Ramos, Daniel III
  *                  Roco, Gwen
  * 
@@ -43,14 +43,16 @@ int main()
 
     do {
         int index = 0;
+        Screen *current = activeScreen.current;
 
-        if(activeScreen.current->get_input == get_choice)
+        if(current->get_input == get_choice)
             index = activeScreen.choice - 1;
         
-        activeScreen.current->options[index].do_option(
-            &activeScreen, 
-            &summary, 
-            &config);
+        void (*do_option)(ActiveScreen*, Summary*, Config*);
+        do_option = current->options[index].do_option;
+
+        if(do_option != NULL)
+            do_option(&activeScreen, &summary, &config);
         
     } while(!check_if_exit(activeScreen.screens, &activeScreen));
 

@@ -1,69 +1,48 @@
+/*******************************************************************************
+ * 
+ * FILE             analyzer.c
+ * LAST MODIFIED    06-17-2022
+ * 
+ * DESCRIPTION
+ *      This file contains the function implementations that process
+ *      set tokenlists to extract features like word count, tf-idf 
+ *      and n-gram count.
+ * 
+ ******************************************************************************/
+
 #include "pgdocs.h"
 #include "deps/internals.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <math.h>
 
-#define MAX_ANALYZER_OPTIONS 3
-
-unsigned int _convert_multiselect_options(int rawInput);
-
-typedef enum {
-    WORD_COUNT,
-    NGRAM_COUNT,
-    CONCORDANCE
-} ANALYZER_OPTIONS_INDEX;
-
+/* -------------------------------------------------------------------------- */
+/*                         PRIVATE FUNCTION PROTOTYPES                        */
+/* -------------------------------------------------------------------------- */
+/**
+ * convert_to_ngrams()
+ * breaks down the tokenlist given n tokens
+ * 
+ * @param       TokenList*      the list of raw tokens to be processed
+ * @param       int             the number of tokens in a sequence
+ * @return      a tokenlist forming the ngrams
+ */
 TokenList *__convert_to_ngrams(TokenList *tl, int n);
+/**
+ * get_idf()
+ * calculates the inverse document frequency of a given term
+ * 
+ * @param       TokenList**     a list of tokens of the whole corpus
+ * @param       char*           keyword to be searched
+ */
+float __get_idf(TokenList **corpusTokens, char *tokenString);
 
-void analyze_data__single(Summary *summary)
-{
-    unsigned int options = summary->option;
-    summary->mode.commands[options].execute_command(summary);
-    summary->mode.commands[options].report_results(summary);
-}
-
-void analyze_data__multi(Summary *summary)
-{
-    unsigned int options = summary->option;
-    summary->mode.commands[options].execute_command(summary);
-    summary->mode.commands[options].report_results(summary);
-}
-
-TokenList *__convert_to_ngrams(TokenList *tl, int n)
-{
-    TokenList *ngrams = initialize_tokenlist();
-    TokenNode *curr = tl->head;
-    char buff[MAX_CHAR];
-
-    while(curr != NULL) {
-        strcpy(buff, curr->tokenString);
-        
-        int i;
-        TokenNode *window = curr->next;
-        for(i = 1; i < n && window != NULL; i++) {
-            strcat(buff, " ");
-            strcat(buff, window->tokenString);
-            window = window->next;
-        }
-
-        if(i == n) {
-            strcat(buff, "\0");
-
-            char *temp = calloc(strlen(buff) + 1, sizeof(char));
-            strcpy(temp, buff);
-
-            add_token(ngrams, temp);
-        }
-
-        curr = curr->next;
-    }
-    
-    return ngrams;
-}
-
+/* -------------------------------------------------------------------------- */
+/*                              PUBLIC FUNCTIONS                              */
+/* -------------------------------------------------------------------------- */
+/* ---------------------------- GETTING FUNCTIONS --------------------------- */
+/*                         gets the analyzing features                        */
 void get_word_count(Summary *summary)
 {
     HashTable *ht = create_hash_table();
@@ -135,58 +114,6 @@ void get_ngram_count(Summary *summary)
     destroy_tokenList(rawNgrams);
 }
 
-void report_token_frequency(Summary *summary)
-{
-    TokenList *list = summary->tokenList;
-    TokenNode *tokenNode = next_token(list);
-
-    int runningTotal = 0;
-    int currentSize = MAX_CHAR;
-    char *temp = calloc(currentSize, 1);
-    char buff[MAX_CHAR] = "";
-
-    int numChar = 0;
-
-    while(tokenNode != NULL) {
-        sprintf(buff, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
-        buff[strlen(buff)] = '\0';
-
-        runningTotal += strlen(buff);
-
-        if(runningTotal >= currentSize) {
-            currentSize *= 5;
-            temp = realloc(temp, currentSize);
-        }
-
-        strcat(temp, buff);                
-        temp[strlen(temp)] = '\0';
-        
-		numChar++;
-		update_reporting(numChar, summary->tokenList->size);
-
-        tokenNode = tokenNode->next;
-    }
-
-    summary->outData = temp;
-}
-
-void report_ngram_count(Summary *summary)
-{
-    TokenList *list = summary->tokenList;
-    TokenNode *tokenNode = next_token(list);
-
-    int n = 0;
-    while(tokenNode != NULL) {
-        if(n < 10)
-            fprintf(stdout, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
-
-        fprintf(summary->outfile, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
-        
-        tokenNode = next_token(list);
-        n++;
-    }
-}
-
 void get_concordance(Summary *summary)
 {
     AdditionalOptions addOpts = summary->addOpts;
@@ -250,6 +177,79 @@ void get_concordance(Summary *summary)
     destroy_tokenList(oldTokenlist);
 }
 
+void get_tfidf(Summary *summary)
+{
+    get_word_count(summary);
+
+    TokenList *tokenlist = summary->tokenList;
+    TokenNode *currentNode = tokenlist->head;
+    
+    float maxFreq = (float)currentNode->frequency;
+    while(currentNode != NULL) {
+        float tf = 0.5 + 0.5 * ((float)currentNode->frequency / maxFreq);
+        float idf = __get_idf(summary->corpusTokens, currentNode->tokenString);
+
+        currentNode->tfidf = tf * idf;
+        currentNode = currentNode->next;
+    }
+
+    sort_tokens_by_tfidf(summary->tokenList);
+}
+
+/* --------------------------- REPORTING FUNCTIONS -------------------------- */
+/*                       writes the output to the string                      */
+void report_token_frequency(Summary *summary)
+{
+    TokenList *list = summary->tokenList;
+    TokenNode *tokenNode = next_token(list);
+
+    int runningTotal = 0;
+    int currentSize = MAX_CHAR;
+    char *temp = calloc(currentSize, 1);
+    char buff[MAX_CHAR] = "";
+
+    int numChar = 0;
+
+    while(tokenNode != NULL) {
+        sprintf(buff, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
+        buff[strlen(buff)] = '\0';
+
+        runningTotal += strlen(buff);
+
+        if(runningTotal >= currentSize) {
+            currentSize *= 5;
+            temp = realloc(temp, currentSize);
+        }
+
+        strcat(temp, buff);                
+        temp[strlen(temp)] = '\0';
+        
+		numChar++;
+		update_reporting(numChar, summary->tokenList->size);
+
+        tokenNode = tokenNode->next;
+    }
+
+    summary->outData = temp;
+}
+
+void report_ngram_count(Summary *summary)
+{
+    TokenList *list = summary->tokenList;
+    TokenNode *tokenNode = next_token(list);
+
+    int n = 0;
+    while(tokenNode != NULL) {
+        if(n < 10)
+            fprintf(stdout, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
+
+        fprintf(summary->outfile, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
+        
+        tokenNode = next_token(list);
+        n++;
+    }
+}
+
 void report_concordance(Summary *summary)
 {
     TokenNode *curr = summary->tokenList->head;
@@ -274,42 +274,6 @@ void report_concordance(Summary *summary)
     }
 
     summary->outData = temp;
-}
-
-float __get_idf(TokenList **corpusTokens, char *tokenString)
-{
-    float idf = 0;
-    int numDocsWithKeyword = 0;
-
-    int i = 0;
-    for(i = 0; corpusTokens[i] != NULL; i++) {
-        if(is_token_found(corpusTokens[i], tokenString))
-            numDocsWithKeyword++;
-    }
-
-    if(numDocsWithKeyword != 0)
-        idf = log10f((float)i / numDocsWithKeyword);
-
-    return idf;
-}
-
-void get_tfidf(Summary *summary)
-{
-    get_word_count(summary);
-
-    TokenList *tokenlist = summary->tokenList;
-    TokenNode *currentNode = tokenlist->head;
-    
-    float maxFreq = (float)currentNode->frequency;
-    while(currentNode != NULL) {
-        float tf = 0.5 + 0.5 * ((float)currentNode->frequency / maxFreq);
-        float idf = __get_idf(summary->corpusTokens, currentNode->tokenString);
-
-        currentNode->tfidf = tf * idf;
-        currentNode = currentNode->next;
-    }
-
-    sort_tokens_by_tfidf(summary->tokenList);
 }
 
 void report_tfidf(Summary *summary)
@@ -345,4 +309,57 @@ void report_tfidf(Summary *summary)
     }
 
     summary->outData = temp;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              PRIVATE FUNCTIONS                             */
+/* -------------------------------------------------------------------------- */
+
+TokenList *__convert_to_ngrams(TokenList *tl, int n)
+{
+    TokenList *ngrams = initialize_tokenlist();
+    TokenNode *curr = tl->head;
+    char buff[MAX_CHAR];
+
+    while(curr != NULL) {
+        strcpy(buff, curr->tokenString);
+        
+        int i;
+        TokenNode *window = curr->next;
+        for(i = 1; i < n && window != NULL; i++) {
+            strcat(buff, " ");
+            strcat(buff, window->tokenString);
+            window = window->next;
+        }
+
+        if(i == n) {
+            strcat(buff, "\0");
+
+            char *temp = calloc(strlen(buff) + 1, sizeof(char));
+            strcpy(temp, buff);
+
+            add_token(ngrams, temp);
+        }
+
+        curr = curr->next;
+    }
+    
+    return ngrams;
+}
+
+float __get_idf(TokenList **corpusTokens, char *tokenString)
+{
+    float idf = 0;
+    int numDocsWithKeyword = 0;
+
+    int i = 0;
+    for(i = 0; corpusTokens[i] != NULL; i++) {
+        if(is_token_found(corpusTokens[i], tokenString))
+            numDocsWithKeyword++;
+    }
+
+    if(numDocsWithKeyword != 0)
+        idf = log10f((float)i / numDocsWithKeyword);
+
+    return idf;
 }

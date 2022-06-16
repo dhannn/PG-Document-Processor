@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * 
+ * FILE             .summary.c
+ * LAST MODIFIED    06-16-2020
+ * 
+ * DESCRIPTION
+ *      This file contains the function implementations involving 
+ *      the Summary structure.
+ * 
+ ******************************************************************************/
+
 #include "pgdocs.h"
 #include "deps/internals.h"
 #include <stdlib.h>
@@ -8,7 +19,6 @@
 Mode MODES[] = {
     {
         .index = CLEAN, 
-        .clean_or_analyze = clean_data,
         .commands = {
             {
                 .name = "To Lowercase",
@@ -68,7 +78,6 @@ Mode MODES[] = {
     }, 
     {
         .index = ANALYZE_SINGLE, 
-        .clean_or_analyze = analyze_data__single,
         .commands = {
             {
                 .name = "Word Count",
@@ -101,7 +110,6 @@ Mode MODES[] = {
     },
     {
         .index = ANALYZE_MULTI, 
-        .clean_or_analyze = analyze_data__multi,
         .commands = {
             {
                 .name = "tf-idf",
@@ -223,7 +231,9 @@ void set_outfile(Summary *summary, Config config, char *filename)
 
 void execute_summary(Summary *summary)
 {
-    summary->mode.clean_or_analyze(summary);
+	unsigned int options = summary->option;
+	summary->mode.commands[options].execute_command(summary);
+	summary->mode.commands[options].report_results(summary);
 }
 
 void set_option(Summary *summary, Config config, int rawInput)
@@ -262,6 +272,13 @@ void destroy_summary(Summary *summary)
         summary->infile = NULL;
     }
 
+    if(summary->corpus != NULL) {
+        for(FILE **file = &summary->corpus[0]; *file != NULL; file++)
+            free(*file);
+
+        summary->corpus = NULL;
+    }
+
     if(summary->outfile != NULL) {
         fclose(summary->outfile);
         summary->outfile = NULL;
@@ -272,16 +289,30 @@ void destroy_summary(Summary *summary)
         summary->inData = NULL;
     }
 
+    if(summary->corpusData != NULL) {
+        for(char **data = &summary->corpusData[0]; *data != NULL; data++)
+            free(*data);
+        summary->corpusData = NULL;
+    }
+
     if(summary->outData != NULL) {
         free(summary->outData);
         summary->outData = NULL;
     }
     
     delete_metadata(summary->metadata);
+
     delete_token_strings(summary->tokenList);
 
     if(summary->tokenList != NULL) {
         destroy_tokenList(summary->tokenList);
         summary->tokenList = NULL;
+    }
+        
+    if(summary->corpusTokens != NULL) {
+        for(TokenList **tl = &summary->corpusTokens[0]; *tl != NULL; tl++)
+            destroy_tokenList(*tl);
+
+        summary->corpusTokens = NULL;
     }
 }

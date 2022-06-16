@@ -1,7 +1,7 @@
 /*******************************************************************************
  * 
  * FILE             pgdocs.h
- * LAST MODIFIED    06-11-2022
+ * LAST MODIFIED    06-17-2022
  * 
  * DESCRIPTION
  *      This file contains the function, structure and constants 
@@ -17,13 +17,10 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#define MAX_CHAR        1024
+#define MAX_CHAR        1024    
 #define MAX_OPTIONS     10
 #define MAX_SCREENS     15
 #define MAX_METADATA    5
-
-#define MAX_ANALYZER_OPTIONS 3
-#define MAX_CLEANER_OPTIONS 5
 
 #define MAX_ADD_OPTS 4
 
@@ -59,7 +56,7 @@ typedef enum {
     ENTER_CLEANED_PATH_MENU,
     ENTER_ANALYSIS_PATH_MENU,
     ENTER_NUMBER_CHAR_MENU,
-    ENTER_MULTISELECT_BOOL_MENU,
+    ENTER_NUM_DOCS_BOOL_MENU,
     ENTER_OUTPUT_FILE_MENU,
     EXIT
 } ScreenTag;
@@ -114,7 +111,6 @@ typedef enum {
 
 typedef struct {
     Command commands[MAX_OPTIONS];
-    void (*clean_or_analyze)(Summary*);
     ModeIndex index;
 } Mode;
 
@@ -696,20 +692,163 @@ void report_document_similarity(Summary *summary);
 /*                        ENGINE.C FUNCTION PROTOTYPES                        */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * do_chosen_mode()
+ * asks the user necessary inputs, reads the metadata and content, and 
+ * tokenizes the data
+ * 
+ * @note        this function is considered as a function implementation of 
+ *              the interface, void (*do_option)(ActiveScreen*, Summary*,
+ *              Config*), found in ScreenOption structure
+ * 
+ * @param       ActiveScreen*       pointer to the current screen
+ * @param       Summary*            structure containing necessary information
+ * @param       Config*             the structure containing all config fields
+ */
 void do_chosen_mode(ActiveScreen *active, Summary *summary, Config *config);
 
+/**
+ * do_default_option()
+ * processes the tokenlist and does the specified operation without
+ * additional options
+ * 
+ * @note        this function is considered as a function implementation of 
+ *              the interface, void (*do_option)(ActiveScreen*, Summary*,
+ *              Config*), found in ScreenOption structure
+ * 
+ * @param       ActiveScreen*       pointer to the current screen
+ * @param       Summary*            structure containing necessary information
+ * @param       Config*             the structure containing all config fields
+ */
 void do_default_option(ActiveScreen *active, Summary *summary, Config *config);
+/**
+ * do_clean_options()
+ * executes a single cleaning operation and asks the users to continue or not
+ * 
+ * @note        this function is considered as a function implementation of 
+ *              the interface, void (*do_option)(ActiveScreen*, Summary*,
+ *              Config*), found in ScreenOption structure
+ * 
+ * @param       ActiveScreen*       pointer to the current screen
+ * @param       Summary*            structure containing necessary information
+ * @param       Config*             the structure containing all config fields
+ */
 void do_clean_options(ActiveScreen *active, Summary *summary, Config *config);
+/**
+ * do_ngram_count()
+ * asks the user a value of n and executes ngram
+ * 
+ * @note        this function is considered as a function implementation of 
+ *              the interface, void (*do_option)(ActiveScreen*, Summary*,
+ *              Config*), found in ScreenOption structure
+ * 
+ * @param       ActiveScreen*       pointer to the current screen
+ * @param       Summary*            structure containing necessary information
+ * @param       Config*             the structure containing all config fields
+ */
 void do_ngram_count(ActiveScreen *active, Summary *summary, Config *config);
+/**
+ * do_concordance()
+ * asks the users a keyword and a value of n, and executes concordance
+ * 
+ * @note        this function is considered as a function implementation of 
+ *              the interface, void (*do_option)(ActiveScreen*, Summary*,
+ *              Config*), found in ScreenOption structure
+ * 
+ * @param       ActiveScreen*       pointer to the current screen
+ * @param       Summary*            structure containing necessary information
+ * @param       Config*             the structure containing all config fields
+ */
 void do_concordance(ActiveScreen *active, Summary *summary, Config *config);
+/**
+ * do_doc_similarity()
+ * asks the user another file to compare to and calculates similarity
+ * 
+ * @note        this function is considered as a function implementation of 
+ *              the interface, void (*do_option)(ActiveScreen*, Summary*,
+ *              Config*), found in ScreenOption structure
+ * 
+ * @param       ActiveScreen*       pointer to the current screen
+ * @param       Summary*            structure containing necessary information
+ * @param       Config*             the structure containing all config fields
+ */
 void do_doc_similarity(ActiveScreen *active, Summary *summary, Config *config);
-
+/**
+ * do_doc_similarity()
+ * asks the user another file to compare to and calculates similarity
+ * 
+ * @note        this function is considered as a function implementation of 
+ *              the interface, void (*do_option)(ActiveScreen*, Summary*,
+ *              Config*), found in ScreenOption structure
+ * 
+ * @param       ActiveScreen*       pointer to the current screen
+ * @param       Summary*            structure containing necessary information
+ * @param       Config*             the structure containing all config fields
+ */
 void initialize_config(ActiveScreen *active, Config *config);
-void choose_option(ActiveScreen* active, Summary *summary, Config *config);
+/**
+ * reset_config()
+ * resets the configurations
+ * 
+ * @note        this function is considered as a function implementation of 
+ *              the interface, void (*do_option)(ActiveScreen*, Summary*,
+ *              Config*), found in ScreenOption structure
+ * 
+ * @param       ActiveScreen*       pointer to the current screen
+ * @param       Summary*            structure containing necessary information
+ * @param       Config*             the structure containing all config fields
+ * 
+ */
 void reset_config(ActiveScreen *active, Summary *summary, Config *config);
+/**
+ * load_help()
+ * prints some helpful information to the screen
+ * 
+ * @note        this function is considered as a function implementation of 
+ *              the interface, void (*do_option)(ActiveScreen*, Summary*,
+ *              Config*), found in ScreenOption structure
+ * 
+ * @param       ActiveScreen*       pointer to the current screen
+ * @param       Summary*            structure containing necessary information
+ * @param       Config*             the structure containing all config fields
+ * 
+ */
 void load_help(ActiveScreen* active, Summary *summary, Config *config);
+/**
+ * return_screen()
+ * returns to the previous screen
+ * 
+ * @note        this function is considered as a function implementation of 
+ *              the interface, void (*do_option)(ActiveScreen*, Summary*,
+ *              Config*), found in ScreenOption structure
+ * 
+ * @param       ActiveScreen*       pointer to the current screen
+ * @param       Summary*            structure containing necessary information
+ * @param       Config*             the structure containing all config fields
+ * 
+ */
 void return_screen(ActiveScreen* active, Summary *summary, Config *config);
+/**
+ * save_results()
+ * prints the result from the outdata to the screen and file
+ * 
+ * @note        this function is considered as a function implementation of 
+ *              the interface, void (*do_option)(ActiveScreen*, Summary*,
+ *              Config*), found in ScreenOption structure
+ * 
+ * @param       ActiveScreen*       pointer to the current screen
+ * @param       Summary*            structure containing necessary information
+ * @param       Config*             the structure containing all config fields
+ */
 void save_results(ActiveScreen* active, Summary *summary, Config *config);
+/**
+ * check_if_exit()
+ * checks if the user wants to exit the program
+ * 
+ * @param       Screen[]            all the possible screens
+ * @param       ActiveScreen*       pointer to the current screen
+ * @return      true if exit, false if not
+ */
 bool check_if_exit(Screen screens[], ActiveScreen *active);
 
 #endif

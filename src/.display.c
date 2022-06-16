@@ -1,9 +1,18 @@
+/*******************************************************************************
+ * 
+ * FILE             .display.c
+ * LAST MODIFIED    06-17-2022
+ * 
+ * DESCRIPTION
+ *      This file contains the function implementations of display functions
+ * 
+ ******************************************************************************/
+
 #include "pgdocs.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdarg.h>
 
 #define MAX_WIDTH       85
 #define MAX_HEIGHT      35
@@ -11,8 +20,6 @@
 
 // ansi escape codes
 #define ESC "\x1b"
-
-#define DEBUG 1
 
 #ifdef DEBUG
 #define CLEAR() (ESC)
@@ -131,8 +138,7 @@ char *OPTION_NAMES[][MAX_OPTIONS] = {
         "Default path for cleaned documents",
         "Default path for analyses",
         "Default number for characters to read",
-        "Multi-select?",
-        "Reset config"
+        "Default maximum number of documents to be read in corpus"
     }, 
     {
         "Clean document",
@@ -281,6 +287,9 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
     },
     {
         save_results
+    }, 
+    {
+        NULL
     }
 };
 
@@ -588,6 +597,7 @@ void update_tokenizing(char *current, int words)
 
 void update_processing(int progress, int max)
 {
+    HIDE_CURS();
     if(progress % 1024 == 0) {
         MOVE(1, 1);
         FMT(RESET_COLOR);

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * 
  * FILE             internals.h
- * LAST MODIFIED    04-19-2022
+ * LAST MODIFIED    06-17-2022
  * 
  * DESCRIPTION
  *      This file contains the function, structure and constants declarations
@@ -218,6 +218,16 @@ void destroy_hash_table(HashTable *hashTable);
  *              characters or a single non-alphabetic character (e.g., "1", ".")
  */
 TokenList *tokenize_string(char *input, bool includeSpace);
+
+/**
+ * tokenize_corpus()
+ * separates strings of a corpus to an array of a token list
+ * 
+ * @pre         string is 
+ * @param       char**          array of strings from the corpus
+ * @return                      
+ */
+TokenList **tokenize_corpus(char **corpusData);
 
 /**
  * remove_duplicates_tokens()

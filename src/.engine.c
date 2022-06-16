@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * 
+ * FILE             engine.c
+ * LAST MODIFIED    06-17-2022
+ * 
+ * DESCRIPTION
+ *      This file contains function implementations that combine
+ *      the various lower-level modules. 
+ * 
+ ******************************************************************************/
+
 #include "pgdocs.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -13,6 +24,32 @@
 /* -------------------------------------------------------------------------- */
 /*                         PRIVATE FUNCTION PROTOTYPES                        */
 /* -------------------------------------------------------------------------- */
+/**
+ * prepare_inputs()
+ * sets the summary variables necessary for processing
+ * 
+ * @param       ActiveScreen*           the pointer to the current screen
+ * @param       Summary*                variables relevant for processing
+ * @param       Config                  structure containing configurations
+ */
+void __prepare_inputs(ActiveScreen *active, Summary *summary, Config *config);
+/**
+ * read_data()
+ * 
+ * 
+ * @param       ActiveScreen*           the pointer to the current screen
+ * @param       Summary*                variables relevant for processing
+ * @param       Config                  structure containing configurations
+ */
+void __read_data(ActiveScreen *active, Summary *summary, Config *config);
+/**
+ * get_analyzer_outfile_name()
+ * checks if keyword is in the document and displays error if not
+ * 
+ * @param       ActiveScreen*           the pointer to the current screen
+ * @param       Summary*                variables relevant for processing
+ */
+void __get_analyzer_outfile_name(ActiveScreen *active, Summary *summary);
 /**
  * validate_file()
  * checks if file exists and displays error if invalid
@@ -40,14 +77,11 @@ void __validate_n(ActiveScreen *active, Summary *summary);
  * @param       Config                  structure containing configurations
  */
 void __validate_keyword(ActiveScreen *active, Summary *summary);
-/**
- * get_analyzer_outfile_name()
- * checks if keyword is in the document and displays error if not
- * 
- * @param       ActiveScreen*           the pointer to the current screen
- * @param       Summary*                variables relevant for processing
- */
-void __get_analyzer_outfile_name(ActiveScreen *active, Summary *summary);
+
+
+/* -------------------------------------------------------------------------- */
+/*                              PUBLIC FUNCTIONS                              */
+/* -------------------------------------------------------------------------- */
 
 void initialize_config(ActiveScreen *active, Config *config)
 {
@@ -61,7 +95,7 @@ void initialize_config(ActiveScreen *active, Config *config)
         ENTER_CLEANED_PATH_MENU,
         ENTER_ANALYSIS_PATH_MENU,
         ENTER_NUMBER_CHAR_MENU,
-        ENTER_MULTISELECT_BOOL_MENU
+        ENTER_NUM_DOCS_BOOL_MENU
     };
     
     FILE *configFile = fopen("dat/config", "w");
@@ -81,68 +115,8 @@ void initialize_config(ActiveScreen *active, Config *config)
     }
 }
 
-void __prepare_inputs(ActiveScreen *active, Summary *summary, Config *config)
-{
-    int mode = active->choice - 1;
-    set_mode(summary, mode);
-
-    go_to_screen(active, summary, ENTER_INPUT_FILE_MENU);    
-    set_infile(summary, *config, active->strInput);
-    __validate_file(active, summary, *config);
-}
-
-void __read_data(ActiveScreen *active, Summary *summary, Config *config)
-{
-    ModeIndex index = summary->mode.index;
-
-    read_file(summary, *config);
-    summary->tokenList = tokenize_string(summary->inData, index == CLEAN);
-
-    if(index == ANALYZE_MULTI) {
-        read_corpus(summary, *config);
-        // TODO: @gwen extract method
-        /*************************************************************************/
-        int i;
-        int numTokenList = 1;
-        TokenList **tokenlists = malloc(sizeof(TokenList*));
-
-        for(i = 0; summary->corpusData[i] != NULL; i++) {
-            char *corpusData = summary->corpusData[i];
-
-            if(i >= numTokenList) {
-                numTokenList *= 4;
-                tokenlists = realloc(tokenlists, sizeof(TokenList*) * numTokenList);
-            }
-                            
-            tokenlists[i] = tokenize_string(corpusData, false);
-        }
-        tokenlists[i] = NULL;
-        summary->corpusTokens = tokenlists;
-        /*************************************************************************/
-    }
-}
-
-void do_clean(ActiveScreen *active, Summary *summary, Config *config)
-{
-    __prepare_inputs(active, summary, config);
-    restart_screen();
-    __read_data(active, summary, config);
-
-    go_to_screen(active, summary, CLEAN_DOCUMENT_MENU);
-}
-
-void do_s_analyze(ActiveScreen *active, Summary *summary, Config *config) 
-{
-    __prepare_inputs(active, summary, config);
-    restart_screen();
-    __read_data(active, summary, config);
-
-    go_to_screen(active, summary, SINGLE_ANALYZE_DOCUMENT_MENU);
-}
-
 void do_chosen_mode(ActiveScreen *active, Summary *summary, Config *config) 
 {
-    ModeIndex index = summary->mode.index;
     ScreenTag resultingScreenIndex[] = {
         CLEAN_DOCUMENT_MENU,
         SINGLE_ANALYZE_DOCUMENT_MENU,
@@ -150,6 +124,7 @@ void do_chosen_mode(ActiveScreen *active, Summary *summary, Config *config)
     };
 
     __prepare_inputs(active, summary, config);
+    ModeIndex index = summary->mode.index;
 
     if(index == ANALYZE_MULTI)
         initialize_corpus(summary, *config);
@@ -197,6 +172,7 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
         go_to_screen(active, summary, CLEAN_DOCUMENT_MENU);
         
         set_option(summary, *config, choice);
+        restart_screen();
         execute_summary(summary);
 
         restart_screen();
@@ -210,39 +186,6 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
     save_results(active, summary, config);
     destroy_summary(summary);
 
-    go_to_screen(active, summary, MAIN_MENU);
-}
-
-void do_clean_all(ActiveScreen *active, Summary *summary, Config *config)
-{
-    int choice = active->choice - 1;
-    set_option(summary, *config, choice);
-
-    restart_screen();
-    execute_summary(summary);
-
-    go_to_screen(active, summary, ENTER_OUTPUT_FILE_MENU);
-    set_outfile(summary, *config, active->strInput);
-    
-    save_results(active, summary, config);
-    destroy_summary(summary);
-
-    go_to_screen(active, summary, MAIN_MENU);
-}
-
-void do_word_count(ActiveScreen *active, Summary *summary, Config *config) 
-{
-    int choice = active->choice - 1;
-    set_option(summary, *config, choice);
-
-    restart_screen();
-    execute_summary(summary);
-
-    __get_analyzer_outfile_name(active, summary);
-    set_outfile(summary, *config, active->strInput);
-
-    save_results(active, summary, config);
-    destroy_summary(summary);
     go_to_screen(active, summary, MAIN_MENU);
 }
 
@@ -294,26 +237,9 @@ void do_concordance(ActiveScreen *active, Summary *summary, Config *config)
     go_to_screen(active, summary, MAIN_MENU);
 }
 
-void do_tfidf(ActiveScreen *active, Summary *summary, Config *config) 
-{
-    int choice = active->choice - 1;
-    set_option(summary, *config, choice);
-
-    __get_analyzer_outfile_name(active, summary);
-    set_outfile(summary, *config, active->strInput);
-    
-    restart_screen();
-    execute_summary(summary);
-
-    save_results(active, summary, config);
-    destroy_summary(summary);
-
-    go_to_screen(active, summary, MAIN_MENU);
-}
-
 void do_doc_similarity(ActiveScreen *active, Summary *summary, Config *config) 
 {
-    
+    return;   
 }
 
 void reset_config(ActiveScreen *active, Summary *summary, Config *config)
@@ -323,7 +249,7 @@ void reset_config(ActiveScreen *active, Summary *summary, Config *config)
 
 void load_help(ActiveScreen* active, Summary *summary, Config *config)
 {
-    
+    return;
 }
 
 void return_screen(ActiveScreen* active, Summary *summary, Config *config)
@@ -356,6 +282,44 @@ bool check_if_exit(Screen screens[], ActiveScreen *active)
 /*                      PRIVATE FUNCTION IMPLEMENTATIONS                      */
 /* -------------------------------------------------------------------------- */
 
+void __prepare_inputs(ActiveScreen *active, Summary *summary, Config *config)
+{
+    int mode = active->choice - 1;
+    set_mode(summary, mode);
+
+    go_to_screen(active, summary, ENTER_INPUT_FILE_MENU);    
+    set_infile(summary, *config, active->strInput);
+    __validate_file(active, summary, *config);
+}
+
+void __read_data(ActiveScreen *active, Summary *summary, Config *config)
+{
+    ModeIndex index = summary->mode.index;
+
+    read_file(summary, *config);
+    summary->tokenList = tokenize_string(summary->inData, index == CLEAN);
+
+    if(index == ANALYZE_MULTI) {
+        read_corpus(summary, *config);
+        summary->corpusTokens = tokenize_corpus(summary->corpusData);
+    }
+}
+
+void __get_analyzer_outfile_name(ActiveScreen *active, Summary *summary)
+{
+    char filename[MAX_CHAR] = "";
+    int option = summary->option;
+    char *suffix = summary->mode.commands[option].fileSuffix;
+    char *original = strtok(summary->infilename, ".");
+    
+    strcpy(filename, original);
+    strcat(filename, "_");
+    strcat(filename, suffix);
+    strcat(filename, ".txt");
+
+    strcpy(active->strInput, filename);
+}
+
 void __validate_file(ActiveScreen *active, Summary *summary, Config config)
 {
     while(summary->infile == NULL) {
@@ -380,19 +344,4 @@ void __validate_keyword(ActiveScreen *active, Summary *summary)
         display_error(ERR_INVALID_KEYWORD);
         go_to_screen(active, summary, ENTER_KEYWORD_MENU);
     }
-}
-
-void __get_analyzer_outfile_name(ActiveScreen *active, Summary *summary)
-{
-    char filename[MAX_CHAR] = "";
-    int option = summary->option;
-    char *suffix = summary->mode.commands[option].fileSuffix;
-    char *original = strtok(summary->infilename, ".");
-    
-    strcpy(filename, original);
-    strcat(filename, "_");
-    strcat(filename, suffix);
-    strcat(filename, ".txt");
-
-    strcpy(active->strInput, filename);
 }

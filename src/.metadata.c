@@ -1,13 +1,21 @@
+/*******************************************************************************
+ * 
+ * FILE             .metadata.c
+ * LAST MODIFIED    06-16-2020
+ * 
+ * DESCRIPTION
+ *      This file contains the function implementations involving 
+ *      the Metadata structure.
+ * 
+ ******************************************************************************/
+
 #include "pgdocs.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <math.h>
 
 #define NOT_METADATA -1
-
-char *_get_starting_token(Mode mode);
 
 const char *METADATA_ITEM_NAMES[] = {
     "Title",
