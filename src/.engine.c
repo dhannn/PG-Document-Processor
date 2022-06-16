@@ -183,6 +183,11 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
     while(in == 'Y' || in == 'y') {
         go_to_screen(active, summary, CLEAN_DOCUMENT_MENU);
         
+        if(active->choice == active->current->numOptions) {
+            destroy_summary(summary);
+            return;
+        } 
+        
         set_option(summary, *config, choice);
         restart_screen();
         execute_summary(summary);
@@ -262,9 +267,36 @@ void reset_config(ActiveScreen *active, Summary *summary, Config *config)
     remove(CONFIG_FILE);
 }
 
+#define HELP_FILE   "dat/help.txt"
+#define MAX_HEIGHT  10
+
 void load_help(ActiveScreen* active, Summary *summary, Config *config)
 {
-    return;
+    FILE *help = fopen(HELP_FILE, "r");
+    char buff[MAX_CHAR] = "";
+    
+    char *flag = fgets(buff, 85 + 1, help);
+    
+    int linesRead = 0;
+
+    CLEAR();
+    MOVE(1, 1);
+    while(flag != NULL) {
+        fprintf(stdout, "%s", buff);
+
+        flag = fgets(buff, 85 + 1, help);
+        linesRead++;
+
+        if(linesRead % MAX_HEIGHT == 0) {
+            printf("\n(Press any key to proceed)");
+            fflush(stdin);
+            scanf("%*c");
+            CLEAR();
+            MOVE(1, 1);
+        }
+    }
+
+    fclose(help);
 }
 
 void return_screen(ActiveScreen* active, Summary *summary, Config *config)
