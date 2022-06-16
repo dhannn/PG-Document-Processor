@@ -1,20 +1,20 @@
 What is Project Gutenberg (PG)?
 Project Gutenberg is a massive library of open-access books. Because of its huge 
-collection, PG documents have been used in data analysis/text mining softwares.
-
+collection, PG documents have been used in data analysis text mining softwares.
+ 
 ------------------------------------------------------------------------------------
-
+ 
 How does this program process a PG document?
 This program has two modes -- data cleaning and data analysis. 
-
+ 
 Data cleaning allows the user to make their document suitable for analysis. 
 It does this by ensuring that the elements of the text are the most useful.
-
+ 
 Data analysis, on the other hand, involves determining key features of the text.
 This mode has two more sub-modes -- single-file analysis and multi-file analyis.
-
+ 
 ------------------------------------------------------------------------------------
-
+ 
 What are the options for data cleaning?
 * Lowercase
     makes all the text lowercase
@@ -27,9 +27,9 @@ What are the options for data cleaning?
 * Stopword removal
     removes common words such as "the", "a" and "an" among others
 * Simple stemming
-
+ 
 ------------------------------------------------------------------------------------
-
+ 
 What are the options for data analysis?
 * Single-File Analysis
     * Word Count

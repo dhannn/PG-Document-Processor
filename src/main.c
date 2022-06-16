@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include "pgdocs.h"
 
+#define DEBUG 1
+
 int main()
 {
     ActiveScreen activeScreen;
