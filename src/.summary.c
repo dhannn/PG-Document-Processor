@@ -126,6 +126,19 @@ Mode MODES[] = {
 
 #define MAX_ANALYZER_OPTIONS 3
 
+void initialize_summary(Summary *summary)
+{
+    initialize_metadata(summary->metadata);
+    summary->infile = NULL;
+    summary->inData = NULL;
+    summary->tokenList = NULL;
+    summary->corpus = NULL;
+    summary->corpusData = NULL;
+    summary->corpusTokens = NULL;
+    summary->outData = NULL;
+    summary->outfile = NULL;
+}
+
 void set_mode(Summary *summary, ModeIndex mode)
 {
     summary->mode = MODES[mode];
@@ -168,8 +181,7 @@ void initialize_corpus(Summary *summary, Config config)
     int numFile = 1;
 
     while(entity != NULL && filesRead < config.numDocs) {
-        if(__check_if_txt_file(entity->d_name))
-        {
+        if(__check_if_txt_file(entity->d_name)) {
             char tempName[MAX_CHAR] = "";
             
             strcpy(tempName, corpusPath);
@@ -245,12 +257,31 @@ void set_add_int(Summary *summary, int addInt)
 
 void destroy_summary(Summary *summary)
 {
-    fclose(summary->infile);
-    fclose(summary->outfile);
-    free(summary->inData);
-    free(summary->outData);
+    if(summary->infile != NULL) {
+        fclose(summary->infile);
+        summary->infile = NULL;
+    }
+
+    if(summary->outfile != NULL) {
+        fclose(summary->outfile);
+        summary->outfile = NULL;
+    }
+
+    if(summary->inData != NULL) {
+        free(summary->inData);
+        summary->inData = NULL;
+    }
+
+    if(summary->outData != NULL) {
+        free(summary->outData);
+        summary->outData = NULL;
+    }
     
     delete_metadata(summary->metadata);
     delete_token_strings(summary->tokenList);
-    destroy_tokenList(summary->tokenList);
+
+    if(summary->tokenList != NULL) {
+        destroy_tokenList(summary->tokenList);
+        summary->tokenList = NULL;
+    }
 }

@@ -44,15 +44,16 @@ TokenList *tokenize_string(char *input, bool includeSpace)
             strncpy(temp, ptrStartChar, charCount);
             add_token(tokenlist, temp);
 
-            // resets the pointer to the new non-alphabetic char
+            // resets the pointer to the new char
             ptrStartChar = curr;
             charCount = 1;
 
+            // for updating
             numWords++;
-            update_tokenizing(temp, numWords);
+            // update_tokenizing(temp, numWords);
         }
 
-        isPrevAlpha = isalpha(*curr);
+        isPrevAlpha = isCurrAlpha;
         curr++;
     }
     
@@ -167,6 +168,7 @@ char *create_string(char *str)
 
 void delete_token_strings(TokenList *tokenList)
 {
+    if(tokenList == NULL) return;
     TokenNode *tokenNode = tokenList->head;
 
     while(tokenNode != NULL) {

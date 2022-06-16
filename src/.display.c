@@ -11,8 +11,16 @@
 
 // ansi escape codes
 #define ESC "\x1b"
+
+#define DEBUG 1
+
+#ifdef DEBUG
+#define CLEAR() (ESC)
+#define MOVE(ROW, COL) (ESC)
+#else
 #define CLEAR() (printf("%s[2J", (ESC)))
 #define MOVE(ROW, COL) (printf("%s[%d;%df", (ESC), (ROW), (COL)))
+#endif
 #define FMT(X) (printf("%s[%dm", (ESC), (X)))
 #define HIDE_CURS() (printf("%s[?25l", (ESC)))
 #define SHOW_CURS() (printf("%s[?25h", (ESC)))
@@ -223,9 +231,9 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
         reset_config
     },
     {
-        do_clean,
-        do_s_analyze,
-        do_m_analyze
+        do_chosen_mode,
+        do_chosen_mode,
+        do_chosen_mode
     },
     {
         NULL
@@ -236,15 +244,15 @@ void (*DO_OPTION[][MAX_OPTIONS])(ActiveScreen*, Summary*, Config*) = {
         do_clean_options,
         do_clean_options,
         do_clean_options,
-        do_clean_all
+        do_default_option
     },
     {
-        do_word_count,
+        do_default_option,
         do_ngram_count,
         do_concordance
     },
     {
-        do_tfidf,
+        do_default_option,
         do_doc_similarity
     }, 
     {
@@ -280,12 +288,14 @@ void __validate_screen_option(ActiveScreen *active);
 void __extract_options(Screen *screens, int index);
 void __extract_back_index(Screen *screens, int index);
 
-bool __validate_choice(ActiveScreen *active)
-{   
-    int choice = active->choice;
+void __validate_choice(ActiveScreen *active, Summary *summary, int index)
+{
     int maxNumOptions = active->current->numOptions;
 
-    return choice < 0 || choice > maxNumOptions - 1;
+    while(active->choice <= 0 || active->choice > maxNumOptions) {
+        display_error(ERR_INVALID_CHOICE);
+        go_to_screen(active, summary, index);
+    }
 }
 
 void initialize_screens(ActiveScreen *screen)
@@ -415,7 +425,7 @@ void go_to_screen(ActiveScreen *active, Summary *summary, int index)
     active->current->get_input(active);
 
     if(active->current->get_input == get_choice) {
-        __validate_choice(active);
+        __validate_choice(active, summary, index);
     }
 }
 

@@ -7,7 +7,7 @@
  * certify that we have not copied in part or whole or otherwise plagiarized 
  * the work of other students and/or persons.
  * 
- *                                      Daniel Ramos,   DLSU ID# 1213136
+ *                                      Daniel Ramos,   DLSU ID# 12131369
  *                                      Gwen Roco,      DLSU ID# 12115207
  * 
  *******************************************************************************/
@@ -37,6 +37,7 @@ int main()
 
     initialize_screens(&activeScreen);
     initialize_config(&activeScreen, &config);
+    initialize_summary(&summary);
 
     go_to_screen(&activeScreen, &summary, MAIN_MENU);
 
@@ -52,6 +53,9 @@ int main()
             &config);
         
     } while(!check_if_exit(activeScreen.screens, &activeScreen));
+
+    
+    destroy_summary(&summary);
 
     return 0;
 }

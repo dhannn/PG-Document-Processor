@@ -207,7 +207,8 @@ void get_concordance(Summary *summary)
             char buff[MAX_CHAR] = "";
             int num = 0;
             TokenNode *tempNode = startOfWindow;
-
+            
+            // concatenate the words before the keyword
             for(int i = 0; i < n; i++) {
                 strcat(buff, tempNode->tokenString);
                 strcat(buff, " ");
@@ -216,6 +217,7 @@ void get_concordance(Summary *summary)
                 num++;
             }
 
+            // concatenate the keyword and the words after it
             for(int i = 0; i <= n && (tempNode + i) != NULL; i++) {
                 strcat(buff, tempNode->tokenString);
 
@@ -226,6 +228,8 @@ void get_concordance(Summary *summary)
                 num++;
             }
 
+            // only add the concatenated buffer if complete 
+            // (i.e. n words before and n words after)
             if(num == 2 * n + 1) {
                 int length = strlen(buff);
                 char *temp = calloc(length + 1, 1);
@@ -293,10 +297,12 @@ void get_tfidf(Summary *summary)
 {
     get_word_count(summary);
 
-    TokenNode *currentNode = summary->tokenList->head;
-
+    TokenList *tokenlist = summary->tokenList;
+    TokenNode *currentNode = tokenlist->head;
+    
+    float maxFreq = (float)currentNode->frequency;
     while(currentNode != NULL) {
-        float tf = (float)currentNode->frequency;
+        float tf = 0.5 + 0.5 * ((float)currentNode->frequency / maxFreq);
         float idf = __get_idf(summary->corpusTokens, currentNode->tokenString);
 
         currentNode->tfidf = tf * idf;

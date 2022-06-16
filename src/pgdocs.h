@@ -317,6 +317,8 @@ void print_concordance(Summary *summary);
 /* -------------------------------------------------------------------------- */
 // encapsulates the request and the needed variables in one structure
 
+void initialize_summary(Summary *summary);
+
 /**
  * execute_summary()
  * runs the command based on the entered information
@@ -694,19 +696,12 @@ void report_document_similarity(Summary *summary);
 /*                        ENGINE.C FUNCTION PROTOTYPES                        */
 /* -------------------------------------------------------------------------- */
 
-void do_clean(ActiveScreen *active, Summary *summary, Config *config);
-void do_s_analyze(ActiveScreen *active, Summary *summary, Config *config);
-void do_m_analyze(ActiveScreen *active, Summary *summary, Config *config);
+void do_chosen_mode(ActiveScreen *active, Summary *summary, Config *config);
+
+void do_default_option(ActiveScreen *active, Summary *summary, Config *config);
 void do_clean_options(ActiveScreen *active, Summary *summary, Config *config);
-void do_remove_special(ActiveScreen *active, Summary *summary, Config *config);
-void do_remove_numbers(ActiveScreen *active, Summary *summary, Config *config);
-void do_clean_whitespace(ActiveScreen *active, Summary *summary, Config *config);
-void do_remove_stopwords(ActiveScreen *active, Summary *summary, Config *config);
-void do_clean_all(ActiveScreen *active, Summary *summary, Config *config);
-void do_word_count(ActiveScreen *active, Summary *summary, Config *config);
 void do_ngram_count(ActiveScreen *active, Summary *summary, Config *config);
 void do_concordance(ActiveScreen *active, Summary *summary, Config *config);
-void do_tfidf(ActiveScreen *active, Summary *summary, Config *config);
 void do_doc_similarity(ActiveScreen *active, Summary *summary, Config *config);
 
 void initialize_config(ActiveScreen *active, Config *config);
@@ -714,9 +709,6 @@ void choose_option(ActiveScreen* active, Summary *summary, Config *config);
 void reset_config(ActiveScreen *active, Summary *summary, Config *config);
 void load_help(ActiveScreen* active, Summary *summary, Config *config);
 void return_screen(ActiveScreen* active, Summary *summary, Config *config);
-void get_filename(ActiveScreen* active, Summary *summary, Config *config);
-void get_add_opts(ActiveScreen* active, Summary *summary, Config *config);
-void do_processing(ActiveScreen* active, Summary *summary, Config *config);
 void save_results(ActiveScreen* active, Summary *summary, Config *config);
 bool check_if_exit(Screen screens[], ActiveScreen *active);
 

@@ -35,6 +35,7 @@ typedef struct tk_n {
 typedef struct {
     TokenNode *head;        // the first token in the list
     TokenNode *iterator;    // pointer to the current node
+    TokenNode *lastNode;    // pointer to the current node
     int size;               // number of elements in the token list
 } TokenList;
 

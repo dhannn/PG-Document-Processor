@@ -48,7 +48,9 @@ int get_metadata_index(MetadataItem metadataItems[], char *fieldName)
 void delete_metadata(MetadataItem metadata[])
 {
     for(int i = 0; i < MAX_METADATA; i++) {
-        if(metadata[i].data != NULL)
+        if(metadata[i].data != NULL) {
             free(metadata[i].data);
+            metadata[i].data = NULL;
+        }
     }
 }

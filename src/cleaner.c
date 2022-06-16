@@ -237,7 +237,7 @@ void remove_stopwords (Summary *summary)
 		}
 
 		numTokens++;
-        update_processing(numTokens, summary->tokenList->size);
+        update_processing(numTokens, oldTokenlist->size);
 
 		currentNode = currentNode->next;
 	}
@@ -300,9 +300,9 @@ void report_cleaned(Summary *summary)
         tokenNode = tokenNode->next;
     }
 
-	char *oldOutdata = summary->outData;
-    summary->outData = temp;
+	if(summary->outData != NULL) {
+		free(summary->outData);
+	}
 	
-	if(summary->outData != NULL)
-		free(oldOutdata);
+    summary->outData = temp;
 }

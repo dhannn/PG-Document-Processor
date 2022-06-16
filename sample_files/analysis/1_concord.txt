@@ -1,0 +1,14 @@
+also referred to as text data mining , similar 
+mining , similar to text analytics , is the 
+- quality information from text . it involves " 
+three different perspectives of text mining : information extraction 
+. [ 2 ] text mining usually involves the 
+of structuring the input text ( usually parsing , 
+high quality ' in text mining usually refers to 
+and interest . typical text mining tasks include text 
+text mining tasks include text categorization , text clustering 
+include text categorization , text clustering , concept / 
+named entities ) . text analysis involves information retrieval 
+essentially , to turn text into data for analysis 
+element while starting with text mining . here , 
+, 

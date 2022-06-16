@@ -32,6 +32,7 @@ TokenList *initialize_tokenlist()
 {
     TokenList *tokenList = malloc(sizeof(TokenList));
 
+    tokenList->lastNode = NULL;
     tokenList->head = NULL;
     tokenList->iterator = tokenList->head;
     tokenList->size = 0;
@@ -49,12 +50,18 @@ void add_token(TokenList *tokenList, char *token)
     temp->tokenType = type;
     temp->next = NULL;
 
-    TokenNode **ptrToNode = &tokenList->head;
+    // TokenNode **ptrToNode = &tokenList->head;
 
-    while(*ptrToNode != NULL)
-        ptrToNode = &(*ptrToNode)->next;
-    
-    *ptrToNode = temp;
+    // while(*ptrToNode != NULL)
+    //     ptrToNode = &(*ptrToNode)->next;
+
+    if(tokenList->lastNode == NULL) {
+        tokenList->head = temp;
+    } else {
+        tokenList->lastNode->next = temp;
+    }
+
+    tokenList->lastNode = temp;
     tokenList->size++;
 
     if(tokenList->iterator == NULL)
