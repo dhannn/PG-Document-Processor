@@ -30,21 +30,38 @@ void __validate_n (ActiveScreen *active, Summary *summary)
     }
 }
 
+//TO FIXXX
 void __validate_keyword (ActiveScreen *active, Summary *summary)
 {
     int flag = 0;
     int n = active->nInput;
-    int size = summary->tokenList->size;
     TokenNode *currentNode = summary->tokenList->head;
 
-    for(int i = 0; i < n; i++)
+    for(int i = 0; i < n && currentNode != NULL; i++)
+    {
+        if(currentNode->tokenType == SPECIAL)
+            i--;
+
+        currentNode = currentNode->next;
+    }
+
+    TokenNode *endNode = currentNode;
+
+    for(int i = 0; i < n && endNode != NULL; i++)
+        endNode = endNode->next;
+
+    while(flag == 0 && endNode != NULL)
+    {
+        while(endNode->tokenType == SPECIAL)
+            endNode = endNode->next;
+
+        if(strcmp(active->strInput, currentNode->tokenString) == 0 && endNode != NULL)
+            flag = 1;
+
         currentNode = currentNode->next;
 
-    for(int j = 0; j < size - (n + n) && flag == 0 && currentNode != NULL; j++)
-    {
-        if(strcmp(active->strInput, currentNode->tokenString) == 0)
-            flag = 1;
-        currentNode = currentNode->next;
+        if(endNode != NULL)
+            endNode = endNode->next;
     }
 
     while(flag == 0)
@@ -54,14 +71,32 @@ void __validate_keyword (ActiveScreen *active, Summary *summary)
     
         currentNode = summary->tokenList->head;
 
-        for(int i = 0; i < n; i++)
+        // setting the current Node
+        for(int i = 0; i < n && currentNode != NULL; i++)
+        {
+            if(currentNode->tokenType == SPECIAL)
+                i--;
+
+            currentNode = currentNode->next;
+        }
+
+        endNode = currentNode;
+
+        for(int i = 0; i < n && endNode != NULL; i++)
+            endNode = endNode->next;
+
+        while(flag == 0 && endNode != NULL)
+        {
+            while(endNode->tokenType == SPECIAL)
+                endNode = endNode->next;
+
+            if(strcmp(active->strInput, currentNode->tokenString) == 0 && endNode != NULL)
+                flag = 1;
+
             currentNode = currentNode->next;
 
-        for(int j = 0; j < size - (n + n) && flag == 0 && currentNode != NULL; j++)
-        {
-            if(strcmp(active->strInput, currentNode->tokenString) == 0)
-                flag = 1;
-            currentNode = currentNode->next;
+            if(endNode != NULL)
+                endNode = endNode->next;
         }
     }
 }

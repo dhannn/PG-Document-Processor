@@ -58,9 +58,9 @@ TokenList *tokenize_string(char *input, bool includeSpace)
     
     // allocates the last token that wasn't processed 
     // due to the null byte condition
-    // char *temp = calloc(charCount + 1, sizeof(char));
-    // strncpy(temp, ptrStartChar, charCount);
-    // add_token(tokenlist, temp);
+    char *temp = calloc(charCount + 1, sizeof(char));
+    strncpy(temp, ptrStartChar, charCount);
+    add_token(tokenlist, temp);       
 
     return tokenlist;
 }

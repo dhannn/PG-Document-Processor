@@ -1,0 +1,6 @@
+gwen: 2
+the: 2
+danyn: 1
+rawrs: 1
+loud: 1
+.: 1
