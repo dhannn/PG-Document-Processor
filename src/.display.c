@@ -484,17 +484,15 @@ void print_token_frequency(Summary *summary)
 {
     FILE *outfile = summary->outfile;
     char *results = summary->outData;
-    int flag;
     char buff[MAX_CHAR];
     int len = 0;
     int linesRead = 0;
+    int flag = sscanf(results + len, "%[^\n]\ns", buff);
     
     CLEAR();
     MOVE(1, 1);
 
-    do {
-        flag = sscanf(results + len, "%[^\n]\ns", buff);
-        
+    while(flag != EOF) {
         if(linesRead < 10)
             fprintf(stdout, "%s\n", buff);
         
@@ -502,7 +500,9 @@ void print_token_frequency(Summary *summary)
         
         len += strlen(buff) + 1; // the "+ 1" accounts for the newline
         linesRead++;
-    } while(flag != EOF);
+        
+        flag = sscanf(results + len, "%[^\n]\ns", buff);
+    }
 }
 
 void print_concordance(Summary *summary)
