@@ -77,6 +77,15 @@ void __validate_n(ActiveScreen *active, Summary *summary);
  * @param       Config                  structure containing configurations
  */
 void __validate_keyword(ActiveScreen *active, Summary *summary);
+/**
+ * __get_continue()
+ * continuously accepts input until in is valid for continuing screen
+ * 
+ * @param       in                      user input to continue or not
+ * @return      char value of valid input
+ */
+int __get_continue(char in);
+
 
 
 /* -------------------------------------------------------------------------- */
@@ -168,6 +177,9 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
     printf("Continue cleaning? [Y or N]: ");
     scanf(" %c", &in);
 
+    if(in != 'Y' && in != 'y' && in != 'N' && in != 'N' && in != 'n') 
+        in = __get_continue(in);
+
     while(in == 'Y' || in == 'y') {
         go_to_screen(active, summary, CLEAN_DOCUMENT_MENU);
         
@@ -178,6 +190,9 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
         restart_screen();
         printf("Continue cleaning? [Y or N]: ");
         scanf(" %c", &in);
+
+        if(in != 'Y' && in != 'y' && in != 'N' && in != 'N' && in != 'n') 
+            in = __get_continue(in);
     }
 
     go_to_screen(active, summary, ENTER_OUTPUT_FILE_MENU);
@@ -343,5 +358,15 @@ void __validate_keyword(ActiveScreen *active, Summary *summary)
     while(!is_token_found(summary->tokenList, active->strInput)) {
         display_error(ERR_INVALID_KEYWORD);
         go_to_screen(active, summary, ENTER_KEYWORD_MENU);
+    }
+}
+
+int __get_continue(char in)
+{
+    while(in != 'Y' && in != 'y' && in != 'N' && in != 'N' && in != 'n') {
+        CLEAR();
+        MOVE(1,1);
+        printf("Invalid input!\nContinue cleaning? [Y or N]: ");
+        scanf(" %c", &in);
     }
 }
