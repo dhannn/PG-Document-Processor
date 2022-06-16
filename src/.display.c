@@ -657,7 +657,7 @@ void display_error(ErrorCode errorCode)
         "File not found",
         "Invalid choice",
         "Invalid value of N",
-        "Keyword not found in text",
+        "Invalid keyword",
         "Memory allocation failed. No memory left"
     };
 

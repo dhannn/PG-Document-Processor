@@ -32,9 +32,37 @@ void __validate_n (ActiveScreen *active, Summary *summary)
 
 void __validate_keyword (ActiveScreen *active, Summary *summary)
 {
-    while(!is_token_found(summary->tokenList, active->strInput)) {
+    int flag = 0;
+    int n = active->nInput;
+    int size = summary->tokenList->size;
+    TokenNode *currentNode = summary->tokenList->head;
+
+    for(int i = 0; i < n; i++)
+        currentNode = currentNode->next;
+
+    for(int j = 0; j < size - (n + n) && flag == 0 && currentNode != NULL; j++)
+    {
+        if(strcmp(active->strInput, currentNode->tokenString) == 0)
+            flag = 1;
+        currentNode = currentNode->next;
+    }
+
+    while(flag == 0)
+    {
         display_error(ERR_INVALID_KEYWORD);
         go_to_screen(active, summary, ENTER_KEYWORD_MENU);
+    
+        currentNode = summary->tokenList->head;
+
+        for(int i = 0; i < n; i++)
+            currentNode = currentNode->next;
+
+        for(int j = 0; j < size - (n + n) && flag == 0 && currentNode != NULL; j++)
+        {
+            if(strcmp(active->strInput, currentNode->tokenString) == 0)
+                flag = 1;
+            currentNode = currentNode->next;
+        }
     }
 }
 
@@ -226,14 +254,13 @@ void do_concordance(ActiveScreen *active, Summary *summary, Config *config)
     int choice = active->choice - 1;
     set_option(summary, *config, choice);
 
-    go_to_screen(active, summary, ENTER_KEYWORD_MENU);
-    
-    __validate_keyword (active, summary);
-    set_add_str(summary, active->strInput);
-
     go_to_screen(active, summary, ENTER_N_MENU);
    __validate_n(active, summary);
     set_add_int(summary, active->nInput); 
+
+    go_to_screen(active, summary, ENTER_KEYWORD_MENU);
+    __validate_keyword (active, summary);
+    set_add_str(summary, active->strInput);
 
     restart_screen();
     execute_summary(summary);
