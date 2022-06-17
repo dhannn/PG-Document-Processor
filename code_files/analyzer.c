@@ -212,7 +212,7 @@ void report_token_frequency(Summary *summary)
     int numChar = 0;
 
     while(tokenNode != NULL) {
-        sprintf(buff, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
+        sprintf(buff, "%10s % 5d\n", tokenNode->tokenString, tokenNode->frequency);
         buff[strlen(buff)] = '\0';
 
         runningTotal += strlen(buff);
@@ -242,9 +242,9 @@ void report_ngram_count(Summary *summary)
     int n = 0;
     while(tokenNode != NULL) {
         if(n < 10)
-            fprintf(stdout, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
+            fprintf(stdout, "%s:\t\t% 5d\n", tokenNode->tokenString, tokenNode->frequency);
 
-        fprintf(summary->outfile, "%s: %d\n", tokenNode->tokenString, tokenNode->frequency);
+        fprintf(summary->outfile, "%s: % 5d\n", tokenNode->tokenString, tokenNode->frequency);
         
         tokenNode = next_token(list);
         n++;
@@ -290,7 +290,7 @@ void report_tfidf(Summary *summary)
     int numChar = 0;
 
     while(tokenNode != NULL) {
-        sprintf(buff, "%s: %.2f\n", tokenNode->tokenString, tokenNode->tfidf);
+        sprintf(buff, "%20s:\t% 5.2f\n", tokenNode->tokenString, tokenNode->tfidf);
         buff[strlen(buff)] = '\0';
 
         runningTotal += strlen(buff);

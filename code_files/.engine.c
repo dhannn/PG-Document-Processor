@@ -108,13 +108,11 @@ void initialize_config(ActiveScreen *active, Config *config)
     };
     
     FILE *configFile = fopen("dat/config", "w");
-    fclose(configFile);
 
     for(int i = 0; i < 5; i++) {
         int index = CONFIG_SCREENS[i];
         
         go_to_screen(active, NULL, index);
-        active->current->get_input(active);
 
         if(i < 3) {
             set_config_path(config, i, active->strInput);
@@ -122,6 +120,8 @@ void initialize_config(ActiveScreen *active, Config *config)
             set_config_int(config, i, active->choice);
         }
     }
+    
+    fclose(configFile);
 }
 
 void do_chosen_mode(ActiveScreen *active, Summary *summary, Config *config) 

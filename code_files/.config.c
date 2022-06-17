@@ -36,8 +36,8 @@ bool check_config_initialized()
 
     if(configFile == NULL)
         flag = false;
-
-    fclose(configFile);
+    else
+        fclose(configFile);
 
     return flag;
 }
