@@ -237,7 +237,6 @@ void do_concordance(ActiveScreen *active, Summary *summary, Config *config)
     set_option(summary, *config, choice);
 
     go_to_screen(active, summary, ENTER_KEYWORD_MENU);
-    
     __validate_keyword (active, summary);
     set_add_str(summary, active->strInput);
 

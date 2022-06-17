@@ -44,24 +44,23 @@ TokenList *tokenize_string(char *input, bool includeSpace)
             strncpy(temp, ptrStartChar, charCount);
             add_token(tokenlist, temp);
 
-            // resets the pointer to the new char
+            // resets the pointer to the new non-alphabetic char
             ptrStartChar = curr;
             charCount = 1;
 
-            // for updating
             numWords++;
-            // update_tokenizing(temp, numWords);
+            update_tokenizing(temp, numWords);
         }
 
-        isPrevAlpha = isCurrAlpha;
+        isPrevAlpha = isalpha(*curr);
         curr++;
     }
     
     // allocates the last token that wasn't processed 
     // due to the null byte condition
-    // char *temp = calloc(charCount + 1, sizeof(char));
-    // strncpy(temp, ptrStartChar, charCount);
-    // add_token(tokenlist, temp);
+    char *temp = calloc(charCount + 1, sizeof(char));
+    strncpy(temp, ptrStartChar, charCount);
+    add_token(tokenlist, temp);       
 
     return tokenlist;
 }
