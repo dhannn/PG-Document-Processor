@@ -41,7 +41,6 @@ The key `HKEY_CURRENT_USER/Console/VirtualTerminalLevel` sets the default behavi
 
 ### Windows Terminal
 The new [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701) supports ANSI escape code without adjustments.
-# Installation
 
 # Features & Use Cases
 
@@ -77,8 +76,8 @@ This feature provides context by highlighting the surrounding words of a key ter
 #### tf-idf
 This feature is similar to the word count and n-gram count but it considers the relative term frequency of other documents in a corpus of text.
 
-#### Document similarity
+#### Document similarity (not implemented)
 This feature computes the similarity of two documents either based on bag-of-words model (i.e. term frequency) or tf-idf
 
-#### Document clustering
+#### Document clustering (not implemented)
 This feature assigns documents in a corpus to clusters either based on the bag-of-words model or tf-idf.

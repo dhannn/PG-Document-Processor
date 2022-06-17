@@ -126,8 +126,9 @@ void get_concordance(Summary *summary)
     TokenNode *curr = oldTokenlist->head;
     TokenNode *startOfWindow = curr;
 
-    for(int i = 0; i < n && curr != NULL; i++)
+    for(int i = 0; i < n && curr != NULL; i++) {
         curr = curr->next;
+    }
 
     while(curr != NULL) {
         if(strcmp(curr->tokenString, keyword) == 0) {
