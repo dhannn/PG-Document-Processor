@@ -52,6 +52,8 @@ void get_word_count(Summary *summary)
     TokenNode *currentNode = tokensWithDuplicates->head;
     int numTokens = 0;
 
+    summary->maxTokenChar = strlen(currentNode->tokenString);
+
     while(currentNode != NULL) {
         char *currentTokenStr = currentNode->tokenString;
 
@@ -60,6 +62,9 @@ void get_word_count(Summary *summary)
         } else {
             increment_token_frequency(tokensWithoutDuplicates, currentTokenStr);
         }
+
+        if(strlen(currentTokenStr) > summary->maxTokenChar)
+            summary->maxTokenChar = strlen(currentTokenStr);
 
         numTokens++;
         update_processing(numTokens, summary->tokenList->size);
@@ -86,6 +91,8 @@ void get_ngram_count(Summary *summary)
     TokenList *ngrams = remove_duplicate_tokens(rawNgrams);
     int numTokens = 0;
 
+    summary->maxTokenChar = strlen(ngrams->head->tokenString);    
+
     TokenNode *currentNode = rawNgrams->head;
     while(currentNode != NULL) {
         char *currentTokenStr = currentNode->tokenString;
@@ -95,6 +102,9 @@ void get_ngram_count(Summary *summary)
         } else {
             increment_token_frequency(ngrams, currentTokenStr);
         }
+
+        if(strlen(currentTokenStr) > summary->maxTokenChar)
+            summary->maxTokenChar = strlen(currentTokenStr);
 
         currentNode = currentNode->next;
 
@@ -212,7 +222,7 @@ void report_token_frequency(Summary *summary)
     int numChar = 0;
 
     while(tokenNode != NULL) {
-        sprintf(buff, "%10s % 5d\n", tokenNode->tokenString, tokenNode->frequency);
+        sprintf(buff, "%-*s\t% 5d\n", summary->maxTokenChar * 3 / 4, tokenNode->tokenString, tokenNode->frequency);
         buff[strlen(buff)] = '\0';
 
         runningTotal += strlen(buff);

@@ -491,10 +491,32 @@ void print_token_frequency(Summary *summary)
     
     CLEAR();
     MOVE(1, 1);
+    
+    FMT(CYAN_FG);
+    FMT(BOLD); 
+    FMT(DIM); 
+    fprintf(stdout, "%-*s", summary->maxTokenChar * 3 / 4, "Token");
 
+    FMT(RESET_COLOR);
+    FMT(BOLD); 
+    FMT(DIM); 
+    fprintf(stdout, "%s\n", "  Frequency");
+    FMT(RESET_COLOR);
     while(flag != EOF) {
-        if(linesRead < 10)
-            fprintf(stdout, "%s\n", buff);
+        if(linesRead < 10) {
+            char temp[MAX_CHAR] = "";
+            strcpy(temp, buff);
+
+            char *token = strtok(temp, "\t");
+            char *freq = strtok(NULL, "\t");
+
+            FMT(CYAN_FG);
+            FMT(BOLD); 
+            fprintf(stdout, "%s", token);
+
+            FMT(RESET_COLOR);
+            fprintf(stdout, "%s\n", freq);
+        }
         
         fprintf(outfile , "%s\n", buff);
         

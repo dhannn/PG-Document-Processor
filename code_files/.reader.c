@@ -19,8 +19,10 @@
 #define NOT_METADATA -1
 
 #define CLEAN_CONTENT_START_SIGNIFIER "*** START"
+#define CLEAN_CONTENT_ALT_START_SIGNIFIER "***START"
 #define ANALYZE_CONTENT_START_SIGNIFIER "Content"
 #define CONTENT_END_SIGNIFIER "*** END"
+#define CONTENT_END_ALT_SIGNIFIER "***END"
 
 /* -------------------------------------------------------------------------- */
 /*                         PRIVATE FUNCTION PROTOTYPES                        */
@@ -206,13 +208,24 @@ char *__get_starting_token(ModeIndex mode)
     return ANALYZE_CONTENT_START_SIGNIFIER;
 }
 
+char *__get_alt_starting_token(ModeIndex mode)
+{
+    return CLEAN_CONTENT_ALT_START_SIGNIFIER;
+}
+
 bool __check_if_content_start(char buff[], ModeIndex mode)
 {
     char *startingToken = __get_starting_token(mode);
     int len = strlen(startingToken);
     buff[len] = '\0';
 
-    return strcmp(startingToken, buff) == 0;
+    bool flag = strcmp(startingToken, buff) == 0;
+
+    if(!flag && mode == CLEAN) {
+        flag = strcmp(CLEAN_CONTENT_ALT_START_SIGNIFIER, buff) == 0;
+    }
+
+    return flag;
 }
 
 bool __check_if_max_char_reached(int numCharRead, int numCharMax)
@@ -226,10 +239,11 @@ bool __check_if_content_end(char buff[], char prev[])
     strcpy(temp, prev);
     strcat(temp, buff);
 
-    char *startingToken = CONTENT_END_SIGNIFIER;
-    int len = strlen(startingToken);
+    char *endingToken = CONTENT_END_SIGNIFIER;
+    char *altEndingToken = CONTENT_END_SIGNIFIER;
+    int len = strlen(endingToken);
     temp[len] = '\0';
 
-    return strcmp(startingToken, temp) == 0;
+    return strcmp(endingToken, temp) == 0;
 }
 

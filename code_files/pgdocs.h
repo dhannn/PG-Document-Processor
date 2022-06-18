@@ -121,17 +121,24 @@ typedef struct {
 
 struct _summary {
     Mode mode;                  // processing mode (i.e. clean or analyze)
+    unsigned int option;        // chosen option for cleaning or analysis
+    
     char infilename[MAX_CHAR];
     FILE *infile;               // file pointer to input 
     FILE **corpus;              // array of file pointers to the files
     FILE *outfile;              // file pointer to output
-    unsigned int option;        // chosen option for cleaning or analysis
+    
     MetadataItem metadata[MAX_METADATA];    // info about the document
+    
     char *inData;               // string of data to be processed
     char **corpusData;          // string of data of the corpus
+    
     TokenList *tokenList;       // tokenized version of the input
     TokenList **corpusTokens;   // tokenized version of the corpus
+    
     char *outData;              // string of data to be reported
+    
+    int maxTokenChar;
     AdditionalOptions addOpts;  // additional options
 };
 
