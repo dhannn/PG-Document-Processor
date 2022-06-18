@@ -3,4 +3,4 @@ Author: Edward S. Ellis
 Release Date: April 7, 2013 [EBook #42474]
 Language: English
 Content:
-mining it of textual data, which normally exists in many types of collections
+mining it of textual data, which, normally exists in many types of collections
