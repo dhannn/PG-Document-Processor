@@ -4,7 +4,7 @@ CFLAGS=-g -std=c99
 EXEC=.exe
 
 # Directories
-SRC_DIR=src
+SRC_DIR=code_files
 
 BIN_DIR=bin
 BIN=$(BIN_DIR)/pg_doc_processor$(EXEC)
