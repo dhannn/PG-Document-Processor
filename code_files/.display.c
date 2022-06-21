@@ -495,7 +495,7 @@ void print_token_frequency(Summary *summary)
     FMT(CYAN_FG);
     FMT(BOLD); 
     FMT(DIM); 
-    fprintf(stdout, "%-*s", summary->maxTokenChar * 3 / 4, "Token");
+    fprintf(stdout, "%-*s", (int)(summary->maxTokenChar * 0.8), "Token");
 
     FMT(RESET_COLOR);
     FMT(BOLD); 
