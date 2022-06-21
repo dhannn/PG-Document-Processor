@@ -19,15 +19,12 @@ Language: English
 Character set encoding: UTF-8
 
 *** START OF THIS PROJECT GUTENBERG EBOOK 1000 MYTHOLOGICAL CHARACTERS ***
-Information retrieval (IR) in computing and information science is the process 
-of obtaining information system resources that are relevant to an information 
-need from a collection of those resources. Searches can be based on full-text or 
-other content-based indexing. Information retrieval is the science[1] of 
-searching for information in a document, searching for documents themselves, and 
-also searching for the metadata that describes data, and for databases of texts, 
-images or sounds.
 
-Automated information retrieval systems are used to reduce what has been called 
-information overload. An IR system is a software system that provides access to 
-books, journals and other documents; stores and manages those documents. Web 
-search engines are the most visible IR applications.
+Text mining, also known as text data mining, is the process of transforming unstructured text into a structured format to identify meaningful patterns and new insights. By applying advanced analytical techniques, such as Naïve Bayes, Support Vector Machines (SVM), and other deep learning algorithms, companies are able to explore and discover hidden relationships within their unstructured data.
+
+Text is a one of the most common data types within databases. Depending on the database, this data can be organized as:
+
+Structured data: This data is standardized into a tabular format with numerous rows and columns, making it easier to store and process for analysis and machine learning algorithms. Structured data can include inputs such as names, addresses, and phone numbers.
+Unstructured data: This data does not have a predefined data format. It can include text from sources, like social media or product reviews, or rich media formats like, video and audio files.
+Semi-structured data: As the name suggests, this data is a blend between structured and unstructured data formats. While it has some organization, it doesn’t have enough structure to meet the requirements of a relational database. Examples of semi-structured data include XML, JSON and HTML files.
+Since 80% of data in the world resides in an unstructured format, text mining is an extremely valuable practice within organizations. Text mining tools and natural language processing (NLP) techniques, like information extraction (PDF, 127.9 KB) (link reside outside of IBM), allow us to transform unstructured documents into a structured format to enable analysis and the generation of high-quality insights. This, in turn, improves the decision-making of organizations, leading to better business outcomes.

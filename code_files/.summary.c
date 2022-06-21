@@ -139,12 +139,19 @@ void initialize_summary(Summary *summary)
 {
     initialize_metadata(summary->metadata);
     summary->infile = NULL;
+    summary->compfile = NULL;
+
     summary->inData = NULL;
+    summary->compData = NULL;
+
     summary->tokenList = NULL;
+    summary->compTokens = NULL;
     summary->corpus = NULL;
+
     summary->corpusData = NULL;
     summary->corpusTokens = NULL;
     summary->outData = NULL;
+
     summary->outfile = NULL;
 }
 
@@ -211,15 +218,16 @@ void initialize_corpus(Summary *summary, Config config)
             strcat(tempName, entity->d_name);
 
             tempFile = fopen(tempName, "r");
+            if(tempFile != NULL) {
+                if(filesRead >= numFile) {
+                    numFile *= 4;
+                    corpus = realloc(corpus, sizeof(FILE*) * numFile);
+                }
 
-            if(filesRead >= numFile) {
-                numFile *= 4;
-                corpus = realloc(corpus, sizeof(FILE*) * numFile);
+                corpus[filesRead] = tempFile;
+                
+                filesRead++;
             }
-
-            corpus[filesRead] = tempFile;
-            
-            filesRead++;
         }
 
         entity = readdir(corpusDir);
@@ -284,6 +292,27 @@ void destroy_summary(Summary *summary)
     if(summary->infile != NULL) {
         fclose(summary->infile);
         summary->infile = NULL;
+    }
+
+    if(summary->compfile != NULL) {
+        fclose(summary->compfile);
+        summary->compfile = NULL;
+    }
+    
+    if(summary->compData != NULL) {
+        free(summary->compData);
+        summary->compData = NULL;
+    }
+    
+    if(summary->docsTokens != NULL) {
+        destroy_tokenList(summary->docsTokens);
+        summary->docsTokens = NULL;
+    }
+    
+    if(summary->compTokens != NULL) {
+        delete_token_strings(summary->compTokens);
+        destroy_tokenList(summary->compTokens);
+        summary->compTokens = NULL;
     }
 
     if(summary->corpus != NULL) {

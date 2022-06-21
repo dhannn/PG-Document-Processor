@@ -1,6 +1,6 @@
 # Compiler Information
 CC=gcc
-CFLAGS=-g -std=c99
+CFLAGS=-g -std=c99 -Wall
 EXEC=.exe
 
 # Directories

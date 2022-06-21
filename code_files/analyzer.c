@@ -201,6 +201,8 @@ void get_tfidf(Summary *summary)
     int size = tokenlist->size;
 
     while(currentNode != NULL) {
+        // the 0.5 normalizes the values
+        //https://nlp.stanford.edu/IR-book/html/htmledition/maximum-tf-normalization-1.html
         float tf = 0.5 + 0.5 * ((float)currentNode->frequency / (float)maxFreq);
         float idf = __get_idf(summary->corpusTokens, currentNode->tokenString);
 
@@ -259,9 +261,9 @@ void report_ngram_count(Summary *summary)
     int n = 0;
     while(tokenNode != NULL) {
         if(n < 10)
-            fprintf(stdout, "%s:\t\t% 5d\n", tokenNode->tokenString, tokenNode->frequency);
+            fprintf(stdout, "%-*s\t% 5d\n", summary->maxTokenChar * 3 / 4, tokenNode->tokenString, tokenNode->frequency);
 
-        fprintf(summary->outfile, "%s: % 5d\n", tokenNode->tokenString, tokenNode->frequency);
+        fprintf(summary->outfile, "%-*s\t% 5d\n", summary->maxTokenChar * 3 / 4, tokenNode->tokenString, tokenNode->frequency);
         
         tokenNode = next_token(list);
         n++;
@@ -307,7 +309,7 @@ void report_tfidf(Summary *summary)
     int numChar = 0;
 
     while(tokenNode != NULL) {
-        sprintf(buff, "%20s:\t% 5.2f\n", tokenNode->tokenString, tokenNode->tfidf);
+        sprintf(buff, "%-*s\t% 8.3f\n", summary->maxTokenChar * 3 / 4, tokenNode->tokenString, tokenNode->tfidf);
         buff[strlen(buff)] = '\0';
 
         runningTotal += strlen(buff);
@@ -465,8 +467,8 @@ void report_doc_similarity(Summary *summary)
 
         runningTotal += strlen(buff);
 
-        if(runningTotal > size) {
-            size *= 2;
+        if(runningTotal >= size) {
+            size *= 4;
             temp = realloc(temp, size);
         }
 

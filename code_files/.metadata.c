@@ -35,7 +35,7 @@ void initialize_metadata(MetadataItem metadataItems[])
 
 void set_metadata(MetadataItem items[], int metadataIndex, char *data)
 {
-    char *temp = malloc(strlen(data) + 1);
+    char *temp = calloc(strlen(data) + 1, 1);
     strcpy(temp, data);
     items[metadataIndex].data = temp;
 }

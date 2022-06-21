@@ -162,8 +162,7 @@ char *OPTION_NAMES[][MAX_OPTIONS] = {
     },
     {
         "tf-idf",
-        "Document similarity",
-        "Document clustering"
+        "Document similarity"
     },
     {""},
     {""},

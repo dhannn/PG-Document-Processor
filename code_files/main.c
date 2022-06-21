@@ -58,7 +58,6 @@ int main()
         
     } while(!check_if_exit(activeScreen.screens, &activeScreen));
 
-    
     destroy_summary(&summary);
 
     return 0;
