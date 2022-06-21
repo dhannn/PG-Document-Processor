@@ -1,3 +1,14 @@
-written resources may include websites , books 
-text mining tasks include text categorization , 
-, 
+text mining also referred text data mining similar text 
+text data mining similar text analytics process deriving high 
+deriving high quality information text involves discovery computer new 
+al differ different perspectives text mining information extraction data 
+knowledge discovery databases process text mining usually involves process 
+involves process structuring input text usually parsing along addition 
+interpretation output high quality text mining usually refers combination 
+relevance novelty interest typical text mining tasks include text 
+text mining tasks include text categorization text clustering concept 
+tasks include text categorization text clustering concept entity extraction 
+learning relations named entities text analysis involves information retrieval 
+overarching goal essentially turn text data analysis via application 
+document basic element starting text mining define document unit 
+unit 
