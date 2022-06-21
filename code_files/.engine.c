@@ -84,7 +84,7 @@ void __validate_keyword(ActiveScreen *active, Summary *summary);
  * @param       in                      user input to continue or not
  * @return      char value of valid input
  */
-int __get_continue(char in);
+void __get_continue(char in);
 
 
 
@@ -178,18 +178,32 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
     scanf(" %c", &in);
 
     if(in != 'Y' && in != 'y' && in != 'N' && in != 'N' && in != 'n') 
-        in = __get_continue(in);
+        __get_continue(in);
 
     while(in == 'Y' || in == 'y') {
         go_to_screen(active, summary, CLEAN_DOCUMENT_MENU);
+        choice = active->choice - 1;
         
         if(active->choice == active->current->numOptions) {
             destroy_summary(summary);
             return;
         } 
-        
+
+        // while the option is viewing help
+        while(active->choice == 7) {
+            set_option(summary, *config, choice);
+            load_help(active, summary, config);
+            choice = active->choice - 1;
+
+            if(active->choice == active->current->numOptions) {
+                destroy_summary(summary);
+                return;
+            } 
+        }
+
         set_option(summary, *config, choice);
-        restart_screen();
+        restart_screen();  
+
         execute_summary(summary);
 
         restart_screen();
@@ -197,7 +211,7 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
         scanf(" %c", &in);
 
         if(in != 'Y' && in != 'y' && in != 'N' && in != 'N' && in != 'n') 
-            in = __get_continue(in);
+            __get_continue(in);
     }
 
     go_to_screen(active, summary, ENTER_OUTPUT_FILE_MENU);
@@ -236,13 +250,13 @@ void do_concordance(ActiveScreen *active, Summary *summary, Config *config)
     int choice = active->choice - 1;
     set_option(summary, *config, choice);
 
-    go_to_screen(active, summary, ENTER_KEYWORD_MENU);
-    __validate_keyword (active, summary);
-    set_add_str(summary, active->strInput);
-
     go_to_screen(active, summary, ENTER_N_MENU);
     __validate_n(active, summary);
     set_add_int(summary, active->nInput); 
+
+    go_to_screen(active, summary, ENTER_KEYWORD_MENU);
+    __validate_keyword (active, summary);
+    set_add_str(summary, active->strInput);
 
     restart_screen();
     execute_summary(summary);
@@ -316,6 +330,8 @@ void load_help(ActiveScreen* active, Summary *summary, Config *config)
     }
 
     fclose(help);
+
+    go_to_screen(active, summary, active->current->index);
 }
 
 void return_screen(ActiveScreen* active, Summary *summary, Config *config)
@@ -413,13 +429,41 @@ void __validate_n (ActiveScreen *active, Summary *summary)
 
 void __validate_keyword(ActiveScreen *active, Summary *summary)
 {
-    while(!is_token_found(summary->tokenList, active->strInput)) {
-        display_error(ERR_INVALID_KEYWORD);
-        go_to_screen(active, summary, ENTER_KEYWORD_MENU);
-    }
+    int flag = 0;
+    int n = active->nInput;
+    TokenNode *currentNode, *endNode;
+
+    do {
+        currentNode = summary->tokenList->head;
+
+        if(is_token_found(summary->tokenList, active->strInput) && flag == 0) {
+            for(int i = 0; i < n && currentNode != NULL; i++)
+                currentNode = currentNode->next;
+
+            endNode = currentNode;
+
+            for(int i = 0; i < n  && endNode != NULL; i++)
+                endNode = endNode->next;
+
+            while(flag == 0 && endNode != NULL) {
+                if(strcmp(active->strInput, currentNode->tokenString) == 0 && endNode != NULL)
+                    flag = 1;
+
+                currentNode = currentNode->next;
+
+                if(endNode != NULL)
+                    endNode = endNode->next;
+            }
+        }
+
+        if(flag == 0) {
+            display_error(ERR_INVALID_KEYWORD);
+            go_to_screen(active, summary, ENTER_KEYWORD_MENU);
+        }
+    } while(flag == 0);
 }
 
-int __get_continue(char in)
+void __get_continue(char in)
 {
     while(in != 'Y' && in != 'y' && in != 'N' && in != 'N' && in != 'n') {
         CLEAR();

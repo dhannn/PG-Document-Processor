@@ -259,7 +259,6 @@ bool __check_if_content_end(char buff[], char prev[])
     strcat(temp, buff);
 
     char *endingToken = CONTENT_END_SIGNIFIER;
-    char *altEndingToken = CONTENT_END_SIGNIFIER;
     int len = strlen(endingToken);
     temp[len] = '\0';
 

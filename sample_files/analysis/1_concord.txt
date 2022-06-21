@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 text mining also referred text data mining similar text 
 text data mining similar text analytics process deriving high 
 deriving high quality information text involves discovery computer new 
@@ -12,3 +14,4 @@ learning relations named entities text analysis involves information retrieval
 overarching goal essentially turn text data analysis via application 
 document basic element starting text mining define document unit 
 unit 
+>>>>>>> a45e7881b7dc94cbfa5e1a9620076a093f4038d7
