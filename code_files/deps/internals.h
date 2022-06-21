@@ -138,6 +138,7 @@ void increment_token_frequency(TokenList *tokenList, char *token);
  */
 void destroy_tokenList(TokenList *tl);
 
+float get_tfidf_from_tokenstring(TokenList *tl, char *str);
 
 /* -------------------------------------------------------------------------- */
 /*                          FUNCTIONS FOR HASH TABLE                          */

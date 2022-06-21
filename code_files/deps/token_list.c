@@ -165,6 +165,20 @@ void destroy_tokenList(TokenList *tokenList)
     free(tokenList);
 }
 
+float get_tfidf_from_tokenstring(TokenList *tl, char *str)
+{
+    TokenNode *curr = tl->head;
+    
+    while(curr != NULL) {
+        if(strcmp(curr->tokenString, str) == 0)
+            return curr->tfidf;
+        
+        curr = curr->next;
+    }
+    
+    return (float)0;
+}
+
 /* -------------------------------------------------------------------------- */
 /*                              PRIVATE FUNCTIONS                             */
 /* -------------------------------------------------------------------------- */

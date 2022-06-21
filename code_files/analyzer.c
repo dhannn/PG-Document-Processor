@@ -196,12 +196,21 @@ void get_tfidf(Summary *summary)
     TokenNode *currentNode = tokenlist->head;
     
     float maxFreq = (float)currentNode->frequency;
+
+    int num = 0;
+    int size = tokenlist->size;
+
     while(currentNode != NULL) {
-        float tf = 0.5 + 0.5 * ((float)currentNode->frequency / maxFreq);
+        // the 0.5 normalizes the values
+        //https://nlp.stanford.edu/IR-book/html/htmledition/maximum-tf-normalization-1.html
+        float tf = 0.5 + 0.5 * ((float)currentNode->frequency / (float)maxFreq);
         float idf = __get_idf(summary->corpusTokens, currentNode->tokenString);
 
         currentNode->tfidf = tf * idf;
         currentNode = currentNode->next;
+        
+        num++;
+        update_processing(num, size);
     }
 
     sort_tokens_by_tfidf(summary->tokenList);
@@ -255,7 +264,7 @@ void report_ngram_count(Summary *summary)
         if(n < 10)
             fprintf(stdout, "%-*s\t% 5d\n", (int)(summary->maxTokenChar * 0.8), tokenNode->tokenString, tokenNode->frequency);
 
-        fprintf(summary->outfile, "%s: % 5d\n", tokenNode->tokenString, tokenNode->frequency);
+        fprintf(summary->outfile, "%-*s\t% 5d\n", (int)(summary->maxTokenChar * 0.8), tokenNode->tokenString, tokenNode->frequency);
         
         tokenNode = next_token(list);
         n++;
@@ -318,6 +327,157 @@ void report_tfidf(Summary *summary)
 		update_reporting(numChar, summary->tokenList->size);
 
         tokenNode = tokenNode->next;
+    }
+
+    summary->outData = temp;
+}
+
+TokenList *__mergeTokenlists(TokenList *a, TokenList *b)
+{
+    TokenList *merged = initialize_tokenlist();
+    TokenNode *currentMerged = NULL;
+
+    TokenNode *currNode = a->head;
+
+    while(currNode != NULL) {
+        add_token(merged, currNode->tokenString);
+
+        if(currentMerged == NULL)
+            currentMerged = merged->head;
+        
+
+        currentMerged->frequency = currNode->frequency;
+        currentMerged->tfidf = currNode->tfidf;
+        currentMerged->tokenType = currNode->tokenType;
+
+        currNode = currNode->next;
+        currentMerged = currentMerged->next;
+    }
+
+    currNode = b->head;
+    while(currNode != NULL) {
+        add_token(merged, currNode->tokenString);
+        currentMerged->frequency = currNode->frequency;
+        currentMerged->tfidf = currNode->tfidf;
+        currentMerged->tokenType = currNode->tokenType;
+
+        currNode = currNode->next;
+        currentMerged = currentMerged->next;
+    }
+
+    return merged;
+}
+
+void get_doc_similarity(Summary *summary)
+{
+    TokenList *firstTokens = summary->tokenList;
+    TokenList *secondTokens = summary->compTokens;
+    
+    Summary summaryA = {
+        .tokenList = firstTokens,
+        .corpusTokens = summary->corpusTokens
+    };
+    get_tfidf(&summaryA);
+
+    TokenNode *currentNode = summaryA.tokenList->head;
+    while(currentNode != NULL) {
+        currentNode->tfidf = get_tfidf_from_tokenstring(summaryA.tokenList, currentNode->tokenString);
+        currentNode = currentNode->next;
+    }
+
+    Summary summaryB = {
+        .tokenList = secondTokens,
+        .corpusTokens = summary->corpusTokens
+    };
+    get_tfidf(&summaryB);
+    
+    currentNode = summaryB.tokenList->head;
+    while(currentNode != NULL) {
+        currentNode->tfidf = get_tfidf_from_tokenstring(summaryB.tokenList, currentNode->tokenString);
+        currentNode = currentNode->next;
+    }
+
+    if(summaryA.maxTokenChar > summaryB.maxTokenChar) 
+        summary->maxTokenChar = summaryA.maxTokenChar;
+    else 
+        summary->maxTokenChar = summaryB.maxTokenChar;
+
+    TokenList *mergedTl = __mergeTokenlists(
+        summaryA.tokenList, 
+        summaryB.tokenList
+    );
+
+    TokenList *mergedNoDuplicates = remove_duplicate_tokens(mergedTl);
+    destroy_tokenList(mergedTl);
+    
+    TokenNode *curr = mergedNoDuplicates->head;
+    float dotProduct = 0;
+    float aBar = 0;
+    float bBar = 0;
+
+    int num = 0;
+    int size = mergedNoDuplicates->size;
+    while(curr != NULL) {
+        char *str = curr->tokenString;
+        float aTfidf = get_tfidf_from_tokenstring(summaryA.tokenList, str);
+        float bTfidf = get_tfidf_from_tokenstring(summaryB.tokenList, str);
+
+        dotProduct += aTfidf * bTfidf;
+        curr->tfidf = aTfidf * bTfidf;
+
+        aBar += aTfidf * aTfidf;
+        bBar += bTfidf * bTfidf;
+
+        num++;
+        update_processing(num, size);
+
+        curr = curr->next;
+    }
+
+    sort_tokens_by_tfidf(mergedNoDuplicates);
+
+    aBar = sqrtf(aBar);
+    bBar = sqrtf(bBar);
+
+    summary->similarity = dotProduct / (aBar * bBar);
+    summary->docsTokens = mergedNoDuplicates;
+    summary->tokenList = summaryA.tokenList;
+    summary->compTokens = summaryB.tokenList;
+}
+
+void report_doc_similarity(Summary *summary)
+{
+    int size = MAX_CHAR;
+    char *temp = calloc(size, 1);
+
+    TokenNode *curr = summary->docsTokens->head;
+    char buff[MAX_CHAR] = "";
+
+    TokenList *tokenA = summary->tokenList;
+    TokenList *tokenB = summary->compTokens;
+
+    int runningTotal = 0;
+    int num = 0;
+    int tokenlistSize = summary->tokenList->size;
+
+    while(curr != NULL) {
+        float aTfidf = get_tfidf_from_tokenstring(tokenA, curr->tokenString);
+        float bTfidf = get_tfidf_from_tokenstring(tokenB, curr->tokenString);
+
+        sprintf(buff, "%-*s\t% 8.3f\t% 8.3f\n", (int)(summary->maxTokenChar * 0.8), curr->tokenString, aTfidf, bTfidf); 
+
+        runningTotal += strlen(buff);
+
+        if(runningTotal >= size) {
+            size *= 4;
+            temp = realloc(temp, size);
+        }
+
+        num++;
+        update_reporting(num, tokenlistSize);
+
+        strcat(temp, buff);
+        curr = curr->next;
     }
 
     summary->outData = temp;

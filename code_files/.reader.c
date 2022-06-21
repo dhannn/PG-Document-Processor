@@ -83,12 +83,12 @@ void read_corpus(Summary *summary, Config config)
     FILE **corpus = summary->corpus;
     char **temp = malloc(sizeof(char*));
 
-    int i  = 0;
+    int i = 0;
     int aBeautifulVariableName = 1;
 
     char buff[MAX_CHAR] = "";
-    
-    for(i = 0; corpus[i] != NULL; i++) {
+
+    while(corpus[i] != NULL) {
         fscanf(corpus[i] , "%s", buff);
 
         while(!__check_if_content_start(strtok(buff, ":"), ANALYZE_MULTI)){
@@ -101,6 +101,8 @@ void read_corpus(Summary *summary, Config config)
         }
 
         read_content(corpus[i], &temp[i], maxChar);
+
+        i++;
     }
         
     if(i >= aBeautifulVariableName) {
@@ -111,6 +113,23 @@ void read_corpus(Summary *summary, Config config)
     temp[i] = NULL;
 
     summary->corpusData = temp;
+}
+
+void read_compfile(Summary *summary, Config config)
+{
+    int maxChar = config.numChar;
+    FILE *compfile = summary->compfile;
+    char buff[MAX_CHAR];
+    char *temp;
+
+    fscanf(compfile , "%s", buff);
+
+    while(!__check_if_content_start(strtok(buff, ":"), ANALYZE_MULTI)){
+        fscanf(compfile, "%s", buff);
+    }
+
+    read_content(compfile, &temp, maxChar);
+    summary->compData = temp;
 }
 
 void seek_metadata(FILE *file, MetadataItem items[])

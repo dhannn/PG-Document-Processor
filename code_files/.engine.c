@@ -258,7 +258,27 @@ void do_concordance(ActiveScreen *active, Summary *summary, Config *config)
 
 void do_doc_similarity(ActiveScreen *active, Summary *summary, Config *config) 
 {
-    return;   
+    int choice = active->choice - 1;
+    set_option(summary, *config, choice);
+
+    go_to_screen(active, summary, ENTER_INPUT_FILE_MENU);
+    __validate_file(active, summary, *config);
+    set_compfile(summary, *config, active->strInput);
+    
+    restart_screen();
+    read_compfile(summary, *config);
+    summary->compTokens = tokenize_string(summary->compData, false);
+
+    restart_screen();
+    execute_summary(summary);
+
+    __get_analyzer_outfile_name(active, summary);
+    set_outfile(summary, *config, active->strInput);
+
+    save_results(active, summary, config);
+    destroy_summary(summary);
+
+    go_to_screen(active, summary, MAIN_MENU);
 }
 
 void reset_config(ActiveScreen *active, Summary *summary, Config *config)
@@ -359,6 +379,13 @@ void __get_analyzer_outfile_name(ActiveScreen *active, Summary *summary)
     char *original = strtok(summary->infilename, ".");
     
     strcpy(filename, original);
+
+    if(strcmp(summary->mode.commands[option].name, "Document similarity") == 0) {
+        char *compfilename = strtok(summary->compfilename, ".");
+        strcat(filename, "_");
+        strcat(filename, compfilename);
+    }
+
     strcat(filename, "_");
     strcat(filename, suffix);
     strcat(filename, ".txt");
