@@ -13,6 +13,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #define MAX_WIDTH       85
 #define MAX_HEIGHT      35
@@ -533,16 +534,17 @@ void print_concordance(Summary *summary)
     char *results = summary->outData;
     int n = summary->addOpts.i[0];
 
-    int flag;
     int length = 0;
     int numWords = 0;
     int linesRead = 0;
     char buff[MAX_CHAR] = "";
+    int flag = sscanf(results + length, "%s", buff);
 
     MOVE(1, 1);
-    do {
-        flag = sscanf(results + length, "%s", buff);
-        numWords++;
+    
+    while(flag != EOF) {
+        if(isalnum(buff[0]))
+            numWords++;
 
         fprintf(outfile, "%s ", buff);
 
@@ -568,7 +570,8 @@ void print_concordance(Summary *summary)
         }
         
         length += strlen(buff) + 1;
-    } while(flag != EOF);
+        flag = sscanf(results + length, "%s", buff);
+    } 
 }
 
 void update_reading(int characters, int words)
@@ -696,7 +699,7 @@ void display_error(ErrorCode errorCode)
         "File not found",
         "Invalid choice",
         "Invalid value of N",
-        "Keyword not found in text",
+        "Invalid keyword",
         "Memory allocation failed. No memory left"
     };
 

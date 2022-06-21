@@ -250,13 +250,13 @@ void do_concordance(ActiveScreen *active, Summary *summary, Config *config)
     int choice = active->choice - 1;
     set_option(summary, *config, choice);
 
-    go_to_screen(active, summary, ENTER_KEYWORD_MENU);
-    __validate_keyword (active, summary);
-    set_add_str(summary, active->strInput);
-
     go_to_screen(active, summary, ENTER_N_MENU);
     __validate_n(active, summary);
     set_add_int(summary, active->nInput); 
+
+    go_to_screen(active, summary, ENTER_KEYWORD_MENU);
+    __validate_keyword (active, summary);
+    set_add_str(summary, active->strInput);
 
     restart_screen();
     execute_summary(summary);
@@ -402,10 +402,38 @@ void __validate_n (ActiveScreen *active, Summary *summary)
 
 void __validate_keyword(ActiveScreen *active, Summary *summary)
 {
-    while(!is_token_found(summary->tokenList, active->strInput)) {
-        display_error(ERR_INVALID_KEYWORD);
-        go_to_screen(active, summary, ENTER_KEYWORD_MENU);
-    }
+    int flag = 0;
+    int n = active->nInput;
+    TokenNode *currentNode, *endNode;
+
+    do {
+        currentNode = summary->tokenList->head;
+
+        if(is_token_found(summary->tokenList, active->strInput) && flag == 0) {
+            for(int i = 0; i < n && currentNode != NULL; i++)
+                currentNode = currentNode->next;
+
+            endNode = currentNode;
+
+            for(int i = 0; i < n  && endNode != NULL; i++)
+                endNode = endNode->next;
+
+            while(flag == 0 && endNode != NULL) {
+                if(strcmp(active->strInput, currentNode->tokenString) == 0 && endNode != NULL)
+                    flag = 1;
+
+                currentNode = currentNode->next;
+
+                if(endNode != NULL)
+                    endNode = endNode->next;
+            }
+        }
+
+        if(flag == 0) {
+            display_error(ERR_INVALID_KEYWORD);
+            go_to_screen(active, summary, ENTER_KEYWORD_MENU);
+        }
+    } while(flag == 0);
 }
 
 int __get_continue(char in)
