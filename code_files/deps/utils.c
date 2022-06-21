@@ -155,7 +155,7 @@ void sort_tokens_by_tfidf(TokenList *tl)
         swap(sortedNode, max);
         sortedNode = sortedNode->next;
     }
-}
+} 
 
 void swap(TokenNode *a, TokenNode *b)
 {
