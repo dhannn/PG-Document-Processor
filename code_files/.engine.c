@@ -84,7 +84,7 @@ void __validate_keyword(ActiveScreen *active, Summary *summary);
  * @param       in                      user input to continue or not
  * @return      char value of valid input
  */
-int __get_continue(char in);
+void __get_continue(char in);
 
 
 
@@ -178,7 +178,7 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
     scanf(" %c", &in);
 
     if(in != 'Y' && in != 'y' && in != 'N' && in != 'N' && in != 'n') 
-        in = __get_continue(in);
+        __get_continue(in);
 
     while(in == 'Y' || in == 'y') {
         go_to_screen(active, summary, CLEAN_DOCUMENT_MENU);
@@ -211,7 +211,7 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
         scanf(" %c", &in);
 
         if(in != 'Y' && in != 'y' && in != 'N' && in != 'N' && in != 'n') 
-            in = __get_continue(in);
+            __get_continue(in);
     }
 
     go_to_screen(active, summary, ENTER_OUTPUT_FILE_MENU);
@@ -436,7 +436,7 @@ void __validate_keyword(ActiveScreen *active, Summary *summary)
     } while(flag == 0);
 }
 
-int __get_continue(char in)
+void __get_continue(char in)
 {
     while(in != 'Y' && in != 'y' && in != 'N' && in != 'N' && in != 'n') {
         CLEAR();
