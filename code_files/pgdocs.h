@@ -124,18 +124,25 @@ struct _summary {
     unsigned int option;        // chosen option for cleaning or analysis
     
     char infilename[MAX_CHAR];
+    char compfilename[MAX_CHAR];// filename to be compared in document similarity
+
     FILE *infile;               // file pointer to input 
+    FILE *compfile;             // file to be compared in document similarity
     FILE **corpus;              // array of file pointers to the files
     FILE *outfile;              // file pointer to output
     
     MetadataItem metadata[MAX_METADATA];    // info about the document
     
     char *inData;               // string of data to be processed
+    char *compData;             // string of second doc data to be processed
     char **corpusData;          // string of data of the corpus
     
     TokenList *tokenList;       // tokenized version of the input
+    TokenList *compTokens;      // tokenized version of the other document input
+    TokenList *docsTokens;      // tokenized version of the merged documents
     TokenList **corpusTokens;   // tokenized version of the corpus
     
+    float similarity;           // output for document similarity
     char *outData;              // string of data to be reported
     
     int maxTokenChar;
@@ -315,6 +322,8 @@ void print_token_frequency(Summary *summary);
  */
 void print_concordance(Summary *summary);
 
+void print_doc_sim(Summary *summary);
+
 /* -------------------------------------------------------------------------- */
 /*                        SUMMARY.C FUNCTION PROTOTYPES                       */
 /* -------------------------------------------------------------------------- */
@@ -365,6 +374,8 @@ void set_option(Summary *summary, Config config, int rawInput);
  */
 void set_infile(Summary *summary, Config config, char *filename);
 
+void set_compfile(Summary *summary, Config config, char *filename);
+
 /**
  * set_outfile()
  * sets the output file and opens it
@@ -409,6 +420,7 @@ void read_file(Summary *summary, Config config);
 
 void initialize_corpus(Summary *summary, Config config);
 void read_corpus(Summary *summary, Config config);
+void read_compfile(Summary *summary, Config config);
 
 /**
  * seek_metadata()
@@ -686,6 +698,8 @@ void report_concordance(Summary *summary);
  * @param       Summary*            contains the necessary input for processing
  */
 void report_tfidf(Summary *summary);
+void get_doc_similarity(Summary *summary);
+void report_doc_similarity(Summary *summary);
 
 /**
  * report_concordance()

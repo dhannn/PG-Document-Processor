@@ -571,6 +571,75 @@ void print_concordance(Summary *summary)
     } while(flag != EOF);
 }
 
+void print_doc_sim(Summary *summary)
+{
+    FILE *outfile = summary->outfile;
+    char *results = summary->outData;
+    char buff[MAX_CHAR];
+    int len = 0;
+    int linesRead = 0;
+    int flag = sscanf(results + len, "%[^\n]\ns", buff);
+    
+    CLEAR();
+    MOVE(1, 1);
+    
+    fprintf(    
+        stdout, 
+        "Cosine similarity of %s and %s: ", 
+        summary->infilename,
+        summary->compfilename
+    );
+    fprintf(    
+        outfile, 
+        "Cosine similarity of %s and %s: ", 
+        summary->infilename,
+        summary->compfilename
+    );
+    FMT(BOLD); 
+    FMT(CYAN_FG);
+
+    fprintf(stdout, "%.2f\n\n", summary->similarity);
+    fprintf(outfile, "%.2f\n\n", summary->similarity);
+
+    FMT(RESET_COLOR);
+
+    FMT(CYAN_FG);
+    FMT(BOLD); 
+    FMT(DIM); 
+    fprintf(stdout, "%-*s", summary->maxTokenChar * 3 / 4, "Token");
+
+    FMT(RESET_COLOR);
+    FMT(BOLD); 
+    FMT(DIM); 
+    fprintf(stdout, "%s\n", "  Frequency");
+    FMT(RESET_COLOR);
+    while(flag != EOF) {
+        if(linesRead < 10) {
+            char temp[MAX_CHAR] = "";
+            strcpy(temp, buff);
+
+            char *token = strtok(temp, "\t");
+            char *freqA = strtok(NULL, "\t");
+            char *freqB = strtok(NULL, "\t");
+
+            FMT(CYAN_FG);
+            FMT(BOLD); 
+            fprintf(stdout, "%s", token);
+
+            FMT(RESET_COLOR);
+            fprintf(stdout, "%s", freqA);
+            fprintf(stdout, "%s\n", freqB);
+        }
+        
+        fprintf(outfile , "%s\n", buff);
+        
+        len += strlen(buff) + 1; // the "+ 1" accounts for the newline
+        linesRead++;
+        
+        flag = sscanf(results + len, "%[^\n]\ns", buff);
+    }
+}
+
 void update_reading(int characters, int words)
 {
     if(words % 1024 == 0) {

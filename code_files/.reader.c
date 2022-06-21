@@ -113,6 +113,23 @@ void read_corpus(Summary *summary, Config config)
     summary->corpusData = temp;
 }
 
+void read_compfile(Summary *summary, Config config)
+{
+    int maxChar = config.numChar;
+    FILE *compfile = summary->compfile;
+    char buff[MAX_CHAR];
+    char *temp;
+
+    fscanf(compfile , "%s", buff);
+
+    while(!__check_if_content_start(strtok(buff, ":"), ANALYZE_MULTI)){
+        fscanf(compfile, "%s", buff);
+    }
+
+    read_content(compfile, &temp, maxChar);
+    summary->compData = temp;
+}
+
 void seek_metadata(FILE *file, MetadataItem items[])
 {
     int flag = NOT_METADATA;
