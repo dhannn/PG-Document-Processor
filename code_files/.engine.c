@@ -182,14 +182,28 @@ void do_clean_options(ActiveScreen *active, Summary *summary, Config *config)
 
     while(in == 'Y' || in == 'y') {
         go_to_screen(active, summary, CLEAN_DOCUMENT_MENU);
+        choice = active->choice - 1;
         
         if(active->choice == active->current->numOptions) {
             destroy_summary(summary);
             return;
         } 
-        
+
+        // while the option is viewing help
+        while(active->choice == 7) {
+            set_option(summary, *config, choice);
+            load_help(active, summary, config);
+            choice = active->choice - 1;
+
+            if(active->choice == active->current->numOptions) {
+                destroy_summary(summary);
+                return;
+            } 
+        }
+
         set_option(summary, *config, choice);
-        restart_screen();
+        restart_screen();  
+
         execute_summary(summary);
 
         restart_screen();
@@ -296,6 +310,8 @@ void load_help(ActiveScreen* active, Summary *summary, Config *config)
     }
 
     fclose(help);
+
+    go_to_screen(active, summary, active->current->index);
 }
 
 void return_screen(ActiveScreen* active, Summary *summary, Config *config)
