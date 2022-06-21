@@ -124,18 +124,25 @@ struct _summary {
     unsigned int option;        // chosen option for cleaning or analysis
     
     char infilename[MAX_CHAR];
+    char compfilename[MAX_CHAR];// filename to be compared in document similarity
+
     FILE *infile;               // file pointer to input 
+    FILE *compfile;             // file to be compared in document similarity
     FILE **corpus;              // array of file pointers to the files
     FILE *outfile;              // file pointer to output
     
     MetadataItem metadata[MAX_METADATA];    // info about the document
     
     char *inData;               // string of data to be processed
+    char *compData;             // string of second doc data to be processed
     char **corpusData;          // string of data of the corpus
     
     TokenList *tokenList;       // tokenized version of the input
+    TokenList *compTokens;      // tokenized version of the other document input
+    TokenList *docsTokens;      // tokenized version of the merged documents
     TokenList **corpusTokens;   // tokenized version of the corpus
     
+    float similarity;           // output for document similarity
     char *outData;              // string of data to be reported
     
     int maxTokenChar;
@@ -190,6 +197,12 @@ void display_screen(ActiveScreen *active, Summary *summary);
  */
 void display_error(ErrorCode errorCode);
 
+/**
+ * restart_screen()
+ * clears screen and moves cursor to the start of the screen
+ * 
+ * @param       ErrorCode       the code pertaining to the error type
+ */
 void restart_screen();
 
 /* ----------------------------- Input Functions ---------------------------- */
@@ -315,11 +328,29 @@ void print_token_frequency(Summary *summary);
  */
 void print_concordance(Summary *summary);
 
+/**
+ * print_doc_sim()
+ * prints the outdata string showing document similarity to the file
+ * 
+ * @note        this function is an implementation of the interface, 
+ *              void (*print_results)(Summary*) found in the Command structure
+ * 
+ * 
+ * @param       Summary*        summary containing the output data
+ */
+void print_doc_sim(Summary *summary);
+
 /* -------------------------------------------------------------------------- */
 /*                        SUMMARY.C FUNCTION PROTOTYPES                       */
 /* -------------------------------------------------------------------------- */
 // encapsulates the request and the needed variables in one structure
 
+/**
+ * initialize_summary()
+ * initializes all summary variables to NULL
+ * 
+ * @param       Summary*        contains the necessary inputs for processing
+ */
 void initialize_summary(Summary *summary);
 
 /**
@@ -366,6 +397,16 @@ void set_option(Summary *summary, Config config, int rawInput);
 void set_infile(Summary *summary, Config config, char *filename);
 
 /**
+ * set_compfile()
+ * sets the 2nd input file for doc similarity and opens it
+ * 
+ * @param       Summary*        contains the necessary inputs for processing
+ * @param       Config          contains the paths for different modes
+ * @param       char*           filename of the input file
+ */
+void set_compfile(Summary *summary, Config config, char *filename);
+
+/**
  * set_outfile()
  * sets the output file and opens it
  * 
@@ -407,8 +448,35 @@ void set_add_int(Summary *summary, int addInt);
  */
 void read_file(Summary *summary, Config config);
 
+/**
+ * initialize_corpus()
+ * opens all files in corpus
+ * 
+ * @pre         infile element of the Summary struct is valid
+ * @param       Summary*            structure containing the necessary inputs
+ * @param       Config              structure containing the configurations
+ */
 void initialize_corpus(Summary *summary, Config config);
+
+/**
+ * read_corpus()
+ * reads all files in corpus
+ * 
+ * @pre         infile element of the Summary struct is valid
+ * @param       Summary*            structure containing the necessary inputs
+ * @param       Config              structure containing the configurations
+ */
 void read_corpus(Summary *summary, Config config);
+
+/**
+ * read_compfile()
+ * reads the content of the comp file
+ * 
+ * @pre         infile element of the Summary struct is valid
+ * @param       Summary*            structure containing the necessary inputs
+ * @param       Config              structure containing the configurations
+ */
+void read_compfile(Summary *summary, Config config);
 
 /**
  * seek_metadata()
@@ -655,13 +723,12 @@ void get_concordance(Summary *summary);
 void get_tfidf(Summary *summary);
 
 /**
- * get_document_similarity()
+ * get_doc_similarity()
  * calculates the similarity between two documents
  * 
  * @param       Summary*            contains the necessary input for processing
  */
-void get_document_similarity(Summary *summary);
-
+void get_doc_similarity(Summary *summary);
 
 /**
  * report_token_frequency()
@@ -680,7 +747,7 @@ void report_token_frequency(Summary *summary);
 void report_concordance(Summary *summary);
 
 /**
- * report_concordance()
+ * report_tfidf()
  * writes the tf-odf of each word to the outdata
  * 
  * @param       Summary*            contains the necessary input for processing
@@ -688,12 +755,13 @@ void report_concordance(Summary *summary);
 void report_tfidf(Summary *summary);
 
 /**
- * report_concordance()
- * writes the similarity of two documents to outdata
+ * report_doc_similarity()
+ * writes the document similarity of two chosen documents word by word to the outdata
  * 
  * @param       Summary*            contains the necessary input for processing
  */
-void report_document_similarity(Summary *summary);
+void report_doc_similarity(Summary *summary);
+
 
 /* -------------------------------------------------------------------------- */
 /*                        ENGINE.C FUNCTION PROTOTYPES                        */

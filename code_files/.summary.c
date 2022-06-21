@@ -122,9 +122,10 @@ Mode MODES[] = {
             },
             {
                 .name = "Document similarity",
-                // .execute_command = get_document_similarity,
-                // .report_results = report_document_similarity,
-                .fileSuffix = "",
+                .execute_command = get_doc_similarity,
+                .report_results = report_doc_similarity,
+                .print_results = print_doc_sim,
+                .fileSuffix = "sim",
                 .usedAddInt = 0,
                 .usedAddStr = 0,
             }
@@ -164,7 +165,21 @@ void set_infile(Summary *summary, Config config, char *filename)
     strcat(completeFilename, "/");
     strcat(completeFilename, filename);
     summary->infile = fopen(completeFilename, "r");
+    
     strcpy(summary->infilename, filename);
+}
+
+void set_compfile(Summary *summary, Config config, char *filename)
+{
+    char completeFilename[MAX_CHAR];
+    
+    strcpy(completeFilename, config.cleanedDocumentPath);
+
+    strcat(completeFilename, "/");
+    strcat(completeFilename, filename);
+    summary->compfile = fopen(completeFilename, "r");
+    
+    strcpy(summary->compfilename, filename);
 }
 
 bool __check_if_txt_file(char *filename)
